@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Registrasi Akun - PPM Nurul Hakim</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/styles.css"/>
+  <link rel="stylesheet" href="/form.css"/>
+  <%- include('partials/notify') %>
+</head>
+<body class="form-page layout-form">
+
+<header class="navbar">
+  <div class="container nav-inner">
+    <div class="brand-wrap">
+      <a href="/" class="btn-back-inline" aria-label="Kembali">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <div class="brand">Registrasi Akun</div>
+    </div>
+  </div>
+</header>
+
+<main class="form-wrap">
+  <div class="form-card">
+    <h2 class="form-title">Buat Akun Baru</h2>
+    <p class="lead" style="margin-bottom:20px; text-align:center;">Lengkapi data awal untuk mendapatkan akses pendaftaran.</p>
+    
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="notify notify-error">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <%= error %>
+      </div>
+    <% } %>
+
+    <form action="/register" method="POST" id="registerForm" onsubmit="return validateForm()">
+      <div class="grid-12">
+        <div class="col-12"><label class="label">Nama Lengkap</label><input class="input" name="nama" id="nama" required></div>
+        <div class="col-12"><label class="label">Email Aktif</label><input type="email" class="input" name="email" id="email" required></div>
+        <div class="col-6"><label class="label">Password</label><input type="password" class="input" name="password" id="password" minlength="6" required></div>
+        <div class="col-6"><label class="label">No WhatsApp</label><input class="input" name="wa" id="wa" placeholder="08..." required></div>
+
+        <div class="col-12"><div class="divider"></div><h3 class="sec-title">Asal Majlis Taklim</h3></div>
+        
+        <div class="col-4"><label class="label">Kelompok</label><input class="input" name="kelompok" id="kelompok" required></div>
+        <div class="col-4"><label class="label">Desa</label><input class="input" name="desa" id="desa" required></div>
+        <div class="col-4"><label class="label">Daerah</label><input class="input" name="daerah" id="daerah" required></div>
+
+        <!-- Validation Warning -->
+        <div class="col-12">
+          <div id="formWarning" class="notify notify-error" style="display:none; margin-bottom: 16px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span id="warningText"></span>
+          </div>
+        </div>
+
+        <div class="col-12 actions">
+          <a href="/" class="btn-ghost">Batal</a>
+          <button class="btn-nav" type="submit">Daftar Sekarang</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container"><p>© <%= new Date().getFullYear() %> PPM Nurul Hakim</p></div>
+</footer>
+
+<button id="themeFab" class="theme-fab" aria-label="Ganti tema" title="Ganti tema"></button>
+
+<script>
+  const root = document.documentElement;
+
+  function setIcon(theme){
+    const sun = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.76 4.84l-1.8-1.79L3.5 4.5l1.79 1.79 1.47-1.45zM1 13h3v-2H1v2zm10-9h2V1h-2v3zm7.24.84L18.5 4.5l-1.46 1.47 1.79 1.79 1.41-1.41zM20 13h3v-2h-3v2zm-7 7h2v-3h-2v3zm5.74-2.16l1.79 1.79 1.41-1.41-1.79-1.79-1.41 1.41zM4.5 18.5l1.79-1.79-1.41-1.41-1.79 1.79 1.41 1.41zM12 6a6 6 0 1 1 0 12 6 6 0 0 1 0-12z"></path></svg>';
+    const moon = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+    
+    const fab = document.getElementById('themeFab');
+    if(fab) fab.innerHTML = (theme === 'light') ? moon : sun;
+  }
+
+  function applyTheme(theme){
+    if(theme === 'light'){ 
+      root.setAttribute('data-theme','light'); 
+    } else { 
+      root.removeAttribute('data-theme'); 
+    }
+    localStorage.setItem('theme', theme);
+    setIcon(theme);
+    
+    const fab = document.getElementById('themeFab');
+    if(fab){ 
+      fab.classList.add('spin'); 
+      setTimeout(()=>fab.classList.remove('spin'), 400); 
+    }
+  }
+
+  // Inisialisasi Tema saat halaman dimuat
+  (function initTheme(){
+    const saved = localStorage.getItem('theme');
+    if(saved){ 
+      applyTheme(saved); 
+    } else {
+      const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+      applyTheme(prefersLight ? 'light' : 'dark');
+    }
+
+    // Event Listener Klik Tombol
+    document.getElementById('themeFab')?.addEventListener('click', ()=>{
+      const isLight = root.getAttribute('data-theme') === 'light';
+      applyTheme(isLight ? 'dark' : 'light');
+    });
+  })();
+
+  // Form Validation
+  function showWarning(message) {
+    const warning = document.getElementById('formWarning');
+    const text = document.getElementById('warningText');
+    if (warning && text) {
+      text.textContent = message;
+      warning.style.display = 'flex';
+      warning.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  function hideWarning() {
+    const warning = document.getElementById('formWarning');
+    if (warning) warning.style.display = 'none';
+  }
+
+  function validateForm() {
+    hideWarning();
+    
+    const fields = [
+      { id: 'nama', label: 'Nama Lengkap' },
+      { id: 'email', label: 'Email' },
+      { id: 'password', label: 'Password' },
+      { id: 'wa', label: 'No WhatsApp' },
+      { id: 'kelompok', label: 'Kelompok' },
+      { id: 'desa', label: 'Desa' },
+      { id: 'daerah', label: 'Daerah' }
+    ];
+
+    // Check empty fields
+    for (const field of fields) {
+      const input = document.getElementById(field.id);
+      if (!input || !input.value.trim()) {
+        showWarning(`${field.label} harus diisi.`);
+        input?.focus();
+        return false;
+      }
+    }
+
+    // Validate email format
+    const email = document.getElementById('email').value;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+      showWarning('Format email tidak valid. Contoh: nama@email.com');
+      document.getElementById('email').focus();
+      return false;
+    }
+
+    // Validate password length
+    const password = document.getElementById('password').value;
+    if (password.length < 6) {
+      showWarning('Password minimal 6 karakter.');
+      document.getElementById('password').focus();
+      return false;
+    }
+
+    // Validate WhatsApp format
+    const wa = document.getElementById('wa').value;
+    if (!/^0[0-9]{9,13}$/.test(wa)) {
+      showWarning('No WhatsApp harus diawali 0 dan berisi 10-14 digit angka.');
+      document.getElementById('wa').focus();
+      return false;
+    }
+
+    return true;
+  }
+</script>
+
+</body>
+</html>
+

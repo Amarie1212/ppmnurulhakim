@@ -1,0 +1,561 @@
+/* ========================================= */
+/* 1. THEME & RESET (IDENTIK DENGAN DUTY)    */
+/* ========================================= */
+:root {
+  /* Master Palette - Emerald & Zinc (Premium Dark) */
+  --bg: #09090b;       /* Rich Black */
+  --bg-2: #18181b;     /* Card/Surface */
+  --bg-3: #27272a;     /* Hover/Active Surface */
+  --text: #f4f4f5;     /* Near White */
+  --muted: #94a3b8;    /* Slate 400 */
+  --accent: #10b981;   /* Emerald 500 */
+  --accent-hover: #059669; /* Emerald 600 */
+  --danger: #ef4444;   /* Red 500 */
+  --border: rgba(255, 255, 255, 0.1);
+  --input-bg: rgba(0, 0, 0, 0.3);
+  --input-border: rgba(255, 255, 255, 0.1);
+  --nav-h: 72px;
+  --dot-color: rgba(255, 255, 255, 0.03);
+  
+  /* Radii & Shadows */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 10px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+:root[data-theme="light"] {
+  --bg: #f8fafc;       
+  --bg-2: #ffffff;     
+  --bg-3: #f1f5f9;
+  --text: #0f172a;     
+  --muted: #64748b;
+  --accent: #10b981;
+  --accent-hover: #059669;
+  --border: rgba(15, 23, 42, 0.08);
+  --input-bg: #f1f5f9;
+  --input-border: rgba(15, 23, 42, 0.08);
+  --dot-color: rgba(15, 23, 42, 0.03);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { 
+  scroll-behavior: smooth; 
+  overflow-x: hidden;
+}
+html, body { 
+  max-width: 100vw; 
+  /* Ensure vertical scrollbar is always accounted for or visible */
+  overflow-y: auto;
+}
+
+/* --- Reveal Animations (Intersection Observer compatible) --- */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), 
+              transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform, opacity;
+}
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.stagger-1 { transition-delay: 0.1s; }
+.stagger-2 { transition-delay: 0.2s; }
+.stagger-3 { transition-delay: 0.3s; }
+
+/* --- Base Body & Typography Refresh --- */
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-attachment: fixed;
+  transition: background 0.4s ease, color 0.4s ease;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Lock body scroll when modal open, keep scrollbar visible */
+body.modal-open {
+  position: fixed;
+  left: 0;
+  right: 0;
+  overflow-y: scroll; /* Force scrollbar to stay */
+}
+
+a { color: inherit; text-decoration: none; }
+.container { width: min(1600px, 96%); margin: 0 auto; }
+.no-scroll { overflow: hidden; }
+
+/* ========================================= */
+/* 2. GLOBAL COMPONENTS (Buttons, Cards, etc) */
+/* ========================================= */
+
+/* --- Buttons --- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 20px; border-radius: var(--radius-md);
+  font-weight: 700; font-size: 0.95rem; cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent; text-decoration: none;
+  font-family: inherit;
+}
+.btn:active { transform: scale(0.97); }
+
+.btn-primary { 
+  background: var(--accent); color: #09090b; 
+}
+.btn-primary:hover { 
+  background: var(--accent-hover); 
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+}
+
+.btn-outline { 
+  background: transparent; color: var(--text); border-color: var(--border); 
+}
+.btn-outline:hover { 
+  background: rgba(255, 255, 255, 0.05); border-color: var(--muted);
+}
+
+.btn-accent-outline {
+  background: rgba(16, 185, 129, 0.05); color: var(--accent); border-color: rgba(16, 185, 129, 0.2);
+}
+.btn-accent-outline:hover {
+  background: var(--accent); color: #09090b;
+}
+
+.btn-ghost {
+  background: transparent; color: var(--muted); padding: 8px 12px;
+}
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.05); color: var(--text);
+}
+
+/* --- Cards --- */
+.card {
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 24px;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-md);
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+/* --- Navbar (Refined) --- */
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  background: var(--bg-2); /* Solid Background */
+  border-bottom: 1px solid var(--border);
+  height: var(--nav-h);
+  display: flex; align-items: center;
+  transition: all .3s ease;
+}
+:root[data-theme="light"] .navbar { background: var(--bg-2); }
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%; height: 100%; padding: 0 24px;
+}
+@media (max-width: 768px) { 
+  .nav-inner { 
+    padding: 0 16px; 
+  } 
+}
+
+.brand-wrap { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.brand { font-weight: 800; letter-spacing: -0.02em; font-size: 1.15rem; }
+
+.menu {
+  display: flex; align-items: center; gap: 32px;
+  margin-left: auto; /* Push menu to the right */
+  margin-right: 32px; /* Gap before buttons */
+}
+.menu a {
+  font-weight: 600; color: var(--muted); font-size: 0.95rem; transition: 0.2s; white-space: nowrap;
+}
+.menu a:hover, .menu a.active { color: var(--accent); }
+
+.right-actions { display: flex; align-items: center; gap: 12px; justify-content: flex-end; }
+
+
+/* Tombol Khusus Mobile (Hidden di Desktop) */
+.mobile-action-btn {
+  display: none; 
+}
+
+/* CTA Button (Daftar) */
+.cta-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--accent); font-weight: 700;
+  padding: 8px 16px; border-radius: var(--radius-md);
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  transition: all 0.2s;
+}
+.cta-btn:hover { background: var(--accent); color: #fff; }
+.cta-btn svg { width: 18px; height: 18px; stroke-width: 2.5; }
+
+/* Login Button / Admin Panel Button */
+.btn-nav {
+  background: transparent; color: var(--text); font-weight: 700;
+  padding: 8px 16px; border-radius: var(--radius-md);
+  border: 1px solid var(--border); cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: .2s;
+}
+.btn-nav:hover { background: rgba(125,125,125,0.08); border-color: var(--muted); }
+.btn-nav svg { width: 18px; height: 18px; }
+
+/* ========================================= */
+/* 3. NAV TOGGLE / HAMBURGER                 */
+/* ========================================= */
+.nav-toggle {
+  display: flex; /* Visible for logged-in panel toggles */
+  flex-direction: column; justify-content: center; align-items: center; gap: 5px;
+  width: 42px; height: 42px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  cursor: pointer; padding: 0;
+  color: var(--text);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@media (min-width: 769px) {
+  /* Guest experience: no hamburger on desktop if not logged in */
+  .navbar:not(.logged-in) .nav-toggle { display: none; }
+}
+.nav-toggle:hover { background: rgba(125,125,125,0.08); transform: scale(1.05); }
+
+.nav-toggle .bar {
+  width: 18px; height: 2px; background-color: currentColor; border-radius: 2px;
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+/* State Active (X) */
+.nav-toggle.active {
+  border-color: var(--accent);
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--accent);
+  transform: rotate(90deg);
+}
+.nav-toggle.active .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); width: 20px; }
+.nav-toggle.active .bar:nth-child(2) { opacity: 0; }
+.nav-toggle.active .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); width: 20px; }
+
+/* Dot Button (Admin Mobile) */
+.icon-btn.dots {
+  width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; border: 1px solid var(--border); background: transparent;
+  color: var(--text); cursor: pointer;
+}
+.icon-btn.dots .dot { 
+  width: 4px; height: 4px; background: currentColor; border-radius: 50%; margin: 0 2px; 
+}
+.icon-btn.dots:hover, .icon-btn.dots.active { border-color: var(--accent); color: var(--accent); background: rgba(34,197,94,0.1); }
+
+
+/* ========================================= */
+/* 4. SIDEBAR & DROPDOWN                     */
+/* ========================================= */
+
+/* --- Mobile Dropdown / Popup --- */
+.admin-dd {
+  position: fixed; 
+  top: calc(var(--nav-h) + 16px); 
+  right: 16px; 
+  z-index: 1006;
+  width: 260px;
+  background: var(--bg-2);
+  border: 1px solid var(--border); 
+  border-radius: var(--radius-lg); 
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  
+  display: block; /* Show/Hide dikontrol JS via hidden/opacity */
+  transform-origin: top right; 
+  transform: scale(0.9) translateY(-10px); 
+  opacity: 0; visibility: hidden;
+  transition: transform .2s cubic-bezier(0.16, 1, 0.3, 1), opacity .2s, visibility .2s;
+}
+
+.admin-dd.open { 
+  transform: scale(1) translateY(0); 
+  opacity: 1; visibility: visible;
+}
+
+.admin-dd-head { padding: 16px; border-bottom: 1px solid var(--border); background: rgba(125,125,125,0.02); }
+.admin-dd-title { font-weight: 800; font-size: 1rem; }
+.admin-dd-sub { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
+
+.admin-dd-item { 
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px; color: var(--text); 
+  border-bottom: 1px solid var(--border); 
+  transition: background .2s; font-size: 0.95rem; font-weight: 500;
+}
+.admin-dd-item:hover { background: rgba(125, 125, 125, 0.05); }
+
+/* Item Logout Merah di Popup */
+.admin-dd-item.danger { 
+  color: var(--danger); 
+  border-bottom: none; 
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+.admin-dd-item.danger:hover { background: rgba(239, 68, 68, 0.1); }
+
+/* Backdrop (Scrim) */
+.admin-dd-scrim, .panel-scrim {
+  position: fixed; inset: 0; 
+  background: rgba(0, 0, 0, 0.5); /* No Blur */
+  z-index: 1005;
+  opacity: 0; visibility: hidden; transition: .2s;
+}
+.admin-dd-scrim.open, .panel-scrim.open { opacity: 1; visibility: visible; }
+
+
+/* --- Desktop Sidebar (Panel) --- */
+.panel-pengurus {
+  position: fixed; top: 0; right: 0; bottom: 0; width: 300px;
+  background: var(--bg-2); border-left: 1px solid var(--border);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
+  transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1007; display: flex; flex-direction: column;
+}
+.panel-pengurus.open { transform: translateX(0); }
+
+.panel-head { display: flex; align-items: center; justify-content: space-between; padding: 20px; border-bottom: 1px solid var(--border); }
+.panel-title { font-weight: 800; font-size: 1.1rem; }
+.panel-sub { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+.panel-close { border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--text); width: 32px; height: 32px; cursor: pointer; display:grid; place-items:center; }
+
+.panel-body { flex: 1; overflow-y: auto; }
+.panel-link { display: block; padding: 14px 24px; color: var(--text); border-bottom: 1px solid var(--border); transition: background .2s; }
+.panel-link:hover { background: rgba(125, 125, 125, 0.05); }
+
+/* Payment status classes */
+.panel-link.payment-warning, .admin-dd-item.payment-warning { 
+  color: #ef4444 !important; 
+  font-weight: 700;
+}
+.panel-link.payment-pending, .admin-dd-item.payment-pending { 
+  color: #f59e0b !important; 
+  font-weight: 700;
+}
+
+/* Logout Button (Outline Merah di Sidebar Desktop) */
+.logout-btn { 
+  display: flex; align-items: center; justify-content: center; gap: 8px; 
+  width: 100%; padding: 12px; border-radius: var(--radius-md); 
+  border: 1px solid var(--danger); color: var(--danger); 
+  font-weight: 700; transition: .2s; background: transparent; 
+  text-decoration: none; margin-top: 10px;
+}
+.logout-btn:hover { background: var(--danger); color: white; }
+.panel-footer { padding: 20px; border-top: 1px solid var(--border); }
+
+
+/* ========================================= */
+/* 5. LANDING PAGE SECTIONS                  */
+/* ========================================= */
+.hero {
+  position: relative; width: 100%; height: 75vh; min-height: 500px;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center; color: #fff;
+  background-size: cover; background-position: center;
+  background-color: #000; background-image: var(--hero);
+}
+.hero::before { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.6); z-index: 1; }
+.hero-content { 
+  position: relative; z-index: 2; 
+  width: 100%; max-width: 900px; 
+  padding: 0 24px; text-align: center;
+}
+.hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; margin-bottom: 12px; line-height: 1.2; }
+.hero p { color: #d1d5db; font-size: 1.2rem; max-width: 700px; margin: 0 auto; }
+
+.section { padding: 80px 0; }
+.section.alt { background: var(--bg-2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.section h2 { text-align: center; margin-bottom: 20px; font-weight: 800; font-size: 2rem; }
+.lead { max-width: 800px; margin: 0 auto 40px; color: var(--muted); text-align: center; }
+
+/* Grid Cards */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+.card { 
+  background: var(--bg-2); border: 1px solid var(--border); 
+  border-radius: var(--radius-lg); padding: 24px; 
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); 
+  display: flex; flex-direction: column; height: 100%;
+}
+/* .card:hover disabled */
+.card h3 { margin-bottom: 10px; font-weight: 700; }
+.card p, .card ul { color: var(--muted); padding-left: 20px; }
+
+/* Gallery */
+.gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+.gallery img { 
+  width: 100%; height: 240px; object-fit: cover; 
+  border-radius: 12px; border: 1px solid var(--border);
+}
+
+.footer { padding: 40px 0; text-align: center; color: var(--muted); border-top: 1px solid var(--border); font-size: 0.9rem; }
+
+
+/* ========================================= */
+/* 6. MODAL & FAB                            */
+/* ========================================= */
+.modal[hidden] { display: none !important; }
+.modal { position: fixed; inset: 0; display: grid; place-items: center; z-index: 1100; animation: fadeIn .2s ease; }
+.modal-card { 
+  width: min(400px, 92%); background: var(--bg-2); 
+  border: 1px solid var(--border); border-radius: var(--radius-lg); 
+  padding: 30px; box-shadow: 0 24px 60px rgba(0,0,0,0.35); 
+}
+.scrim { position: fixed; inset: 0; z-index: 1050; background: rgba(0,0,0,0.7); }
+
+.theme-fab { 
+  position: fixed; left: 24px; bottom: 24px; width: 48px; height: 48px; 
+  display: grid; place-items: center; border-radius: 50%; 
+  border: 1px solid var(--border); background: var(--bg-2); 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer; z-index: 1100; transition: transform .2s; 
+}
+.theme-fab:hover { transform: translateY(-3px); }
+.theme-fab .icon { width: 22px; height: 22px; fill: var(--text); }
+
+
+/* ========================================= */
+/* 7. RESPONSIVE LOGIC (MOBILE)              */
+/* ========================================= */
+@media (max-width: 768px) {
+  :root { --nav-h: 64px; }
+  .nav-inner { padding: 0 16px; }
+  
+  /* 1. SEMBUNYIKAN MENU TENGAH (Beranda, Profil, dll) */
+  .menu { display: none; }
+
+  /* 2. SEMBUNYIKAN TOMBOL LOGIN/DAFTAR DI HEADER */
+  /* Agar header bersih, tombol ini pindah ke dalam menu hamburger */
+  .right-actions .cta-btn, 
+  .right-actions .btn-nav {
+    display: none !important; 
+  }
+  
+  /* 3. MUNCULKAN HAMBURGER MENU */
+  .nav-toggle { display: flex !important; } 
+  .nav-toggle.desktop-only { display: none !important; }
+  
+  /* --- STYLING MOBILE MENU (DRAWER) --- */
+  .mobile-menu {
+    display: flex !important; flex-direction: column;
+    position: fixed; top: var(--nav-h); left: 0; right: 0;
+    background: var(--bg-2); /* Solid Background */
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px; gap: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    z-index: 999;
+    
+    transform: translateY(-20px);
+    opacity: 0; visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .mobile-menu.open { 
+    transform: translateY(0); 
+    opacity: 1; visibility: visible;
+  }
+
+  /* Link Menu Biasa di Mobile */
+  .mobile-menu a:not(.mobile-btn) {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  /* --- PERBAIKAN TOMBOL MASUK & DAFTAR DI DALAM MENU MOBILE --- */
+  .mobile-auth-buttons {
+    display: grid; 
+    grid-template-columns: 1fr 1fr; /* Sebelahan 50:50 */
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* Tombol Masuk (Outline) */
+  .mobile-btn-login {
+    display: flex; align-items: center; justify-content: center;
+    padding: 12px; border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: transparent; color: var(--text);
+    font-weight: 700; text-decoration: none;
+  }
+  
+  /* Tombol Daftar (Solid Hijau) */
+  .mobile-btn-register {
+    display: flex; align-items: center; justify-content: center;
+    padding: 12px; border-radius: var(--radius-md);
+    background: var(--accent); color: #08110a; /* Teks Gelap biar kontras */
+    font-weight: 800; text-decoration: none;
+    border: none;
+  }
+
+  /* Panel Desktop Hilang */
+  .panel-pengurus { display: none !important; } 
+  .desk-pengurus-toggle { display: none !important; }
+  .admin-toggle-mobile { display: inline-flex !important; }
+  
+  .admin-dd { display: block; } 
+  .hero { height: 60vh; }
+  
+  /* Responsive sizes for mobile */
+  .brand { font-size: 1rem; }
+  .section { padding: 60px 0; }
+  .section h2 { font-size: 1.5rem; }
+  .lead { font-size: 0.9rem; margin-bottom: 30px; }
+  .cards { gap: 16px; }
+  .card { padding: 20px; }
+  .card h3 { font-size: 1rem; }
+  .footer { padding: 30px 0; font-size: 0.85rem; }
+  .modal-card { padding: 24px; }
+  .theme-fab { width: 44px; height: 44px; left: 16px; bottom: 16px; }
+  .theme-fab .icon { width: 20px; height: 20px; }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .container { width: 95%; }
+  .hero h1 { font-size: 1.8rem; }
+  .hero p { font-size: 0.95rem; }
+  .cta-btn, .btn-nav { padding: 8px 12px; font-size: 0.9rem; }
+  .gallery { grid-template-columns: 1fr; }
+  .gallery img { height: 200px; }
+  .modal-card { width: 96%; padding: 20px; }
+}
+
+@media (min-width: 769px) {
+  .mobile-menu, .nav-toggle[id="btnMobileMenu"] { display: none !important; }
+  .admin-toggle-mobile { display: none !important; }
+  
+  /* Di Desktop: Tombol Header Muncul */
+  .right-actions .cta-btn, 
+  .right-actions .btn-nav { display: inline-flex !important; }
+
+  .admin-dd { display: none !important; } 
+  .admin-dd-scrim { display: none !important; }
+  .panel-pengurus { display: flex !important; }
+}

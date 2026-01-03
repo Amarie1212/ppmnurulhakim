@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title><%= title %></title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/styles.css"/>
+  <link rel="stylesheet" href="/form.css"/>
+  
+  <style>
+    /* Tambahan agar layout thanks benar-benar di tengah */
+    .center-thanks {
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      min-height: calc(100vh - 140px); /* Kurangi tinggi navbar/footer */
+    }
+  </style>
+</head>
+<body class="form-page layout-thanks">
+
+<header class="navbar">
+  <div class="container nav-inner">
+    <div class="brand-wrap">
+      <a href="/" class="btn-back-inline" aria-label="Kembali ke Beranda" title="Kembali ke Beranda">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <div class="brand">PPM Nurul Hakim</div>
+    </div>
+  </div>
+</header>
+
+<main class="form-wrap center-thanks">
+  <div class="form-card" style="max-width:560px; width:100%; margin:0 auto; text-align:center; padding:32px 24px;">
+    
+    <div style="margin-bottom:16px; display:inline-flex; padding:16px; background:rgba(34,197,94,0.1); border-radius:50%; color:#22c55e;">
+      <svg style="width:48px;height:48px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    </div>
+
+    <h2 class="form-title" style="margin-bottom:8px;"><%= title %></h2>
+    <p class="lead" style="margin:0 auto 24px; max-width:400px; line-height:1.5;">
+      <%= msg || 'Data Anda sudah kami terima. Mohon menunggu konfirmasi selanjutnya.' %>
+    </p>
+    
+    <a href="/" class="btn-nav" style="display:inline-block; width:100%; max-width:200px;">
+      Kembali ke Beranda
+    </a>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container"><p>© <%= new Date().getFullYear() %> PPM Nurul Hakim Jatinangor</p></div>
+</footer>
+
+<button id="themeFab" class="theme-fab" aria-label="Ganti tema" title="Ganti tema"></button>
+
+<script>
+  // Theme FAB Logic
+  const root = document.documentElement;
+  function setFabIcon(theme){
+    const sun = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.76 4.84l-1.8-1.79L3.5 4.5l1.79 1.79 1.47-1.45zM1 13h3v-2H1v2zm10-9h2V1h-2v3zm7.24.84L18.5 4.5l-1.46 1.47 1.79 1.79 1.41-1.41zM20 13h3v-2h-3v2zm-7 7h2v-3h-2v3zm5.74-2.16l1.79 1.79 1.41-1.41-1.79-1.79-1.41 1.41zM4.5 18.5l1.79-1.79-1.41-1.41-1.79 1.79 1.41 1.41zM12 6a6 6 0 1 1 0 12 6 6 0 0 1 0-12z"></path></svg>';
+    const moon = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+    const fab = document.getElementById('themeFab');
+    if (fab) fab.innerHTML = (theme === 'light') ? moon : sun;
+  }
+  function applyTheme(theme){
+    if (theme === 'light') root.setAttribute('data-theme','light');
+    else root.removeAttribute('data-theme');
+    localStorage.setItem('theme', theme);
+    setFabIcon(theme);
+    const fab = document.getElementById('themeFab');
+    if (fab){ fab.classList.add('spin'); setTimeout(()=>fab.classList.remove('spin'), 400); }
+  }
+  (function initTheme(){
+    const saved = localStorage.getItem('theme');
+    if (saved) applyTheme(saved);
+    else {
+      const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+      applyTheme(prefersLight ? 'light' : 'dark');
+    }
+    document.getElementById('themeFab')?.addEventListener('click', ()=>{
+      const isLight = root.getAttribute('data-theme') === 'light';
+      applyTheme(isLight ? 'dark' : 'light');
+    });
+  })();
+</script>
+</body>
+</html>
+

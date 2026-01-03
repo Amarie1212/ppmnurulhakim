@@ -1,0 +1,28 @@
+{
+  "name": "ppmnurulhakim",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/app.jss",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^17.2.3",
+    "ejs": "^3.1.10",
+    "exceljs": "^4.4.0",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.12",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

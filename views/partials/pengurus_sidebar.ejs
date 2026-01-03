@@ -1,0 +1,128 @@
+<!-- Sidebar untuk Pengurus (Desktop: Panel Samping, Mobile: Dropdown) -->
+
+<style>
+  /* CSS untuk Mobile Dropdown */
+  #mobileDropdown {
+    display: none;
+    position: fixed; 
+    top: calc(var(--nav-h, 72px) + 10px); 
+    right: 16px; 
+    z-index: 1006;
+    width: 280px;
+    background: var(--bg-2);
+    border: 1px solid var(--border); 
+    border-radius: 16px; 
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    transform-origin: top right; 
+    transform: scale(0.9) translateY(-10px); 
+    opacity: 0;
+    transition: transform .2s cubic-bezier(0.16, 1, 0.3, 1), opacity .2s;
+  }
+  #mobileDropdown.open {
+    display: block;
+    transform: scale(1) translateY(0); 
+    opacity: 1;
+  }
+  #mobileScrim {
+    display: none;
+    position: fixed; 
+    inset: 0; 
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1005;
+    opacity: 0;
+    transition: opacity .2s;
+  }
+  #mobileScrim.open {
+    display: block;
+    opacity: 1;
+  }
+</style>
+
+<!-- Mobile Dropdown -->
+<div id="mobileDropdown" class="admin-dd">
+  <div class="admin-dd-head">
+    <div class="admin-dd-title">Menu Pengurus</div>
+    <div class="admin-dd-sub">Halo, <%= user.name %> (<%= user.role.toUpperCase() %>)</div>
+  </div>
+  <a class="admin-dd-item <%= currentPage === 'home' ? 'active' : '' %>" href="/pengurus/home">Beranda Admin</a>
+  <a class="admin-dd-item" href="/">Lihat Website ↗</a>
+  <div style="height:1px; background:var(--border); margin:4px 0;"></div>
+
+  <% if (user.role !== 'keuangan') { %>
+    <a class="admin-dd-item <%= currentPage === 'santri' ? 'active' : '' %>" href="/pengurus">Data Santri</a>
+  <% } %>
+  <% if (user.role === 'admin' || user.role === 'panitia') { %>
+    <a class="admin-dd-item <%= currentPage === 'verifikasi' ? 'active' : '' %>" href="/pengurus/verifikasi">Verifikasi Pendaftaran</a>
+  <% } %>
+  <% if (user.role === 'admin' || user.role === 'keuangan') { %>
+    <a class="admin-dd-item <%= currentPage === 'verif-bayar' ? 'active' : '' %>" href="/pengurus/verifikasi-pembayaran">Verifikasi Pembayaran</a>
+  <% } %>
+  <% if (user.role === 'admin' || user.role === 'keuangan') { %>
+    <a class="admin-dd-item <%= currentPage === 'laporan-bayar' ? 'active' : '' %>" href="/pengurus/laporan-pembayaran">Laporan Pembayaran</a>
+  <% } %>
+  <% if (user.role === 'admin' || user.role === 'ketua') { %>
+    <a class="admin-dd-item <%= currentPage === 'laporan-masuk' ? 'active' : '' %>" href="/pengurus/laporan-masuk">Laporan Pembayaran Masuk</a>
+  <% } %>
+
+
+  <% if (user.role === 'admin') { %>
+    <a class="admin-dd-item <%= currentPage === 'akun' ? 'active' : '' %>" href="/pengurus/kelola-akun">Kelola Akun Pengurus</a>
+  <% } %>
+  <% if (user.role === 'admin' || user.role === 'panitia') { %>
+    <a class="admin-dd-item <%= currentPage === 'kelola-pengumuman' ? 'active' : '' %>" href="/pengurus/kelola-pengumuman">Kelola Pengumuman</a>
+  <% } %>
+  <a class="admin-dd-item danger" href="/logout">Logout</a>
+</div>
+<div id="mobileScrim" class="admin-dd-scrim"></div>
+
+<!-- Desktop Sidebar Panel -->
+<aside id="panelPengurus" class="panel-pengurus" hidden>
+  <div class="panel-head">
+    <div>
+      <div class="panel-title">Pengurus</div>
+      <div class="panel-sub">Halo, <%= user.name %> (<%= user.role.toUpperCase() %>)</div>
+    </div>
+    <button class="panel-close" id="closePanelPengurus">×</button>
+  </div>
+  <nav class="panel-nav panel-body">
+    <a href="/pengurus/home" class="panel-link <%= currentPage === 'home' ? 'active' : '' %>">Beranda Admin</a>
+    <a href="/" class="panel-link" style="color:var(--accent)">Lihat Website Utama ↗</a>
+    <div style="height:1px; background:var(--border); margin:10px 0;"></div>
+
+    <% if (user.role !== 'keuangan') { %>
+      <a href="/pengurus" class="panel-link <%= currentPage === 'santri' ? 'active' : '' %>">Data Santri</a>
+    <% } %>
+    <% if (user.role === 'admin' || user.role === 'panitia') { %>
+      <a href="/pengurus/verifikasi" class="panel-link <%= currentPage === 'verifikasi' ? 'active' : '' %>">
+        Verifikasi Pendaftaran 
+        <% if(stat && stat.pending > 0){ %>
+          <span style="background:var(--danger); color:white; padding:2px 8px; border-radius:10px; font-size:0.7em; margin-left:auto"><%= stat.pending %></span>
+        <% } %>
+      </a>
+    <% } %>
+    <% if (user.role === 'admin' || user.role === 'keuangan') { %>
+        <a href="/pengurus/verifikasi-pembayaran" class="panel-link <%= currentPage === 'verif-bayar' ? 'active' : '' %>">Verifikasi Pembayaran</a>
+    <% } %>
+    <% if (user.role === 'admin' || user.role === 'keuangan') { %>
+        <a href="/pengurus/laporan-pembayaran" class="panel-link <%= currentPage === 'laporan-bayar' ? 'active' : '' %>">Laporan Pembayaran</a>
+    <% } %>
+    <% if (user.role === 'admin' || user.role === 'ketua') { %>
+        <a href="/pengurus/laporan-masuk" class="panel-link <%= currentPage === 'laporan-masuk' ? 'active' : '' %>">Laporan Pembayaran Masuk</a>
+    <% } %>
+
+
+    <% if (user.role === 'admin') { %>
+      <a href="/pengurus/kelola-akun" class="panel-link <%= currentPage === 'akun' ? 'active' : '' %>">Kelola Akun Pengurus</a>
+    <% } %>
+    <% if (user.role === 'admin' || user.role === 'panitia') { %>
+      <a href="/pengurus/kelola-pengumuman" class="panel-link <%= currentPage === 'kelola-pengumuman' ? 'active' : '' %>">Kelola Pengumuman</a>
+    <% } %>
+  </nav>
+  <div class="panel-footer">
+    <a href="/logout" class="logout-btn">Logout</a>
+  </div>
+</aside>
+<div class="panel-scrim" id="panelPengurusScrim" hidden></div>
+
+

@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/duty.css" />
+  
+  <style>
+    /* Zoom Modal Styling */
+    #zoomModal {
+      display: none;
+      z-index: 10001;
+    }
+    #zoomModal.open {
+      display: flex;
+    }
+    #zoomModal .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+    .modal-img {
+      max-width: 90%;
+      max-height: 85vh;
+      object-fit: contain;
+      border-radius: 4px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    }
+    
+    /* Improved Table Styling */
+    .table-card {
+      padding: 0;
+      overflow: hidden;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-2);
+    }
+    .table thead {
+      background: var(--bg-3);
+    }
+    :root[data-theme="light"] .table thead {
+      background: #f8fafc;
+    }
+    .table th {
+      padding: 16px 20px;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      border-bottom: 2px solid var(--border);
+    }
+    .table td {
+      padding: 16px 20px;
+      vertical-align: middle;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    .table tr:last-child td { border-bottom: none; }
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .page-title, h2 { font-size: 1.3rem !important; }
+      .page-sub, p { font-size: 0.8rem !important; }
+      
+      .table-card { 
+        overflow-x: auto;
+        border-radius: var(--radius-md);
+      }
+      .table {
+        min-width: 700px; /* More width for bukti + info */
+      }
+      .table th, .table td {
+        font-size: 0.85rem !important;
+        padding: 14px 12px !important;
+      }
+      
+      .bukti-thumb {
+        width: 45px !important;
+        height: 45px !important;
+      }
+      .btn-detail {
+        padding: 8px 14px !important;
+        font-size: 0.8rem !important;
+      }
+      .status-badge {
+        font-size: 0.75rem !important;
+        padding: 6px 14px !important;
+      }
+      
+      .modal-box { width: 95% !important; max-width: 400px !important; padding: 16px !important; }
+    }
+    
+    @media (max-width: 480px) {
+      .table { min-width: 600px; }
+      .table th, .table td { font-size: 0.8rem !important; padding: 12px 10px !important; }
+    }
+    
+    /* Modal Styling - Match verifikasi.ejs */
+    .modal-overlay { 
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: rgba(0, 0, 0, 0.6); 
+      backdrop-filter: blur(4px);
+      z-index: 9999; display: none; justify-content: center; align-items: center; padding: 20px; 
+    }
+    .modal-box { 
+      background: var(--bg-2); 
+      border: 1px solid var(--border); 
+      border-radius: 6px; 
+      width: 100%; 
+      max-width: 500px; 
+      padding: 24px;
+      position: relative; 
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    }
+    @keyframes modalPop { 
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; } 
+    }
+    
+    .modal-header { 
+      display: flex; justify-content: space-between; align-items: center; 
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border); 
+    }
+    .modal-title { font-size: 1.2rem; font-weight: 700; margin: 0; color: var(--text); }
+    .modal-close { 
+      background: var(--bg); 
+      border: 1px solid var(--border); 
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem; 
+      color: var(--muted); 
+      cursor: pointer; 
+      border-radius: 4px; 
+      transition: all .2s;
+      line-height: 1;
+    }
+    .modal-close:hover { 
+      background: rgba(239, 68, 68, 0.1); 
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #ef4444; 
+    }
+    
+    .biodata-section {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .biodata-section-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 0 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .biodata-section-title svg { width: 18px; height: 18px; }
+    
+    .info-row { 
+      display: flex; justify-content: space-between; align-items: flex-start; 
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { color: var(--muted); font-size: 0.9rem; }
+    .info-val { 
+      font-weight: 600; text-align: right; word-break: break-word; 
+      max-width: 60%; color: var(--text); font-size: 0.9rem;
+    }
+    
+    .modal-actions { display: flex; gap: 12px; margin-top: 8px; }
+    .btn-action { 
+      flex: 1; padding: 12px 16px; border-radius: 4px; border: none; 
+      font-weight: 600; cursor: pointer; font-size: 0.9rem; 
+      display: flex; align-items: center; justify-content: center; gap: 6px; 
+      transition: all .2s;
+    }
+    .btn-reject { 
+      background: transparent; 
+      color: #ef4444; 
+      border: 1px solid rgba(239, 68, 68, 0.3); 
+    }
+    .btn-reject:hover { 
+      background: rgba(239, 68, 68, 0.1); 
+      border-color: #ef4444; 
+      color: #ef4444;
+    }
+    .btn-accept { 
+      background: transparent; 
+      color: var(--accent); 
+      border: 1px solid var(--accent); 
+    }
+    .btn-accept:hover { 
+      background: var(--accent); 
+      color: #000; 
+    }
+  </style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="container nav-inner">
+    <div class="brand-wrap">
+      <a href="/pengurus/home" class="btn-back-inline" title="Kembali">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </a>
+      <div class="brand">Verifikasi Pembayaran</div>
+    </div>
+    <div class="right-actions">
+      <button id="navToggle" class="nav-toggle" style="display:flex !important;" aria-label="Menu">
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      </button>
+    </div>
+  </div>
+</header>
+
+<%- include('partials/pengurus_sidebar', { currentPage: 'verif-bayar', user: user, stat: null }) %>
+
+<main class="section">
+  <div class="container">
+
+    <% if(pembayaran.length === 0) { %>
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <h3>Tidak ada pembayaran menunggu</h3>
+        <p>Semua pembayaran sudah diproses.</p>
+      </div>
+    <% } else { %>
+      <div class="card table-card">
+        <table class="table">
+          <thead>
+            <tr>
+              <th style="text-align:center" width="60">No</th>
+              <th width="80">Bukti</th>
+              <th>Nama Santri</th>
+              <th>Keterangan Pembayaran</th>
+              <th>Tanggal Upload</th>
+              <th style="text-align:center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% pembayaran.forEach((p, i) => { %>
+              <tr>
+                <td style="text-align:center; color:var(--muted); font-size:0.9rem"><%= i + 1 %></td>
+                <td>
+                  <div style="width:50px; height:50px; border-radius:8px; overflow:hidden; border:1px solid var(--border); background:var(--bg);">
+                    <img src="<%= p.bukti_path %>" alt="Bukti" style="width:100%; height:100%; object-fit:cover; cursor:pointer;" onclick="openZoom('<%= p.bukti_path %>')">
+                  </div>
+                </td>
+                <td style="font-weight:700"><%= p.nama_santri %></td>
+                <td style="font-size:0.9rem"><%= p.keterangan || '-' %></td>
+                <td style="color:var(--muted); font-size:0.85rem"><%= p.tanggal_upload %></td>
+                <td style="text-align:center">
+                  <button type="button" class="btn btn-detail" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); padding: 8px 16px; font-size: 0.85rem;" onclick="showDetailModal('<%= p.id %>', '<%= p.nama_santri %>', '<%= p.keterangan || '-' %>', '<%= p.bukti_path %>', '<%= p.tanggal_upload %>')">Pemeriksaan</button>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<!-- Modal Zoom -->
+<div id="zoomModal" class="modal-overlay" onclick="closeZoom()">
+  <button class="modal-close" onclick="closeZoom()">×</button>
+  <img id="zoomImg" src="" alt="Bukti Pembayaran" class="modal-img">
+</div>
+
+<button id="themeFab" class="theme-fab"></button>
+
+<!-- Modal Detail Pembayaran -->
+<div id="detailModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title">Detail Pembayaran</h3>
+      <button class="modal-close" onclick="closeDetailModal()">×</button>
+    </div>
+    
+    <!-- Bukti Pembayaran -->
+    <div class="biodata-section" style="text-align: center;">
+      <img id="detailBukti" src="" alt="Bukti" style="max-width: 100%; max-height: 250px; border-radius: 4px; border: 1px solid var(--border); cursor: pointer;" onclick="openZoom(this.src)">
+      <p style="margin: 8px 0 0; font-size: 0.8rem; color: var(--muted);">Klik gambar untuk memperbesar</p>
+    </div>
+    
+    <!-- Info Pembayaran -->
+    <div class="biodata-section">
+      <h4 class="biodata-section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        Info Pembayaran
+      </h4>
+      <div class="info-row"><span class="info-label">Nama Santri</span><span class="info-val" id="detailNama"></span></div>
+      <div class="info-row"><span class="info-label">Keterangan</span><span class="info-val" id="detailKeterangan"></span></div>
+      <div class="info-row"><span class="info-label">Tanggal Upload</span><span class="info-val" id="detailTanggal"></span></div>
+    </div>
+    
+    <!-- PAYMENT ACTIONS - Outside the info section -->
+    <div id="paymentInitialActions" class="modal-actions" style="margin-top: 16px;">
+      <button type="button" class="btn-action btn-reject" onclick="showRejectModal()">✖ Tolak</button>
+      <button type="submit" class="btn-action btn-accept" onclick="showVerifyModal()" style="flex:1;">✔ Terima Pembayaran</button>
+    </div>
+
+<!-- Hidden Form for Submission -->
+<form id="actionForm" method="POST" action="/pengurus/verifikasi-pembayaran" style="display:none;">
+  <input type="hidden" name="id" id="actionId">
+  <input type="hidden" name="aksi" id="actionType">
+  <input type="hidden" name="alasan" id="actionReason">
+</form>
+
+<script>
+  let currentPaymentId = '';
+  
+  function showDetailModal(id, nama, nominal, bukti, tgl) {
+    currentPaymentId = id;
+    
+    document.getElementById('detailNama').textContent = nama || '-'; 
+    document.getElementById('detailKeterangan').textContent = nominal || '-'; 
+    document.getElementById('detailTanggal').textContent = tgl || '-'; 
+    
+    const img = document.getElementById('detailBukti'); 
+    if (bukti) {
+      img.src = bukti;
+      img.onclick = () => openZoom(bukti); 
+    } else {
+      img.src = '';
+      img.onclick = null;
+    }
+    
+    const modal = document.getElementById('detailModal');
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('open'), 10);
+    document.body.style.overflow = 'hidden'; 
+  }
+
+  function showVerifyModal() {
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); z-index:10000; display:flex; justify-content:center; align-items:center; padding:20px;';
+    modal.innerHTML = `
+      <div style="background:var(--bg-2); border:1px solid var(--border); border-radius:6px; max-width:400px; width:100%; padding:24px; text-align:center; box-shadow:0 25px 50px rgba(0,0,0,0.5); animation:modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+        <div style="width:60px; height:60px; background:rgba(34, 197, 94, 0.1); color:#22c55e; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="32" height="32"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3 style="margin:0 0 8px; font-size:1.1rem; font-weight:700; color:#22c55e; line-height:1.4;">Terima Pembayaran?</h3>
+        <p style="margin:0 0 20px; color:var(--muted); line-height:1.5; font-size:0.9rem;">
+          Pastikan bukti transfer valid dan nominal sesuai.<br>Status santri akan berubah menjadi <strong>Terverifikasi</strong>.
+        </p>
+        <div style="display:flex; gap:12px;">
+              <button type="button" id="cancelVerifyBtn" style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:12px; border-radius:4px; font-weight:600; cursor:pointer; transition:all .2s;">Batal</button>
+          <form action="/pengurus/verifikasi-pembayaran" method="POST" style="flex:1;">
+             <input type="hidden" name="id" value="${currentPaymentId}">
+             <input type="hidden" name="aksi" value="verify">
+              <button type="submit" style="width:100%; background:transparent; border:1px solid var(--accent); color:var(--accent); padding:12px; border-radius:4px; font-weight:600; cursor:pointer; transition:all .2s;" onmouseover="this.style.background='var(--accent)';this.style.color='#000'" onmouseout="this.style.background='transparent';this.style.color='var(--accent)'">Ya, Terima</button>
+          </form>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    document.getElementById('cancelVerifyBtn').onclick = () => {
+       modal.style.opacity = 0;
+       setTimeout(() => modal.remove(), 200);
+    };
+    
+    const cancelBtn = document.getElementById('cancelVerifyBtn');
+    cancelBtn.onmouseover = () => { cancelBtn.style.background = 'var(--bg)'; };
+    cancelBtn.onmouseout = () => { cancelBtn.style.background = 'transparent'; };
+  }
+
+  function showRejectModal() {
+    // Custom Reject Modal
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); z-index:10000; display:flex; justify-content:center; align-items:center; padding:20px;';
+    modal.innerHTML = `
+      <div style="background:var(--bg-2); border:1px solid var(--border); border-radius:6px; max-width:400px; width:100%; padding:24px; text-align:center; box-shadow:0 25px 50px rgba(0,0,0,0.5); animation:modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+        <h3 style="margin:0 0 8px; font-size:1.1rem; font-weight:700; color:#ef4444; line-height:1.4;">Konfirmasi Penolakan</h3>
+        <p style="margin:0 0 16px; color:var(--muted); line-height:1.5; font-size:0.9rem;">
+          Tulis alasan kenapa pembayaran ini ditolak.<br>Pesan ini akan muncul di riwayat santri.
+        </p>
+        <form action="/pengurus/verifikasi-pembayaran" method="POST">
+            <input type="hidden" name="id" value="${currentPaymentId}">
+            <input type="hidden" name="aksi" value="reject">
+            <textarea name="alasan" required placeholder="Tulis alasan penolakan di sini..." style="width:100%; height:100px; background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:4px; padding:14px; color:var(--text); font-family:inherit; margin-bottom:20px; resize:none; outline:none; font-size:0.95rem; line-height:1.5;"></textarea>
+            <div style="display:flex; gap:12px;">
+              <button type="button" id="cancelRejectBtn" style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:12px; border-radius:4px; font-weight:600; cursor:pointer; transition:all .2s;">Batal</button>
+              <button type="submit" style="flex:1; background:transparent; border:1px solid #ef4444; color:#ef4444; padding:12px; border-radius:4px; font-weight:600; cursor:pointer; transition:all .2s;" onmouseover="this.style.background='#ef4444';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#ef4444'">Kirim Penolakan</button>
+            </div>
+        </form>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Focus textarea
+    setTimeout(() => modal.querySelector('textarea').focus(), 100);
+
+    document.getElementById('cancelRejectBtn').onclick = () => {
+       modal.style.opacity = 0;
+       setTimeout(() => modal.remove(), 200);
+    };
+    
+    // Hover effect for cancel button
+    const cancelBtn = document.getElementById('cancelRejectBtn');
+    cancelBtn.onmouseover = () => { cancelBtn.style.background = 'var(--bg)'; };
+    cancelBtn.onmouseout = () => { cancelBtn.style.background = 'transparent'; };
+  }
+
+  function closeDetailModal() { 
+    const modal = document.getElementById('detailModal');
+    modal.classList.remove('open');
+    setTimeout(() => {
+      modal.style.display = 'none';
+      document.body.style.overflow = ''; 
+    }, 200);
+  }
+  
+  function openZoom(src) {
+    document.getElementById('zoomImg').src = src;
+    document.getElementById('zoomModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  
+  function closeZoom() {
+    document.getElementById('zoomModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+</script>
+
+<%- include('partials/pengurus_nav_script') %>
+
+</body>
+</html>
+
+

@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/duty.css" />
+  
+  <style>
+    /* Tab Styling */
+    .tab-container { margin-bottom: 20px; }
+    .tab-buttons {
+      display: flex;
+      gap: 10px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px;
+    }
+    .tab-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn svg { width: 18px; height: 18px; }
+    .tab-btn:hover { background: var(--bg); color: var(--text); }
+    .tab-btn.active { background: var(--accent); color: #000; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* MODAL - Dark Theme */
+    .modal-overlay { 
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: rgba(0, 0, 0, 0.6); 
+      backdrop-filter: blur(4px);
+      z-index: 9999; display: none; justify-content: center; align-items: center; padding: 20px; 
+    }
+    .modal-box { 
+      background: var(--bg-2); 
+      border: 1px solid var(--border); 
+      border-radius: 6px; 
+      width: 100%; 
+      max-width: 500px; 
+      padding: 24px;
+      position: relative; 
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    }
+    @keyframes modalPop { 
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; } 
+    }
+    
+    .modal-header { 
+      display: flex; justify-content: space-between; align-items: center; 
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border); 
+    }
+    .modal-title { font-size: 1.25rem; font-weight: 700; margin: 0; color: var(--text); line-height: 1.2; }
+    .modal-close { 
+      background: var(--bg); 
+      border: 1px solid var(--border); 
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; 
+      color: var(--muted); 
+      cursor: pointer; 
+      border-radius: 8px; 
+      transition: all .2s;
+      line-height: 1;
+      padding: 0;
+      padding-bottom: 2px; /* Visual adjustment for X center */
+    }
+    .modal-close:hover { 
+      background: rgba(239, 68, 68, 0.1); 
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #ef4444; 
+    }
+    
+    /* Section Cards - Dark Theme */
+    .biodata-section {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .biodata-section-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 0 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .biodata-section-title svg { width: 18px; height: 18px; }
+    
+    .info-row { 
+      display: flex; justify-content: space-between; align-items: center; 
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { color: var(--muted); font-size: 0.9rem; font-weight: 500; }
+    .info-val { 
+      font-weight: 600; text-align: right; word-break: break-word; 
+      max-width: 60%; color: var(--text); font-size: 0.95rem; display: flex; align-items: center; justify-content: flex-end; gap: 6px;
+    }
+    
+    .modal-actions { display: flex; gap: 12px; padding: 20px 24px; border-top: 1px solid var(--border); }
+    .modal-actions-single { display: block; padding: 20px 24px; border-top: 1px solid var(--border); }
+    .btn-action { 
+      flex: 1; padding: 12px 16px; border-radius: 4px; border: none; 
+      font-weight: 600; cursor: pointer; font-size: 0.9rem; 
+      display: flex; align-items: center; justify-content: center; gap: 8px; 
+      transition: all .2s;
+    }
+    .btn-reject { 
+      background: transparent; 
+      color: #ef4444; 
+      border: 1px solid rgba(239, 68, 68, 0.3); 
+    }
+    .btn-reject:hover { 
+      background: rgba(239, 68, 68, 0.1); 
+      border-color: #ef4444; 
+      color: #ef4444;
+    }
+    .btn-accept { 
+      background: transparent; 
+      color: var(--accent); 
+      border: 1px solid var(--accent); 
+    }
+    .btn-accept:hover { 
+      background: var(--accent); 
+      color: #000; 
+    }
+    .btn-check { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
+    
+    /* Document Preview - Clean Grid */
+    .doc-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .doc-item {
+      text-align: center;
+    }
+    .doc-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    .doc-preview {
+      aspect-ratio: 3/4;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .doc-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .doc-preview img:hover { opacity: 0.9; }
+    .doc-empty {
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+    
+    .btn-small { padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; transition: all .2s; }
+    .btn-detail-link { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.15); }
+    .btn-detail-link:hover { background: #3b82f6; color: #fff; }
+    
+    .status-badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+    .status-badge.pending { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+    
+    .page-title { margin-bottom: 24px; font-weight: 800; }
+    
+    .supporting-badge { 
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 600;
+      background: rgba(99, 102, 241, 0.1); color: #6366f1; border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+    .supporting-badge svg { width: 14px; height: 14px; }
+
+    /* Improved Table Styling */
+    .table-card {
+      padding: 0;
+      overflow: hidden;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-2);
+    }
+    .table thead {
+      background: var(--bg-3);
+    }
+    :root[data-theme="light"] .table thead {
+      background: #f8fafc;
+    }
+    .table th {
+      padding: 16px 20px;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      border-bottom: 2px solid var(--border);
+    }
+    .table td {
+      padding: 16px 20px;
+      vertical-align: middle;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    .table tr:last-child td { border-bottom: none; }
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .page-title { font-size: 1.3rem !important; }
+      .tab-buttons { gap: 6px; padding: 4px; }
+      .tab-btn { padding: 10px 12px; font-size: 0.75rem; gap: 4px; }
+      .tab-btn svg { width: 14px; height: 14px; }
+
+      .table-card { 
+        overflow-x: auto;
+        border-radius: var(--radius-md);
+      }
+      .table {
+        min-width: 600px;
+      }
+      .table th, .table td {
+        font-size: 0.85rem !important;
+        padding: 14px 12px !important;
+      }
+      .btn-small { padding: 8px 14px !important; font-size: 0.8rem !important; }
+      
+      .modal-box { width: 95% !important; max-width: 400px !important; padding: 16px !important; }
+      .modal-title { font-size: 1rem !important; }
+      .info-label { font-size: 0.75rem !important; }
+      .info-val { font-size: 0.8rem !important; }
+      .btn-action { padding: 10px !important; font-size: 0.85rem !important; }
+    }
+    
+    @media (max-width: 480px) {
+      .table { min-width: 500px; }
+      .table th, .table td { font-size: 0.8rem !important; padding: 12px 10px !important; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="container nav-inner">
+    <div class="brand-wrap">
+      <a href="/pengurus/home" class="btn-back-inline" title="Kembali ke Dashboard">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </a>
+      <div class="brand">Verifikasi Pendaftaran</div>
+    </div>
+    <div class="right-actions">
+      <button id="navToggle" class="nav-toggle" style="display:flex !important;" aria-label="Menu">
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      </button>
+    </div>
+  </div>
+</header>
+
+<%- include('partials/pengurus_sidebar', { currentPage: 'verifikasi', user: user, stat: null }) %>
+
+<main class="section">
+  <div class="container">
+
+    <!-- TAB SWITCHER -->
+    <div class="tab-container">
+      <div class="tab-buttons">
+        <button class="tab-btn <%= activeTab === 'akun' ? 'active' : '' %>" onclick="switchTab('akun')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Verifikasi Akun (<%= akun.length %>)
+        </button>
+        <button class="tab-btn <%= activeTab === 'biodata' ? 'active' : '' %>" onclick="switchTab('biodata')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Cek Biodata (<%= biodata.length %>)
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB 1: VERIFIKASI AKUN -->
+    <div id="tab-akun" class="tab-content <%= activeTab === 'akun' ? 'active' : '' %>">
+      <div class="card table-card">
+        <table class="table">
+          <thead>
+            <tr>
+              <th width="60" style="text-align:center">No</th>
+              <th>Nama Pendaftar</th>
+              <th>Informasi Kontak</th>
+              <th style="text-align:center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if(akun.length === 0){ %>
+              <tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted)">Tidak ada pendaftar baru yang perlu diverifikasi.</td></tr>
+            <% } %>
+            <% akun.forEach((a, index) => { %>
+              <tr>
+                <td style="text-align:center; color:var(--muted); font-size:0.9rem"><%= index + 1 %></td>
+                <td style="font-weight:700"><%= a.nama %></td>
+                <td>
+                  <div style="font-size:0.85rem; color:var(--muted); margin-bottom:4px;"><%= a.email %></div>
+                  <% if(a.wa) { %><a href="https://wa.me/<%= a.wa.startsWith('0') ? '62' + a.wa.slice(1) : a.wa %>" target="_blank" style="color:var(--accent);text-decoration:none;display:inline-flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.304-1.654a11.882 11.882 0 005.713 1.456h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg><%= a.wa %></a><% } %>
+                </td>
+                <td style="text-align:center">
+                  <button class="btn-small btn-detail-link" onclick="openAccountModal(this)"
+                    data-id="<%= a.id %>"
+                    data-nama="<%= a.nama %>"
+                    data-email="<%= a.email %>"
+                    data-wa="<%= a.wa %>"
+                    data-kelompok="<%= a.kelompok %>"
+                    data-desa="<%= a.desa %>"
+                    data-daerah="<%= a.daerah %>"
+                    data-tgl="<%= a.created_fmt %>"
+                  >
+                    Proses
+                  </button>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 2: CEK BIODATA -->
+    <div id="tab-biodata" class="tab-content <%= activeTab === 'biodata' ? 'active' : '' %>">
+      <div class="card table-card">
+        <table class="table">
+          <thead>
+            <tr>
+              <th width="60" style="text-align:center">No</th>
+              <th>Nama Santri</th>
+              <th>Informasi Kontak</th>
+              <th style="text-align:center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if(biodata.length === 0){ %>
+              <tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted)">Semua biodata sudah dicek ✓</td></tr>
+            <% } %>
+            <% biodata.forEach((b, index) => { %>
+              <tr>
+                <td style="text-align:center; color:var(--muted); font-size:0.9rem"><%= index + 1 %></td>
+                <td style="font-weight:700"><%= b.nama %></td>
+                <td>
+                  <div style="font-size:0.85rem; color:var(--muted); margin-bottom:4px;"><%= b.email %></div>
+                  <% if(b.wa) { %><a href="https://wa.me/<%= b.wa.startsWith('0') ? '62' + b.wa.slice(1) : b.wa %>" target="_blank" style="color:var(--accent);text-decoration:none;display:inline-flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.304-1.654a11.882 11.882 0 005.713 1.456h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg><%= b.wa %></a><% } %>
+                </td>
+                <td style="text-align:center">
+                  <button class="btn-small btn-detail-link" onclick="openBiodataModal(this)"
+                    data-id="<%= b.id %>"
+                    data-nama="<%= b.nama %>"
+                    data-jk="<%= b.jk === 'L' ? 'Laki-laki' : 'Perempuan' %>"
+                    data-wa="<%= b.wa %>"
+                    data-email="<%= b.email %>"
+                    data-kelompok="<%= b.kelompok %>"
+                    data-no-ki="<%= b.no_ki %>"
+                    data-desa="<%= b.desa %>"
+                    data-daerah="<%= b.daerah %>"
+                    data-kelurahan="<%= b.kelurahan %>"
+                    data-kecamatan="<%= b.kecamatan %>"
+                    data-kota-kab="<%= b.kota_kab %>"
+                    data-provinsi="<%= b.provinsi %>"
+                    data-kampus="<%= b.kampus %>"
+                    data-prodi="<%= b.prodi %>"
+                    data-jenjang="<%= b.jenjang %>"
+                    data-angkatan="<%= b.angkatan %>"
+                    data-ayah-nama="<%= b.ayah_nama %>"
+                    data-ayah-hp="<%= b.ayah_hp %>"
+                    data-ibu-nama="<%= b.ibu_nama %>"
+                    data-ibu-hp="<%= b.ibu_hp %>"
+                    data-foto-path="<%= b.foto_path %>"
+                    data-kk-path="<%= b.kk_path %>"
+                    data-ktp-path="<%= b.ktp_path %>"
+                    data-tgl="<%= b.created_fmt %>"
+                  >
+                    Verifikasi
+                  </button>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Hidden Inputs for JS -->
+<input type="hidden" id="akunVerifyId">
+<input type="hidden" id="biodataVerifyId">
+
+<!-- MODAL VERIFIKASI AKUN -->
+<div id="modalAkun" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title">Verifikasi Akun</h3>
+      <button class="modal-close" onclick="closeModal('modalAkun')">×</button>
+    </div>
+    
+    <div id="modalAkunData">
+      <div class="info-row"><span class="info-label">Nama</span><span class="info-val" id="a-nama"></span></div>
+      <div class="info-row"><span class="info-label">Email</span><span class="info-val" id="a-email"></span></div>
+      <div class="info-row"><span class="info-label">WhatsApp</span><span class="info-val" id="a-wa"></span></div>
+      <div class="info-row"><span class="info-label">Kelompok</span><span class="info-val" id="a-kelompok"></span></div>
+      <div class="info-row"><span class="info-label">Desa</span><span class="info-val" id="a-desa"></span></div>
+      <div class="info-row"><span class="info-label">Daerah</span><span class="info-val" id="a-daerah"></span></div>
+      <div class="info-row"><span class="info-label">Tgl Daftar</span><span class="info-val" id="a-tgl"></span></div>
+    </div>
+
+    <!-- ACCOUNT ACTIONS -->
+    <div id="akunInitialActions" class="modal-actions">
+      <button type="button" class="btn-action btn-reject" onclick="showAccountRejectModal()">✖ Tolak</button>
+      <button type="button" class="btn-action btn-accept" onclick="showAccountVerifyModal()" style="width:100%;">✔ Setujui</button>
+    </div>
+
+    <!-- REJECT FORM REMOVED (Replaced by Modal) -->
+
+  </div>
+</div>
+
+<!-- MODAL CEK BIODATA -->
+<div id="modalBiodata" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title">Verifikasi Biodata</h3>
+      <button class="modal-close" onclick="closeModal('modalBiodata')">×</button>
+    </div>
+    
+    <!-- Info Biodata - LENGKAP -->
+    <div id="modalBiodataData" style="max-height: 60vh; overflow-y: auto; padding-right: 10px; margin-bottom:20px;">
+      <!-- Data Pribadi -->
+      <div class="biodata-section">
+        <h4 class="biodata-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          Data Pribadi
+        </h4>
+        <div class="info-row"><span class="info-label">Nama Lengkap</span><span class="info-val" id="b-nama"></span></div>
+        <div class="info-row"><span class="info-label">No. Kartu Identitas</span><span class="info-val" id="b-no-ki"></span></div>
+        <div class="info-row"><span class="info-label">Jenis Kelamin</span><span class="info-val" id="b-jk"></span></div>
+        <div class="info-row"><span class="info-label">WhatsApp</span><span class="info-val" id="b-wa"></span></div>
+        <div class="info-row"><span class="info-label">Email</span><span class="info-val" id="b-email"></span></div>
+      </div>
+
+      <!-- Alamat -->
+      <div class="biodata-section">
+        <h4 class="biodata-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          Alamat
+        </h4>
+        <div class="info-row"><span class="info-label">Desa</span><span class="info-val" id="b-desa"></span></div>
+        <div class="info-row"><span class="info-label">Daerah</span><span class="info-val" id="b-daerah"></span></div>
+        <div class="info-row"><span class="info-label">Kelurahan</span><span class="info-val" id="b-kelurahan"></span></div>
+        <div class="info-row"><span class="info-label">Kecamatan</span><span class="info-val" id="b-kecamatan"></span></div>
+        <div class="info-row"><span class="info-label">Kota/Kab</span><span class="info-val" id="b-kota-kab"></span></div>
+        <div class="info-row"><span class="info-label">Provinsi</span><span class="info-val" id="b-provinsi"></span></div>
+      </div>
+
+      <!-- Pendidikan -->
+      <div class="biodata-section">
+        <h4 class="biodata-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          </svg>
+          Pendidikan
+        </h4>
+        <div class="info-row"><span class="info-label">Kelompok</span><span class="info-val" id="b-kelompok"></span></div>
+        <div class="info-row"><span class="info-label">Kampus</span><span class="info-val" id="b-kampus"></span></div>
+        <div class="info-row"><span class="info-label">Program Studi</span><span class="info-val" id="b-prodi"></span></div>
+        <div class="info-row"><span class="info-label">Jenjang</span><span class="info-val" id="b-jenjang"></span></div>
+        <div class="info-row"><span class="info-label">Angkatan</span><span class="info-val" id="b-angkatan"></span></div>
+      </div>
+
+      <!-- Data Orang Tua -->
+      <div class="biodata-section">
+        <h4 class="biodata-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          Data Orang Tua
+        </h4>
+        <div class="info-row"><span class="info-label">Nama Ayah</span><span class="info-val" id="b-ayah-nama"></span></div>
+        <div class="info-row"><span class="info-label">HP Ayah</span><span class="info-val" id="b-ayah-hp"></span></div>
+        <div class="info-row"><span class="info-label">Nama Ibu</span><span class="info-val" id="b-ibu-nama"></span></div>
+        <div class="info-row"><span class="info-label">HP Ibu</span><span class="info-val" id="b-ibu-hp"></span></div>
+      </div>
+
+      <div class="biodata-section">
+        <div class="info-row"><span class="info-label">Tanggal Input</span><span class="info-val" id="b-tgl"></span></div>
+      </div>
+
+      <!-- Dokumen Upload -->
+      <div class="biodata-section">
+        <h4 class="biodata-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+          Dokumen Upload
+        </h4>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+          <!-- Foto -->
+          <div style="text-align: center;">
+            <div style="font-size: 0.75rem; color: var(--muted); margin-bottom: 6px;">Foto</div>
+            <div id="b-foto-container" style="width: 100%; aspect-ratio: 3/4; background: var(--bg-2); border-radius: 8px; overflow: hidden; border: 1px solid var(--border);">
+              <img id="b-foto" src="" alt="Foto" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer; display: none;" onclick="window.open(this.src, '_blank')">
+              <div id="b-foto-empty" style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--muted); font-size: 0.7rem;">-</div>
+            </div>
+          </div>
+          <!-- KK -->
+          <div style="text-align: center;">
+            <div style="font-size: 0.75rem; color: var(--muted); margin-bottom: 6px;">KK</div>
+            <div id="b-kk-container" style="width: 100%; aspect-ratio: 3/4; background: var(--bg-2); border-radius: 8px; overflow: hidden; border: 1px solid var(--border);">
+              <img id="b-kk" src="" alt="KK" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer; display: none;" onclick="window.open(this.src, '_blank')">
+              <div id="b-kk-empty" style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--muted); font-size: 0.7rem;">-</div>
+            </div>
+          </div>
+          <!-- KTP -->
+          <div style="text-align: center;">
+            <div style="font-size: 0.75rem; color: var(--muted); margin-bottom: 6px;">KTP</div>
+            <div id="b-ktp-container" style="width: 100%; aspect-ratio: 3/4; background: var(--bg-2); border-radius: 8px; overflow: hidden; border: 1px solid var(--border);">
+              <img id="b-ktp" src="" alt="KTP" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer; display: none;" onclick="window.open(this.src, '_blank')">
+              <div id="b-ktp-empty" style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--muted); font-size: 0.7rem;">-</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size: 0.7rem; color: var(--muted); text-align: center; margin-top: 8px;">Klik gambar untuk memperbesar</div>
+      </div>
+    </div>
+
+    <!-- BIODATA ACTIONS -->
+    <div id="biodataInitialActions" class="modal-actions" style="border-top:1px solid var(--border); padding-top:20px;">
+      <button type="button" class="btn-action btn-reject" onclick="showBiodataRejectModal()">✖ Tolak Biodata</button>
+      <button type="button" class="btn-action btn-accept" onclick="showBiodataVerifyModal()" style="width:100%;">✔ Terima Biodata</button>
+    </div>
+
+    <!-- REJECT FORM REMOVED (Replaced by Modal) -->
+
+  </div>
+</div>
+
+<button id="themeFab" class="theme-fab"></button>
+
+<script>
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+    if (tab === 'akun') {
+      document.querySelectorAll('.tab-btn')[0].classList.add('active');
+      document.getElementById('tab-akun').classList.add('active');
+    } else {
+      document.querySelectorAll('.tab-btn')[1].classList.add('active');
+      document.getElementById('tab-biodata').classList.add('active');
+    }
+  }
+
+  function closeModal(id) { 
+    document.getElementById(id).style.display = 'none'; 
+  }
+
+
+
+  // Modal Akun
+  function openAccountModal(btn) {
+      const d = btn.dataset;
+      document.getElementById('akunVerifyId').value = d.id;
+      
+      document.getElementById('a-nama').textContent = d.nama;
+      document.getElementById('a-email').textContent = d.email;
+      document.getElementById('a-kelompok').textContent = d.kelompok || '-';
+      document.getElementById('a-desa').textContent = d.desa || '-';
+      document.getElementById('a-daerah').textContent = d.daerah || '-';
+      document.getElementById('a-tgl').textContent = d.tgl;
+      
+      let waNum = d.wa || '';
+      if (waNum.startsWith('0')) waNum = '62' + waNum.slice(1);
+      
+      const waIcon = `<svg viewBox="0 0 24 24" fill="#22c55e" width="20" height="20"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.304-1.654a11.882 11.882 0 005.713 1.456h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>`;
+      
+      document.getElementById('a-wa').innerHTML = waNum ? 
+        `<a href="https://wa.me/${waNum}" target="_blank" title="Chat WhatsApp" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px; color:#22c55e; font-size:1rem; font-weight:500; transition:opacity .2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">${waIcon} ${waNum}</a>` 
+        : '-';
+      
+      const modal = document.getElementById('modalAkun');
+      modal.style.display = 'flex';
+      setTimeout(() => modal.classList.add('open'), 10);
+      document.body.classList.add('no-scroll');
+  }
+
+  function showAccountVerifyModal() {
+    const akunId = document.getElementById('akunVerifyId').value;
+    
+    // Custom Verify Modal for Account
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); z-index:10000; display:flex; justify-content:center; align-items:center; padding:20px;';
+    modal.innerHTML = `
+      <div style="background:var(--bg-2); border:1px solid var(--border); border-radius:6px; max-width:400px; width:100%; padding:24px; text-align:center; box-shadow:0 25px 50px rgba(0,0,0,0.5); animation:modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+        <div style="width:60px; height:60px; background:rgba(34, 197, 94, 0.1); color:#22c55e; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="32" height="32"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3 style="margin:0 0 8px; font-size:1.1rem; font-weight:700; color:#22c55e; line-height:1.4;">Setujui Akun?</h3>
+        <p style="margin:0 0 20px; color:var(--muted); line-height:1.5; font-size:0.9rem;">
+          Akun santri akan diaktifkan dan dapat digunakan untuk login.<br>Pastikan data pendaftar valid.
+        </p>
+        <div style="display:flex; gap:12px;">
+          <button type="button" id="cancelAccVerifyBtn" style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:12px; border-radius:4px; font-weight:600; cursor:pointer; transition:all .2s;">Batal</button>
+          <form action="/pengurus/verifikasi" method="POST" style="flex:1;">
+             <input type="hidden" name="id" value="${akunId}">
+             <input type="hidden" name="aksi" value="verify">
+             <button type="submit" style="width:100%; background:transparent; border:1px solid var(--accent); color:var(--accent); padding:12px; border-radius:4px; font-weight:600; cursor:pointer; transition:all .2s;" onmouseover="this.style.background='var(--accent)';this.style.color='#000'" onmouseout="this.style.background='transparent';this.style.color='var(--accent)'">Ya, Setujui</button>
+          </form>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    document.getElementById('cancelAccVerifyBtn').onclick = () => {
+       modal.style.opacity = 0;
+       setTimeout(() => modal.remove(), 200);
+    };
+    
+    const cancelBtn = document.getElementById('cancelAccVerifyBtn');
+    cancelBtn.onmouseover = () => { cancelBtn.style.background = 'var(--bg)'; };
+    cancelBtn.onmouseout = () => { cancelBtn.style.background = 'transparent'; };
+  }
+
+  function showAccountRejectModal() {
+    const akunId = document.getElementById('akunVerifyId').value;
+    
+    // Custom Reject Modal for Account
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); z-index:10000; display:flex; justify-content:center; align-items:center; padding:20px;';
+    modal.innerHTML = `
+      <div style="background:var(--bg-2); border:1px solid var(--border); border-radius:6px; max-width:400px; width:100%; padding:24px; text-align:center; box-shadow:0 25px 50px rgba(0,0,0,0.5); animation:modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+        <h3 style="margin:0 0 8px; font-size:1.1rem; font-weight:700; color:#ef4444; line-height:1.4;">Tolak Pendaftaran?</h3>
+        <p style="margin:0 0 16px; color:var(--muted); line-height:1.5; font-size:0.9rem;">
+          Akun santri akan ditolak permanen.<br>Harap berikan alasan yang jelas.
+        </p>
+        <form action="/pengurus/verifikasi" method="POST">
+            <input type="hidden" name="id" value="${akunId}">
+            <input type="hidden" name="aksi" value="reject">
+            <textarea name="alasan" required placeholder="Tulis alasan penolakan di sini..." style="width:100%; height:100px; background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:4px; padding:14px; color:var(--text); font-family:inherit; margin-bottom:20px; resize:none; outline:none; font-size:0.95rem; line-height:1.5;"></textarea>
+            <div style="display:flex; gap:12px;">
+              <button type="button" id="cancelAccRejectBtn" style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:12px; border-radius:4px; font-weight:600; cursor:pointer; transition:all .2s;">Batal</button>
+              <button type="submit" style="flex:1; background:transparent; border:1px solid #ef4444; color:#ef4444; padding:12px; border-radius:4px; font-weight:600; cursor:pointer; transition:all .2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.1)';this.style.color='#ef4444'" onmouseout="this.style.background='transparent';this.style.color='#ef4444'">Kirim Penolakan</button>
+            </div>
+        </form>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    
+    setTimeout(() => modal.querySelector('textarea').focus(), 100);
+
+    document.getElementById('cancelAccRejectBtn').onclick = () => {
+       modal.style.opacity = 0;
+       setTimeout(() => modal.remove(), 200);
+    };
+    
+    const cancelBtn = document.getElementById('cancelAccRejectBtn');
+    cancelBtn.onmouseover = () => { cancelBtn.style.background = 'var(--bg)'; };
+    cancelBtn.onmouseout = () => { cancelBtn.style.background = 'transparent'; };
+  }
+
+  // Modal Biodata - COMPLETE FIELDS
+  function openBiodataModal(btn) {
+      const d = btn.dataset;
+      document.getElementById('biodataVerifyId').value = d.id;
+      
+      // Data Pribadi
+      document.getElementById('b-nama').textContent = d.nama;
+      document.getElementById('b-no-ki').textContent = d.noKi || '-';
+      document.getElementById('b-jk').textContent = d.jk;
+      
+      let waNum = d.wa || '';
+      if (waNum.startsWith('0')) waNum = '62' + waNum.slice(1);
+      
+      const waIcon = `<svg viewBox="0 0 24 24" fill="#22c55e" width="20" height="20"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.304-1.654a11.882 11.882 0 005.713 1.456h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>`;
+      
+      document.getElementById('b-wa').innerHTML = waNum ? 
+        `<a href="https://wa.me/${waNum}" target="_blank" title="Chat WhatsApp" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px; color:#22c55e; font-size:1rem; font-weight:500; transition:opacity .2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">${waIcon} ${waNum}</a>` 
+        : '-';
+      document.getElementById('b-email').textContent = d.email || '-';
+      
+      // Alamat
+      document.getElementById('b-desa').textContent = d.desa || '-';
+      document.getElementById('b-daerah').textContent = d.daerah || '-';
+      document.getElementById('b-kelurahan').textContent = d.kelurahan || '-';
+      document.getElementById('b-kecamatan').textContent = d.kecamatan || '-';
+      document.getElementById('b-kota-kab').textContent = d.kotaKab || '-';
+      document.getElementById('b-provinsi').textContent = d.provinsi || '-';
+      
+      // Pendidikan
+      document.getElementById('b-kelompok').textContent = d.kelompok || '-';
+      document.getElementById('b-kampus').textContent = d.kampus || '-';
+      document.getElementById('b-prodi').textContent = d.prodi || '-';
+      document.getElementById('b-jenjang').textContent = d.jenjang || '-';
+      document.getElementById('b-angkatan').textContent = d.angkatan || '-';
+      
+      // Orang Tua
+      document.getElementById('b-ayah-nama').textContent = d.ayahNama || '-';
+      document.getElementById('b-ayah-hp').textContent = d.ayahHp || '-';
+      document.getElementById('b-ibu-nama').textContent = d.ibuNama || '-';
+      document.getElementById('b-ibu-hp').textContent = d.ibuHp || '-';
+      
+      document.getElementById('b-tgl').textContent = d.tgl;
+      
+      // Dokumen - Foto
+      const fotoImg = document.getElementById('b-foto');
+      const fotoEmpty = document.getElementById('b-foto-empty');
+      if (d.fotoPath) {
+        fotoImg.src = d.fotoPath;
+        fotoImg.style.display = 'block';
+        fotoEmpty.style.display = 'none';
+      } else {
+        fotoImg.style.display = 'none';
+        fotoEmpty.style.display = 'flex';
+      }
+      
+      // Dokumen - KK
+      const kkImg = document.getElementById('b-kk');
+      const kkEmpty = document.getElementById('b-kk-empty');
+      if (d.kkPath) {
+        kkImg.src = d.kkPath;
+        kkImg.style.display = 'block';
+        kkEmpty.style.display = 'none';
+      } else {
+        kkImg.style.display = 'none';
+        kkEmpty.style.display = 'flex';
+      }
+      
+      // Dokumen - KTP
+      const ktpImg = document.getElementById('b-ktp');
+      const ktpEmpty = document.getElementById('b-ktp-empty');
+      if (d.ktpPath) {
+        ktpImg.src = d.ktpPath;
+        ktpImg.style.display = 'block';
+        ktpEmpty.style.display = 'none';
+      } else {
+        ktpImg.style.display = 'none';
+        ktpEmpty.style.display = 'flex';
+      }
+      
+      document.getElementById('modalBiodata').style.display = 'flex';
+      setTimeout(() => document.getElementById('modalBiodata').classList.add('open'), 10);
+      document.body.classList.add('no-scroll');
+  }
+
+  function showBiodataVerifyModal() {
+    const santriId = document.getElementById('biodataVerifyId').value;
+    
+    // Custom Verify Modal for Biodata
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); z-index:10000; display:flex; justify-content:center; align-items:center; padding:20px;';
+    modal.innerHTML = `
+      <div style="background:var(--bg-2); border:1px solid var(--border); border-radius:6px; max-width:400px; width:100%; padding:24px; text-align:center; box-shadow:0 25px 50px rgba(0,0,0,0.5); animation:modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+        <div style="width:60px; height:60px; background:rgba(34, 197, 94, 0.1); color:#22c55e; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="32" height="32"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3 style="margin:0 0 8px; font-size:1.1rem; font-weight:700; color:#22c55e; line-height:1.4;">Terima Biodata?</h3>
+        <p style="margin:0 0 20px; color:var(--muted); line-height:1.5; font-size:0.9rem;">
+          Pastikan data santri sudah valid.<br>Tindakan ini akan memverifikasi biodata santri.
+        </p>
+        <div style="display:flex; gap:12px;">
+          <button type="button" id="cancelBioVerifyBtn" style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:12px; border-radius:8px; font-weight:600; cursor:pointer; transition:all .2s;">Batal</button>
+          <form action="/pengurus/biodata/verify" method="POST" style="flex:1;">
+             <input type="hidden" name="santri_id" value="${santriId}">
+             <input type="hidden" name="action" value="approve">
+             <button type="submit" style="width:100%; background:transparent; border:1px solid var(--accent); color:var(--accent); padding:12px; border-radius:8px; font-weight:600; cursor:pointer; transition:all .2s;" onmouseover="this.style.background='var(--accent)';this.style.color='#000'" onmouseout="this.style.background='transparent';this.style.color='var(--accent)'">Ya, Terima</button>
+          </form>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    document.getElementById('cancelBioVerifyBtn').onclick = () => {
+       modal.style.opacity = 0;
+       setTimeout(() => modal.remove(), 200);
+    };
+    
+    const cancelBtn = document.getElementById('cancelBioVerifyBtn');
+    cancelBtn.onmouseover = () => { cancelBtn.style.background = 'var(--bg)'; };
+    cancelBtn.onmouseout = () => { cancelBtn.style.background = 'transparent'; };
+  }
+
+  function showBiodataRejectModal() {
+    const santriId = document.getElementById('biodataVerifyId').value;
+    
+    // Custom Reject Modal for Biodata
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); z-index:10000; display:flex; justify-content:center; align-items:center; padding:20px;';
+    modal.innerHTML = `
+      <div style="background:var(--bg-2); border:1px solid var(--border); border-radius:6px; max-width:400px; width:100%; padding:24px; text-align:center; box-shadow:0 25px 50px rgba(0,0,0,0.5); animation:modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+        <h3 style="margin:0 0 8px; font-size:1.1rem; font-weight:700; color:#ef4444; line-height:1.4;">Konfirmasi Penolakan</h3>
+        <p style="margin:0 0 16px; color:var(--muted); line-height:1.5; font-size:0.9rem;">
+          Tulis alasan kenapa biodata ini perlu diperbaiki.<br>Pesan ini akan muncul di dashboard santri.
+        </p>
+        <form action="/pengurus/biodata/verify" method="POST">
+            <input type="hidden" name="santri_id" value="${santriId}">
+            <input type="hidden" name="action" value="reject">
+            <textarea name="alasan" required placeholder="Jelaskan bagian yang perlu diperbaiki..." style="width:100%; height:100px; background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:8px; padding:14px; color:var(--text); font-family:inherit; margin-bottom:20px; resize:none; outline:none; font-size:0.95rem; line-height:1.5; box-shadow:inset 0 2px 4px rgba(0,0,0,0.1);"></textarea>
+            <div style="display:flex; gap:12px;">
+              <button type="button" id="cancelBioRejectBtn" style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:12px; border-radius:8px; font-weight:600; cursor:pointer; transition:all .2s;">Batal</button>
+              <button type="submit" style="flex:1; background:transparent; border:1px solid #ef4444; color:#ef4444; padding:12px; border-radius:8px; font-weight:600; cursor:pointer; transition:all .2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.1)';this.style.color='#ef4444'" onmouseout="this.style.background='transparent';this.style.color='#ef4444'">Kirim Penolakan</button>
+            </div>
+        </form>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    
+    setTimeout(() => modal.querySelector('textarea').focus(), 100);
+
+    document.getElementById('cancelBioRejectBtn').onclick = () => {
+       modal.style.opacity = 0;
+       setTimeout(() => modal.remove(), 200);
+    };
+    
+    const cancelBtn = document.getElementById('cancelBioRejectBtn');
+    cancelBtn.onmouseover = () => { cancelBtn.style.background = 'var(--bg)'; };
+    cancelBtn.onmouseout = () => { cancelBtn.style.background = 'transparent'; };
+  }
+
+  // Close modal on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(modal => {
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(modal.id); });
+  });
+</script>
+
+<%- include('partials/pengurus_nav_script') %>
+
+</body>
+</html>
+

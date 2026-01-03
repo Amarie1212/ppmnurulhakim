@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/duty.css" />
+  
+  <style>
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .page-title { font-weight: 800; margin: 0; }
+    
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all .2s;
+    }
+    .btn-back:hover {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
+    .btn-back svg { width: 18px; height: 18px; }
+    
+    /* Profile Card */
+    .profile-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 24px;
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, transparent 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    .profile-foto {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--accent);
+      background: var(--bg);
+    }
+    .profile-foto-placeholder {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: var(--bg);
+      display: grid;
+      place-items: center;
+      border: 3px dashed var(--border);
+    }
+    .profile-foto-placeholder svg {
+      width: 40px;
+      height: 40px;
+      color: var(--muted);
+    }
+    .profile-info {
+      flex: 1;
+      text-align: left !important;
+    }
+    .profile-info h2 {
+      margin: 0 0 6px;
+      font-size: 1.4rem;
+      font-weight: 800;
+      text-align: left !important;
+    }
+    .profile-meta {
+      color: var(--muted);
+      font-size: 0.9rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: flex-start;
+    }
+    .profile-meta span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    /* Info Sections */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      padding: 24px;
+    }
+    .info-section {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(34, 197, 94, 0.1);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+    }
+    .section-icon svg {
+      width: 18px;
+      height: 18px;
+      color: var(--accent);
+    }
+    .section-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 8px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-label {
+      color: var(--muted);
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .info-val {
+      font-weight: 600;
+      text-align: right;
+      max-width: 60%;
+      word-break: break-word;
+      font-size: 0.9rem;
+    }
+    /* Document thumbnails */
+    .doc-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .doc-preview-item {
+      text-align: center;
+    }
+    .doc-preview-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .doc-preview-box {
+      width: 100%;
+      aspect-ratio: 3/4;
+      background: var(--bg-2);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .doc-preview-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+    .doc-preview-empty {
+      color: var(--muted);
+      font-size: 0.7rem;
+    }
+    
+    @media (max-width: 768px) {
+      .page-header { 
+        flex-direction: column; 
+        align-items: flex-start !important; 
+        gap: 12px;
+      }
+      .page-title { font-size: 1.3rem !important; }
+      .btn-back { width: 100%; justify-content: center; }
+      
+      .profile-header { 
+        flex-direction: column; 
+        align-items: center;
+        text-align: center;
+        padding: 16px;
+      }
+      .profile-info { text-align: center !important; }
+      .profile-info h2 { text-align: center !important; font-size: 1.2rem; }
+      .profile-meta { justify-content: center; font-size: 0.8rem; }
+      .profile-foto, .profile-foto-placeholder { width: 70px; height: 70px; }
+      
+      .info-grid { 
+        grid-template-columns: 1fr; 
+        padding: 12px; 
+        gap: 12px; 
+      }
+      .info-section { padding: 12px; }
+      .section-header { margin-bottom: 10px; padding-bottom: 8px; }
+      .section-title { font-size: 0.85rem; }
+      .section-icon { width: 28px; height: 28px; }
+      .section-icon svg { width: 14px; height: 14px; }
+      
+      .info-row { padding: 6px 0; }
+      .info-label { font-size: 0.8rem; }
+      .info-val { font-size: 0.85rem; max-width: 55%; }
+      
+      .doc-preview-grid { 
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 8px; 
+      }
+      .doc-preview-label { font-size: 0.65rem; }
+    }
+    
+    @media (max-width: 480px) {
+      .page-title { font-size: 1.1rem !important; }
+      .btn-back { padding: 8px 16px; font-size: 0.85rem; }
+      
+      .profile-header { padding: 12px; }
+      .profile-foto, .profile-foto-placeholder { width: 60px; height: 60px; }
+      .profile-info h2 { font-size: 1.1rem; }
+      .profile-meta { font-size: 0.75rem; gap: 8px; }
+      
+      .info-grid { padding: 10px; gap: 10px; }
+      .info-section { padding: 10px; }
+      .section-title { font-size: 0.8rem; }
+      
+      .info-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+      .info-label { font-size: 0.75rem; }
+      .info-val { text-align: left; max-width: 100%; font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="container nav-inner">
+    <div class="brand-wrap">
+      <a href="/pengurus" class="btn-back-inline" title="Kembali">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </a>
+      <div class="brand">Detail Santri</div>
+    </div>
+    <div class="right-actions">
+      <button id="navToggle" class="nav-toggle" style="display:flex !important;" aria-label="Menu">
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      </button>
+    </div>
+  </div>
+</header>
+
+<%- include('partials/pengurus_sidebar', { currentPage: 'santri', user: user, stat: null }) %>
+
+<main class="section">
+  <div class="container">
+    <div class="page-header">
+      <h2 class="page-title">Data Lengkap Santri</h2>
+      <a href="/pengurus" class="btn-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Kembali
+      </a>
+    </div>
+
+    <div class="profile-card">
+      <!-- Profile Header -->
+      <div class="profile-header">
+        <% if(s.foto_path){ %>
+          <img src="<%= s.foto_path %>" alt="Foto" class="profile-foto">
+        <% } else { %>
+          <div class="profile-foto-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+        <% } %>
+        <div class="profile-info">
+          <h2><%= s.nama %></h2>
+          <div class="profile-meta">
+            <span><%= s.jk_label %></span>
+            <span><%= s.phone || '-' %></span>
+            <span>Terdaftar: <%= s.created_fmt %></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Grid -->
+      <div class="info-grid">
+        <!-- Data Pribadi -->
+        <div class="info-section">
+          <div class="section-header">
+            <div class="section-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="section-title">Data Pribadi</div>
+          </div>
+          <div class="info-row"><span class="info-label">Email</span><span class="info-val"><%= s.email || '-' %></span></div>
+          <div class="info-row"><span class="info-label">WhatsApp</span><span class="info-val"><%= s.wa || '-' %></span></div>
+          <div class="info-row"><span class="info-label">Pernah Mondok</span><span class="info-val"><%= s.pernah_mondok ? 'Ya' : 'Tidak' %></span></div>
+          <div class="info-row"><span class="info-label">Lulus Muballigh</span><span class="info-val"><%= s.lulus_muballigh ? 'Ya' : 'Tidak' %></span></div>
+        </div>
+
+        <!-- Alamat -->
+        <div class="info-section">
+          <div class="section-header">
+            <div class="section-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div class="section-title">Alamat</div>
+          </div>
+          <div class="info-row"><span class="info-label">Kelurahan</span><span class="info-val"><%= s.kelurahan || '-' %></span></div>
+          <div class="info-row"><span class="info-label">Kecamatan</span><span class="info-val"><%= s.kecamatan || '-' %></span></div>
+          <div class="info-row"><span class="info-label">Kota/Kab</span><span class="info-val"><%= s.kota_kab || '-' %></span></div>
+          <div class="info-row"><span class="info-label">Provinsi</span><span class="info-val"><%= s.provinsi || '-' %></span></div>
+        </div>
+
+        <!-- Pendidikan -->
+        <div class="info-section">
+          <div class="section-header">
+            <div class="section-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            </div>
+            <div class="section-title">Pendidikan</div>
+          </div>
+          <div class="info-row"><span class="info-label">Kampus</span><span class="info-val"><%= s.kampus || '-' %></span></div>
+          <div class="info-row"><span class="info-label">Program Studi</span><span class="info-val"><%= s.prodi || '-' %></span></div>
+          <div class="info-row"><span class="info-label">Jenjang</span><span class="info-val"><%= s.jenjang || '-' %></span></div>
+          <div class="info-row"><span class="info-label">Angkatan</span><span class="info-val"><%= s.angkatan || '-' %></span></div>
+          <div class="info-row"><span class="info-label">No. KI</span><span class="info-val"><%= s.no_ki || '-' %></span></div>
+        </div>
+
+        <!-- Kelompok Desa -->
+        <div class="info-section">
+          <div class="section-header">
+            <div class="section-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <div class="section-title">Asal Majlis Taklim</div>
+          </div>
+          <div class="info-row"><span class="info-label">Kelompok</span><span class="info-val"><%= s.kelompok || '-' %></span></div>
+          <div class="info-row"><span class="info-label">Desa</span><span class="info-val"><%= s.desa || '-' %></span></div>
+          <div class="info-row"><span class="info-label">Daerah</span><span class="info-val"><%= s.daerah || '-' %></span></div>
+        </div>
+
+        <!-- Dokumen Pendukung -->
+        <div class="info-section">
+          <div class="section-header">
+            <div class="section-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="section-title">Dokumen Upload</div>
+          </div>
+          <div class="doc-preview-grid">
+            <!-- Foto -->
+            <div class="doc-preview-item">
+              <div class="doc-preview-label">Foto</div>
+              <div class="doc-preview-box">
+                <% if(s.foto_path) { %>
+                  <img src="<%= s.foto_path %>" alt="Foto" onclick="openZoom('<%= s.foto_path %>')">
+                <% } else { %>
+                  <span class="doc-preview-empty">-</span>
+                <% } %>
+              </div>
+            </div>
+            <!-- KK -->
+            <div class="doc-preview-item">
+              <div class="doc-preview-label">KK</div>
+              <div class="doc-preview-box">
+                <% if(s.kk_path) { %>
+                  <img src="<%= s.kk_path %>" alt="KK" onclick="openZoom('<%= s.kk_path %>')">
+                <% } else { %>
+                  <span class="doc-preview-empty">-</span>
+                <% } %>
+              </div>
+            </div>
+            <!-- KTP -->
+            <div class="doc-preview-item">
+              <div class="doc-preview-label">KTP</div>
+              <div class="doc-preview-box">
+                <% if(s.ktp_path) { %>
+                  <img src="<%= s.ktp_path %>" alt="KTP" onclick="openZoom('<%= s.ktp_path %>')">
+                <% } else { %>
+                  <span class="doc-preview-empty">-</span>
+                <% } %>
+              </div>
+            </div>
+          </div>
+          <div style="font-size: 0.7rem; color: var(--muted); text-align: center; margin-top: 8px;">Klik gambar untuk memperbesar</div>
+        </div>
+
+        <!-- Data Ayah -->
+        <div class="info-section">
+          <div class="section-header">
+            <div class="section-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="section-title">Data Ayah</div>
+          </div>
+          <div class="info-row"><span class="info-label">Nama</span><span class="info-val"><%= s.ayah_nama || '-' %></span></div>
+          <div class="info-row"><span class="info-label">No. HP</span><span class="info-val"><%= s.ayah_hp || '-' %></span></div>
+        </div>
+
+        <!-- Data Ibu -->
+        <div class="info-section">
+          <div class="section-header">
+            <div class="section-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="section-title">Data Ibu</div>
+          </div>
+          <div class="info-row"><span class="info-label">Nama</span><span class="info-val"><%= s.ibu_nama || '-' %></span></div>
+          <div class="info-row"><span class="info-label">No. HP</span><span class="info-val"><%= s.ibu_hp || '-' %></span></div>
+        </div>
+      </div>
+      
+      <!-- Verification Actions (Only for Admin/Panitia) -->
+      <% if (user && (user.role === 'admin' || user.role === 'panitia') && fromVerification) { %>
+        <div style="border-top: 1px solid var(--border); padding-top: 24px; margin-top: 24px;">
+          <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+              <svg style="width: 20px; height: 20px; color: var(--accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 11l3 3L22 4"/>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+              </svg>
+              <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">Verifikasi Biodata</h3>
+            </div>
+            <p style="margin: 0; color: var(--muted); font-size: 0.9rem;">
+              Periksa kelengkapan dan kebenaran biodata di atas. Jika ada kesalahan, tolak biodata agar santri dapat mengisi ulang.
+            </p>
+          </div>
+          
+          <form action="/pengurus/biodata/verify" method="POST" style="display: flex; gap: 12px;">
+            <input type="hidden" name="santri_id" value="<%= s.id %>">
+            <button type="submit" name="action" value="reject" 
+                    onclick="return confirm('Yakin tolak biodata ini? Santri akan diminta mengisi ulang.')"
+                    style="flex: 1; padding: 14px 24px; background: var(--danger); color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+              Tolak Biodata
+            </button>
+            <button type="submit" name="action" value="approve"
+                    onclick="return confirm('Yakin approve biodata ini?')"
+                    style="flex: 1; padding: 14px 24px; background: var(--accent); color: #000; border: none; border-radius: 10px; font-weight: 600; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 11l3 3L22 4"/>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+              </svg>
+              Approve Biodata
+            </button>
+          </form>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</main>
+
+<button id="themeFab" class="theme-fab"></button>
+
+<script>
+  // Image Zoom Modal
+  function openZoom(src) {
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:9999;cursor:zoom-out;padding:20px;';
+    modal.innerHTML = '<img src="' + src + '" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;">';
+    modal.onclick = () => modal.remove();
+    document.body.appendChild(modal);
+  }
+</script>
+
+<%- include('partials/pengurus_nav_script') %>
+
+</body>
+</html>
+
+

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daftar Pengurus Baru</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/duty.css" />
+  <link rel="stylesheet" href="/form.css" />
+  
+  <style>
+    /* Menggunakan style yang sama dengan admin_login.ejs */
+    body {
+      background-image: 
+        var(--form-pattern, none),
+        linear-gradient(to bottom, rgba(9, 9, 11, 0.7), rgba(9, 9, 11, 0.9)),
+        url("/img/ppm.jpg");
+      background-size: 32px 32px, cover;
+      background-attachment: fixed;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: var(--bg); /* Fallback */
+      color: var(--text);
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; margin: 0; font-family: 'Poppins', sans-serif;
+    }
+    .admin-card {
+      background: var(--bg-2); border: 1px solid var(--border);
+      padding: 40px; border-radius: 6px; width: 100%; max-width: 400px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    .input, select.input {
+      background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: var(--text);
+      width: 100%; margin-bottom: 12px; padding: 12px; border-radius: 4px;
+      box-sizing: border-box; /* Penting agar padding tidak melebarkan elemen */
+    }
+    :root[data-theme="light"] .input { background: #f1f5f9; }
+    .btn-login {
+      background: var(--accent); color: #08110a; font-weight: 700; width: 100%;
+      padding: 12px; border-radius: 4px; border: none; cursor: pointer; margin-top: 8px;
+    }
+    .btn-login:hover { background: var(--accent-hover); }
+    .label-text { display:block; margin-bottom:6px; font-size:0.9rem; color: var(--muted); font-weight: 600; }
+    .alert-box {
+      background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 12px; border-radius: 4px; font-size: 0.85rem; margin-bottom: 20px; text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-card">
+    <div style="text-align:center; margin-bottom:24px;">
+      <h2 style="margin:0">Registrasi Pengurus</h2>
+      <small style="color:var(--muted)">Halaman ini bersifat sementara (Dev Mode)</small>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert-box"><%= error %></div>
+    <% } %>
+
+    <form method="POST" action="/panel-admin/register">
+      <div>
+        <label class="label-text">Nama Lengkap</label>
+        <input type="text" name="nama" class="input" required placeholder="Fulan bin Fulan" />
+      </div>
+
+      <div>
+        <label class="label-text">Email</label>
+        <input type="email" name="email" class="input" required placeholder="admin@contoh.com" />
+      </div>
+
+      <div>
+        <label class="label-text">Password</label>
+        <input type="password" name="password" class="input" required placeholder="••••••••" />
+      </div>
+
+      <div>
+        <label class="label-text">Role (Jabatan)</label>
+        <select name="role" class="input" required>
+          <option value="admin">Admin (Super User)</option>
+          <option value="panitia">Panitia (Verifikasi)</option>
+          <option value="keuangan">Keuangan</option>
+          <option value="ketua">Ketua</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn-login">BUAT AKUN</button>
+    </form>
+    
+    <div style="text-align:center; margin-top:20px;">
+      <a href="/panel-admin" style="display:inline-block; padding:10px 20px; font-size:0.9rem; color:var(--muted); text-decoration:none; font-weight:700; border:1px solid var(--border); border-radius:4px; transition:all .2s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+        ← Sudah punya akun? Login
+      </a>
+    </div>
+  </div>
+
+  <button class="theme-fab" id="themeToggle" title="Ganti Tema">
+    <svg class="icon sun-icon" viewBox="0 0 24 24">
+       <path d="M12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3zm0-2V4h.01M12 20v-3h.01M4 12h3.01M17 12h3.01M5.64 5.64l2.12 2.12M16.24 16.24l2.12 2.12M5.64 18.36l2.12-2.12M16.24 7.76l2.12-2.12"></path>
+    </svg>
+  </button>
+
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+      const toggleBtn = document.getElementById('themeToggle');
+      if(toggleBtn){
+        toggleBtn.addEventListener('click', () => {
+          toggleBtn.classList.add('spin');
+          setTimeout(() => toggleBtn.classList.remove('spin'), 500);
+          const currentTheme = document.documentElement.getAttribute('data-theme');
+          if (currentTheme === 'light') {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'dark');
+          } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/duty.css" />
+  
+  <style>
+    /* =========================================
+       DASHBOARD CARDS
+       ========================================= */
+    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+    .dash-card {
+      background: var(--bg-2); border: 1px solid var(--border); border-radius: 4px; padding: 24px;
+      text-decoration: none; color: var(--text); display: flex; flex-direction: column; justify-content: space-between; height: 100%;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+    .dash-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-color: var(--accent); }
+    .dash-icon { width: 48px; height: 48px; border-radius: 4px; display: grid; place-items: center; margin-bottom: 16px; }
+    .dash-stat { font-size: 2rem; font-weight: 800; margin: 8px 0; color: var(--text); line-height: 1; }
+    .dash-label { color: var(--muted); font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Kelas Warna Kartu */
+    .card-verif { border-color: #ea580c; }
+    .icon-verif { background:rgba(234, 88, 12, 0.1); color:#ea580c; }
+    .card-santri { border-color: var(--accent); }
+    .icon-santri { background: rgba(34, 197, 94, 0.1); color: var(--accent); }
+    .card-keuangan { background:rgba(255, 193, 7, 0.1); border-color:#ffc107; }
+    .icon-keuangan { background:rgba(255, 193, 7, 0.15); color:#ffc107; }
+    .card-kode { border-color: #3b82f6; }
+    .icon-kode { background:rgba(37, 99, 235, 0.1); color:#3b82f6; }
+    .card-kelola-akun { background:rgba(147, 51, 234, 0.1); border-color:#9333ea; }
+    .icon-kelola-akun { background:rgba(147, 51, 234, 0.15); color:#9333ea; }
+
+    .page-title { margin-bottom: 24px; font-weight: 800; }
+  </style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="container nav-inner">
+    <div class="brand-wrap">
+      <img src="/img/logo%20ppm.png" alt="PPM" class="brand-logo">
+      <div class="brand">PPM Nurul Hakim</div>
+    </div>
+    
+    <div class="right-actions">
+      <button id="navToggle" class="nav-toggle" style="display:flex !important;" aria-label="Menu" type="button">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </button>
+    </div>
+  </div>
+</header>
+
+<%- include('partials/pengurus_sidebar', { currentPage: 'home', user: user, stat: stat }) %>
+
+<main class="section">
+  <div class="container">
+    <div class="page-header">
+      <h2 class="page-title">Dashboard Overview</h2>
+    </div>
+    <div class="dashboard-grid">
+      
+      <% if (user.role === 'admin' || user.role === 'panitia') { %>
+      <a href="/pengurus/verifikasi" class="dash-card">
+        <div>
+          <div class="dash-icon" style="background:rgba(234, 88, 12, 0.1); color:#ea580c;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <div class="dash-label">Verifikasi</div>
+          
+          <div style="display:flex; align-items:center; gap:24px; margin:12px 0 8px;">
+            <div>
+              <div class="dash-stat" style="margin:0; font-size:1.8rem;"><%= stat.pending %></div>
+              <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px;">Akun</div>
+            </div>
+            <div style="width:1px; height:32px; background:var(--border);"></div>
+            <div>
+              <div class="dash-stat" style="margin:0; font-size:1.8rem;"><%= stat.biodata_pending %></div>
+              <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px;">Biodata</div>
+            </div>
+          </div>
+
+        </div>
+        <div style="font-size:0.85rem; color:var(--muted); margin-top:10px;">
+          Antrean verifikasi masuk
+        </div>
+      </a>
+      <% } %>
+
+      <% if (user.role !== 'keuangan') { %>
+      <a href="/pengurus" class="dash-card">
+        <div>
+          <div class="dash-icon" style="background:rgba(34, 197, 94, 0.1); color:#22c55e;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="dash-label">Data Santri</div>
+          <div class="dash-stat"><%= stat.total_santri %></div>
+        </div>
+        <div style="font-size:0.85rem; color:var(--muted); margin-top:10px">
+          Putra: <%= stat.putra %> · Putri: <%= stat.putri %>
+        </div>
+      </a>
+      <% } %>
+
+      <% if (user.role === 'admin' || user.role === 'keuangan') { %>
+      <a href="/pengurus/verifikasi-pembayaran" class="dash-card">
+        <div>
+          <div class="dash-icon" style="background:rgba(255, 193, 7, 0.1); color:#ffc107;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div class="dash-label">Verifikasi Bayar</div>
+          <div class="dash-stat" style="font-size:1.3rem">Cek Bukti</div>
+        </div>
+        <div style="font-size:0.85rem; color:var(--muted); margin-top:10px;">
+          Verifikasi bukti pembayaran santri
+        </div>
+      </a>
+      
+      <a href="/pengurus/laporan-pembayaran" class="dash-card">
+        <div>
+          <div class="dash-icon" style="background:rgba(59, 130, 246, 0.1); color:#3b82f6;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <div class="dash-label">Laporan Pembayaran</div>
+          <div class="dash-stat" style="font-size:1.5rem">Lihat</div>
+        </div>
+        <div style="font-size:0.85rem; color:var(--muted); margin-top:10px;">
+          Data pembayaran terverifikasi
+        </div>
+      </a>
+      <% } %>
+      
+      <% if (user.role === 'admin' || user.role === 'ketua') { %>
+      <a href="/pengurus/laporan-masuk" class="dash-card">
+        <div>
+          <div class="dash-icon" style="background:rgba(255, 193, 7, 0.1); color:#ffc107;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <div class="dash-label">Laporan Masuk</div>
+          <div class="dash-stat" style="font-size:1.5rem">Review</div>
+        </div>
+        <div style="font-size:0.85rem; color:var(--muted); margin-top:10px;">
+          Lihat laporan pembayaran masuk
+        </div>
+      </a>
+      <% } %>
+
+      <% if (user.role === 'admin') { %>
+
+      <a href="/pengurus/kelola-akun" class="dash-card">
+        <div>
+          <div class="dash-icon" style="background:rgba(147, 51, 234, 0.1); color:#9333ea;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="dash-label">Akun Pengurus</div>
+          <div class="dash-stat" style="font-size:1.5rem">Kelola</div>
+        </div>
+        <div style="font-size:0.85rem; color:var(--muted); margin-top:10px;">Kelola akun admin & pengurus</div>
+      </a>
+      <% } %>
+
+      <% if (user.role === 'admin' || user.role === 'panitia') { %>
+      <a href="/pengurus/kelola-pengumuman" class="dash-card">
+        <div>
+          <div class="dash-icon" style="background:rgba(245,158,11,0.1); color:#f59e0b;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="dash-label">Pengumuman</div>
+          <div class="dash-stat" style="font-size:1.5rem">Edit</div>
+        </div>
+        <div style="font-size:0.85rem; color:var(--muted); margin-top:10px;">Edit info untuk santri terdaftar</div>
+      </a>
+      <% } %>
+
+
+
+    </div>
+  </div>
+</main>
+
+<button id="themeFab" class="theme-fab" aria-label="Ganti tema" title="Ganti tema"></button>
+
+<%- include('partials/pengurus_nav_script') %>
+
+</body>
+</html>
+
+

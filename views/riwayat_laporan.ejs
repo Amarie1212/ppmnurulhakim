@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/duty.css" />
+  
+  <style>
+    .page-header { margin-bottom: 32px; }
+    .page-title { font-weight: 800; margin-bottom: 8px; }
+    .page-sub { color: var(--muted); }
+    
+    .filter-row {
+      display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all .2s;
+      text-decoration: none;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    /* Improved Table Styling - Enhanced Consistency */
+    .table-card {
+      padding: 0;
+      overflow: hidden;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .data-table thead {
+      background: var(--bg-3);
+    }
+    :root[data-theme="light"] .data-table thead {
+      background: #f8fafc;
+    }
+    .data-table th {
+      padding: 16px 20px;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      border-bottom: 2px solid var(--border);
+    }
+    .data-table td {
+      padding: 16px 20px;
+      vertical-align: middle;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(16, 185, 129, 0.05); }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .status-pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+    .status-approved { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+    .status-rejected { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+    .empty-state svg { width: 64px; height: 64px; opacity: 0.3; margin-bottom: 16px; }
+    
+    @media (max-width: 768px) {
+      .table-card { 
+        overflow-x: auto;
+        border-radius: var(--radius-md);
+      }
+      .data-table {
+        min-width: 600px;
+      }
+      .data-table th, .data-table td {
+        font-size: 0.85rem !important;
+        padding: 14px 12px !important;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .data-table { min-width: 500px; }
+      .data-table th, .data-table td { font-size: 0.8rem !important; padding: 12px 10px !important; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="container nav-inner">
+    <div class="brand-wrap">
+      <a href="/pengurus/home" class="btn-back-inline" title="Kembali">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </a>
+      <img src="/img/logo%20ppm.png" alt="PPM" class="brand-logo">
+      <div class="brand">Riwayat Laporan</div>
+    </div>
+    <div class="right-actions">
+      <button id="navToggle" class="nav-toggle" style="display:flex !important;" aria-label="Menu">
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      </button>
+    </div>
+  </div>
+</header>
+
+<%- include('partials/pengurus_sidebar', { currentPage: 'riwayat-laporan', user: user, stat: null }) %>
+
+<main class="section">
+  <div class="container">
+    <div class="page-header">
+      <h2 class="page-title">Riwayat Laporan</h2>
+      <p class="page-sub">Arsip semua laporan yang sudah diproses</p>
+    </div>
+
+    <div class="filter-row">
+      <a href="/pengurus/riwayat-laporan" class="filter-btn <%= !filter ? 'active' : '' %>">Semua</a>
+      <a href="/pengurus/riwayat-laporan?status=APPROVED" class="filter-btn <%= filter === 'APPROVED' ? 'active' : '' %>">Disetujui</a>
+      <a href="/pengurus/riwayat-laporan?status=REJECTED" class="filter-btn <%= filter === 'REJECTED' ? 'active' : '' %>">Ditolak</a>
+      <a href="/pengurus/riwayat-laporan?status=PENDING" class="filter-btn <%= filter === 'PENDING' ? 'active' : '' %>">Menunggu</a>
+    </div>
+
+    <% if(!laporan || laporan.length === 0) { %>
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <h3>Belum ada riwayat</h3>
+        <p>Belum ada laporan yang tersimpan.</p>
+      </div>
+    <% } else { %>
+      <div class="table-card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th width="60" style="text-align:center">No</th>
+              <th>Periode Laporan</th>
+              <th>Dibuat Oleh</th>
+              <th>Tanggal Proses</th>
+              <th style="text-align:center">Total Data</th>
+              <th style="text-align:center">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% laporan.forEach((l, i) => { %>
+              <tr>
+                <td style="text-align:center; color:var(--muted); font-size:0.9rem"><%= i + 1 %></td>
+                <td><strong><%= l.periode_mulai %> - <%= l.periode_akhir %></strong></td>
+                <td><%= l.nama_pembuat %></td>
+                <td style="color:var(--muted); font-size:0.85rem"><%= l.dibuat_at %></td>
+                <td style="text-align:center"><%= l.total_pembayaran %> record</td>
+                <td style="text-align:center">
+                  <span class="status-badge status-<%= l.status.toLowerCase() %>">
+                    <% if(l.status === 'PENDING') { %>Menunggu<% } %>
+                    <% if(l.status === 'APPROVED') { %>Disetujui<% } %>
+                    <% if(l.status === 'REJECTED') { %>Ditolak<% } %>
+                  </span>
+                </td>
+              </tr>
+              <% if(l.komentar_ketua) { %>
+                <tr>
+                  <td colspan="6" style="background:var(--bg); font-size:0.85rem; color:var(--muted); border-top:1px dashed var(--border);">
+                    <div style="padding:10px 20px;">
+                      <strong>Komentar Ketua:</strong> <%= l.komentar_ketua %>
+                    </div>
+                  </td>
+                </tr>
+              <% } %>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<button id="themeFab" class="theme-fab"></button>
+
+<%- include('partials/pengurus_nav_script') %>
+
+</body>
+</html>
+
+

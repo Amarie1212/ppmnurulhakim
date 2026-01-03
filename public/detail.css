@@ -1,0 +1,185 @@
+/* ===========================
+   detail.css — Halaman Detail Santri
+   - Theme & navbar mirip duty.css
+   - Layout isi mirip form.css
+   =========================== */
+
+/* ===== THEME (duty.css style) ===== */
+:root{
+  --bg:#0b0e14; --bg-2:#11151d; --text:#f4f4f4;
+  --muted:#6b7280;
+  --accent:#22c55e; --accent-hover:#16a34a;
+  --border:rgba(255,255,255,.10);
+  --glass:rgba(10,10,10,.65); --glass-strong:rgba(15,15,20,.96);
+  --nav-h:72px;
+}
+:root[data-theme="light"]{
+  --bg:#f6f7fb; --bg-2:#ffffff; --text:#0b0e14; --muted:#4b5563;
+  --accent:#16a34a; --accent-hover:#0e9f45;
+  --border:rgba(0,0,0,.08);
+  --glass:rgba(255,255,255,.72); --glass-strong:rgba(255,255,255,.97);
+}
+
+/* ===== BACKGROUND MOTIF GRID (bukan foto) ===== */
+html,body{margin:0}
+body{font-family:"Merriweather Sans",sans-serif;line-height:1.6;transition:background .3s,color .3s}
+body {
+  background-color: #242424;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-attachment: fixed;
+  color: var(--text);
+}
+
+:root[data-theme="light"] body {
+  background-color: #d8d8d8;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+}
+.detail-page{
+  background-color: #242424;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-attachment: fixed;
+  color: var(--text);
+}
+:root[data-theme="light"] .detail-page{
+  background-color: #d8d8d8;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+}
+
+/* ===== LAYOUT WRAPPER (form.css style) ===== */
+.form-wrap{ width:min(980px,94%); margin:calc(var(--nav-h) + 16px) auto 44px; }
+.form-title{ text-align:center; font-weight:800; margin-bottom:8px; letter-spacing:.2px; }
+
+/* Kartu kaca (form.css) */
+.form-card{
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.33);
+  transition: box-shadow .3s ease, transform .2s ease;
+}
+.form-card:hover{ transform:translateY(-1px); box-shadow:0 26px 72px rgba(0,0,0,.38); }
+
+/* Grid (form.css) */
+.grid-12{ display:grid; grid-template-columns:repeat(12,1fr); gap:12px; }
+.col-12{ grid-column:span 12; } .col-6{ grid-column:span 6; }
+.col-4{ grid-column:span 4; }   .col-3{ grid-column:span 3; }
+@media (max-width:900px){ .col-6,.col-4,.col-3{ grid-column:span 12; } }
+
+/* Section spacing (duty.css-ish) */
+.section{ padding:calc(var(--nav-h) + 10px) 0 72px; }
+.page-title{ text-align:center; margin:18px 0; font-size:clamp(22px,3.6vw,30px); }
+
+/* Divider & headings (form.css) */
+.sec-title{ font-weight:800; margin:4px 0 6px; }
+.divider{ height:1px; background:var(--border); margin:10px 0; }
+
+/* Kotak info (form.css) */
+.smooth-box{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:12px;
+  background:rgba(255,255,255,.02);
+  transition:background .25s, border-color .25s;
+}
+.smooth-box:hover{ background:rgba(255,255,255,.04); }
+.sub{ font-weight:700; color:var(--muted); margin-bottom:6px; }
+
+/* ===== NAVBAR & BACK BUTTON (duty.css style) ===== */
+.navbar{
+  position:fixed; top:0; left:0; right:0; z-index:1000;
+  background:var(--glass); border-bottom:1px solid var(--border);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter:blur(10px); min-height:var(--nav-h);
+}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+.brand-wrap{ display:flex; align-items:center; gap:10px; }
+.brand{ font-weight:700; letter-spacing:.3px; }
+
+/* Tombol back inline — kontras jelas di dark/light */
+.btn-back-inline{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:36px; height:36px; border-radius:10px;
+  border:1px solid var(--border);
+  background: rgba(255,255,255,0.10);
+  color: var(--text);
+  transition: transform .2s, background .2s, border-color .2s, box-shadow .2s;
+}
+.btn-back-inline:hover{ transform: translateX(-2px); background: rgba(255,255,255,0.18); }
+.btn-back-inline:focus-visible{ outline: none; box-shadow: 0 0 0 3px rgba(34,197,94,.28); }
+.btn-back-inline .icon{
+  width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2;
+  stroke-linecap:round; stroke-linejoin:round;
+}
+:root[data-theme="light"] .btn-back-inline{
+  background: rgba(0,0,0,0.06);
+  border-color: rgba(0,0,0,0.10);
+  color:#111;
+}
+:root[data-theme="light"] .btn-back-inline:hover{ background: rgba(0,0,0,0.12); }
+
+/* ===== HEAD AREA (foto + nama) ===== */
+.header-row{ display:flex; gap:14px; align-items:center; margin-bottom:6px; }
+.avatar{
+  width:112px; height:112px; border-radius:12px; object-fit:cover;
+  border:1px solid var(--border); background:#e5e7eb0f;
+}
+.no-foto{ display:grid; place-items:center; color:var(--muted); }
+.head-meta .name{ margin:0 0 2px; font-size:1.15rem; font-weight:800; }
+.muted{ color:var(--muted); }
+
+/* ===== Key–Value (form.css style) ===== */
+.kv{ display:grid; grid-template-columns:160px 1fr; gap:8px 12px; margin:4px 0; }
+.kv .k{ color:var(--muted); font-weight:700; }
+.kv > div:last-child{ word-break: break-word; overflow-wrap: anywhere; }
+.theme-fab{
+  position:fixed; left:18px; bottom:18px; width:52px; height:52px;
+  display:grid; place-items:center; border-radius:9999px;
+  border:1px solid var(--border); background:var(--glass); -webkit-backdrop-filter: blur(10px); backdrop-filter:blur(10px);
+  z-index:1100; box-shadow:0 10px 28px rgba(0,0,0,.25); transition:transform .2s;
+}
+.theme-fab:hover{ transform:translateY(-2px) }
+.theme-fab .icon{ width:22px; height:22px; fill:var(--text) }
+.theme-fab.spin{ animation:spinOnce .4s ease }
+@keyframes spinOnce{ from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width:768px){
+  :root{ --nav-h:60px }
+  .nav-inner{ padding:10px 0 }
+  .section{ padding:calc(var(--nav-h) + 10px) 0 60px }
+
+  .form-card{ padding:14px; border-radius:14px; }
+  .smooth-box{ padding:10px; border-radius:12px; }
+  .sub{ font-size:.95rem; }
+
+  .avatar{ width:84px; height:84px; border-radius:10px; }
+  .head-meta .name{ font-size:1.05rem; }
+
+  .kv{ grid-template-columns:110px 1fr; gap:6px 10px; margin:2px 0; }
+  .kv .k{ font-size:.92rem; }
+  .kv > div:last-child{ font-size:.98rem; line-height:1.5; }
+
+  .brand-wrap .brand{ font-size:1rem; }
+  .btn-back-inline{ width:30px; height:30px; border-radius:8px; }
+  .btn-back-inline .icon{ width:16px; height:16px; }
+}
+@media (max-width:480px){
+  .kv{ grid-template-columns:96px 1fr; }
+  .avatar{ width:72px; height:72px; }
+}
+
+/* (Opsional) sembunyikan menu link top di mobile kalau perlu */
+/* .menu{ display:none } */

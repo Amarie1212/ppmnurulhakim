@@ -1,0 +1,1894 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <!-- Apply theme immediately to prevent flash -->
+  <script>
+    (function() {
+      var theme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+  
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/form.css" />
+  <link rel="stylesheet" href="/toast.css" />
+
+  <style>
+    /* ========================================= */
+    /* 0. BRAND LOGO IN NAVBAR                   */
+    /* ========================================= */
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 4px;
+      object-fit: contain;
+      background: white;
+      padding: 2px;
+    }
+    
+    /* Agenda Tab active state mapping */
+    .agenda-tab.active {
+      background: var(--accent) !important;
+      color: #09090b !important;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+    
+    /* Reveal Animation helper */
+    .agenda-content {
+      animation: fadeInUp 0.4s ease-out;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* ========================================= */
+    
+    /* ========================================= */
+    /* 1. BUTTON STYLING (DESKTOP & UMUM)        */
+    /* ========================================= */
+    
+    /* Buttons (Unified) */
+    .cta-btn, .btn-nav {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 8px 16px; border-radius: var(--radius-md);
+      font-weight: 700; transition: all 0.2s ease;
+      font-size: 0.95rem;
+    }
+    
+    .cta-btn {
+      background: var(--accent); color: #08110a; border: 1px solid transparent;
+    }
+    .cta-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    
+    .btn-nav {
+      background: transparent; color: var(--accent); border: 1px solid var(--accent);
+    }
+    .btn-nav:hover { background: rgba(34, 197, 94, 0.1); transform: translateY(-1px); }
+    
+    .cta-btn svg, .btn-nav svg { width: 16px; height: 16px; stroke-width: 2.5; }
+
+    /* Desktop Only - Kurangi Gap */
+    .desktop-only {
+      gap: 8px !important;
+    }
+
+    /* ========================================= */
+    /* MENU DROPDOWN (DESKTOP NAV)              */
+    /* ========================================= */
+    .menu-dropdown {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+    .menu-dropdown-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 10px;
+      color: var(--muted);
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.2s;
+      font-size: 0.9rem;
+    }
+    .menu-dropdown-trigger:hover {
+      color: var(--text);
+    }
+    .menu-dropdown-trigger svg {
+      transition: transform 0.2s;
+    }
+    .menu-dropdown:hover .menu-dropdown-trigger svg {
+      transform: rotate(180deg);
+    }
+    .menu-dropdown-content {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      min-width: 160px;
+      padding: 8px 0;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+      z-index: 100;
+    }
+    .menu-dropdown:hover .menu-dropdown-content {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+    .menu-dropdown-content a {
+      display: block;
+      padding: 10px 16px;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .menu-dropdown-content a:hover {
+      background: rgba(34, 197, 94, 0.1);
+      color: var(--accent);
+    }
+
+
+    /* ========================================= */
+    /* 2. RESPONSIVE LOGIC (MOBILE vs DESKTOP)   */
+    /* ========================================= */
+    .mobile-only { display: none !important; }
+    .desktop-only { display: inline-flex !important; }
+
+    @media (max-width: 768px) {
+      .menu { display: none !important; }
+      .desktop-only { display: none !important; }
+      .mobile-only { display: flex !important; }
+      
+      /* --- STYLING TOMBOL DI DALAM MENU MOBILE --- */
+      .mobile-auth-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Sebelahan 50:50 */
+        gap: 12px;
+        padding: 12px 16px;
+        border-top: 1px solid var(--border);
+        margin-top: 8px;
+      }
+      
+      .btn-mobile-login, .btn-mobile-register {
+        display: flex; align-items: center; justify-content: center;
+        padding: 10px; border-radius: var(--radius-md);
+        font-weight: 700; text-decoration: none; cursor: pointer;
+        gap: 8px; font-size: 0.95rem;
+        transition: all 0.2s;
+      }
+
+      .btn-mobile-login svg, .btn-mobile-register svg { width: 18px; height: 18px; }
+      
+      /* Mobile Masuk (Outline) */
+      .btn-mobile-login {
+        border: 1px solid var(--accent);
+        background: transparent; color: var(--accent);
+      }
+      .btn-mobile-login:hover { background: rgba(34, 197, 94, 0.1); }
+      
+      /* Mobile Daftar (Solid) */
+      .btn-mobile-register {
+        background: var(--accent); color: #08110a; border: none; font-weight: 800;
+      }
+      .btn-mobile-register:hover { filter: brightness(1.1); }
+      
+      /* Hero Buttons on Mobile */
+      .hero-cta {
+        flex-direction: column !important;
+        gap: 10px !important;
+      }
+      .hero-cta .cta-btn,
+      .hero-cta .btn-nav {
+        width: 100% !important;
+        max-width: 280px !important;
+        padding: 14px 20px !important;
+        font-size: 0.95rem !important;
+        white-space: nowrap !important;
+      }
+    }
+    
+    /* Biodata Warning Style */
+    .biodata-warning {
+      color: var(--danger) !important;
+      font-weight: 700 !important;
+    }
+    .biodata-pending {
+      color: #f59e0b !important;
+      font-weight: 700 !important;
+    }
+    /* Payment Warning Style */
+    .payment-warning {
+      color: var(--danger) !important;
+      font-weight: 700 !important;
+    }
+    
+    /* Mobile Brand Dropdown */
+    @media (max-width: 768px) {
+      .brand-wrap { cursor: pointer; }
+      .brand-arrow { width: 16px; height: 16px; margin-left: 6px; transition: transform 0.2s; }
+      .brand-wrap.open .brand-arrow { transform: rotate(180deg); }
+      
+      .brand-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--bg-2);
+        border-bottom: 1px solid var(--border);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        display: flex;
+        flex-direction: column;
+        padding: 8px 0;
+        transform: translateY(-10px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s ease;
+        z-index: 1000;
+      }
+      .brand-dropdown.open {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .brand-dropdown a {
+        padding: 12px 24px;
+        color: var(--text);
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        text-decoration: none;
+      }
+      .brand-dropdown a:hover { 
+        background: rgba(34, 197, 94, 0.08); 
+        color: var(--accent); 
+      }
+      .brand-dropdown a.active {
+        color: var(--accent);
+        font-weight: 600;
+      }
+    }
+    @media (min-width: 769px) {
+      .brand-arrow { display: none; }
+      .brand-dropdown { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="navbar <%= user ? 'logged-in' : '' %>">
+  <div class="container nav-inner">
+    
+    <div class="brand-wrap" id="brandToggle">
+      <img src="/img/logo%20ppm.png" alt="PPM" class="brand-logo">
+      <div class="brand">PPM Nurul Hakim</div>
+      <svg class="brand-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </div>
+    
+    <!-- Mobile Brand Dropdown -->
+    <nav id="brandDropdown" class="brand-dropdown">
+      <a href="#beranda">Beranda</a>
+      <a href="#profil">Profil</a>
+      <a href="#target-santri">Target Santri</a>
+      <a href="#agenda">Agenda Rutin</a>
+      <a href="#fasilitas">Fasilitas</a>
+      <a href="#galeri">Galeri</a>
+      <a href="#lokasi">Lokasi</a>
+      <a href="#about">Alur Pendaftaran</a>
+      <a href="#biaya">Manajemen Administrasi</a>
+      <a href="#kontak">Kontak</a>
+    </nav>
+
+    <nav class="menu">
+      <a href="#beranda" class="active">Beranda</a>
+      <div class="menu-dropdown">
+        <span class="menu-dropdown-trigger">Info <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+        <div class="menu-dropdown-content">
+          <a href="#profil">Profil</a>
+          <a href="#target-santri">Target Santri</a>
+          <a href="#agenda">Agenda Rutin</a>
+          <a href="#fasilitas">Fasilitas</a>
+          <a href="#galeri">Galeri</a>
+          <a href="#lokasi">Lokasi</a>
+        </div>
+      </div>
+      <div class="menu-dropdown">
+        <span class="menu-dropdown-trigger">Daftar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+        <div class="menu-dropdown-content">
+          <a href="#about">Alur Pendaftaran</a>
+          <a href="#biaya">Manajemen Administrasi</a>
+        </div>
+      </div>
+      <a href="#kontak">Kontak</a>
+    </nav>
+
+    <div class="right-actions">
+      
+      <% if (!user) { %>
+        <!-- Desktop: Auth Buttons -->
+        <div class="desktop-only" style="display: flex; gap: 8px; align-items: center;">
+          <button onclick="openLogin()" class="btn-nav">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            Masuk
+          </button>
+          <a href="/register" class="cta-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+            Daftar
+          </a>
+        </div>
+        
+        <!-- Mobile: Hamburger Menu (Restored) -->
+        <button class="nav-toggle mobile-only" id="btnMobileMenu">
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        </button>
+      <% } %>
+
+      <% if (user && user.role === 'santri') { %>
+        <button id="santriToggle" class="nav-toggle" style="position: relative;">
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          <% 
+            let badgeColor = '';
+            if (user.isBiodataEmpty) {
+              badgeColor = '#ef4444'; // Red - belum isi biodata
+            } else if (!user.biodataVerified) {
+              badgeColor = '#f59e0b'; // Orange - biodata verifikasi
+            } else if (user.paymentPending) {
+              badgeColor = '#f59e0b'; // Orange - menunggu verifikasi
+            } else if (!user.hasPaid) {
+              badgeColor = '#ef4444'; // Red - belum bayar
+            }
+            // No badge if hasPaid = true (verified)
+          %>
+          <% if (badgeColor) { %>
+            <span style="position:absolute; top:8px; right:8px; width:10px; height:10px; background:<%= badgeColor %>; border-radius:50%; border:2px solid var(--bg-2);"></span>
+          <% } %>
+        </button>
+      <% } %>
+
+      <% if (user && ['admin', 'keuangan', 'ketua', 'panitia'].includes(user.role)) { %>
+        <button id="pengurusToggle" class="nav-toggle">
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        </button>
+      <% } %>
+
+    </div>
+
+  </div>
+</header>
+
+<!-- Auth Dropdown (Desktop Only) -->
+<% if (!user) { %>
+  <nav id="authDropdown" class="admin-dd desktop-only" hidden>
+    <div class="admin-dd-head">
+      <div class="admin-dd-title">Selamat Datang</div>
+      <div class="admin-dd-sub">Silakan masuk atau daftar untuk melanjutkan</div>
+    </div>
+    <div style="padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+      <a href="/register" class="auth-dropdown-btn primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="8.5" cy="7" r="4"/>
+          <line x1="20" y1="8" x2="20" y2="14"/>
+          <line x1="23" y1="11" x2="17" y2="11"/>
+        </svg>
+        <span>Daftar Sekarang</span>
+      </a>
+      
+      <button onclick="openLogin(); document.getElementById('authDropdown').hidden = true; document.getElementById('authToggle').classList.remove('active');" class="auth-dropdown-btn secondary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+          <polyline points="10 17 15 12 10 7"/>
+          <line x1="15" y1="12" x2="3" y2="12"/>
+        </svg>
+        <span>Masuk</span>
+      </button>
+    </div>
+  </nav>
+  <div id="authDdScrim" class="admin-dd-scrim"></div>
+
+  <style>
+    /* Auth Dropdown Desktop Improvements */
+    #authDropdown {
+      width: 340px !important;
+      top: calc(var(--nav-h) + 8px) !important;
+      right: 20px !important;
+    }
+    #authDropdown .admin-dd-head {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    #authDropdown .admin-dd-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    #authDropdown .admin-dd-sub {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .auth-dropdown-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      width: 100%;
+      justify-content: center;
+      white-space: nowrap;
+    }
+    .auth-dropdown-btn svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+    .auth-dropdown-btn span {
+      flex-shrink: 0;
+    }
+    .auth-dropdown-btn.primary {
+      background: var(--accent);
+      color: #000;
+    }
+    .auth-dropdown-btn.primary:hover {
+      filter: brightness(1.1);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+    }
+    .auth-dropdown-btn.secondary {
+      background: transparent;
+      color: var(--accent);
+      border: 2px solid var(--accent);
+    }
+    .auth-dropdown-btn.secondary:hover {
+      background: rgba(34, 197, 94, 0.1);
+      transform: translateY(-2px);
+    }
+  </style>
+<% } %>
+
+<!-- Guest Mobile Menu (Restored & Fixed) -->
+<nav id="mobile-menu" class="admin-dd" hidden>
+  <% if (!user) { %>
+    <div class="admin-dd-head">
+      <div class="admin-dd-title">Selamat Datang</div>
+      <div class="admin-dd-sub">Silakan masuk atau daftar</div>
+    </div>
+    
+    <button onclick="openLogin()" class="admin-dd-item" style="width:100%; justify-content: flex-start; gap: 12px; cursor: pointer; background: transparent; border: none; border-bottom: 1px solid var(--border); text-align: left;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      Masuk
+    </button>
+    
+    <a href="/register" class="admin-dd-item" style="justify-content: flex-start; gap: 12px; color: var(--accent); font-weight: 700; border-bottom: none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+      Daftar Sekarang
+    </a>
+  <% } %>
+</nav>
+<div class="admin-dd-scrim" id="mobileScrim" hidden></div>
+
+<% if (user && user.role === 'santri') { %>
+  <div id="santriDropdownMobile" class="admin-dd" hidden>
+    <div class="admin-dd-head"><div class="admin-dd-title">Menu Santri</div><div class="admin-dd-sub">Halo, <%= user.name %></div></div>
+    <div class="admin-dd-item" style="cursor: default;">
+      <span>Status Akun</span>
+      <% if(user.status === 'PENDING') { %>
+        <span style="color:#eab308; font-weight:800; font-size:0.75rem; background:rgba(234,179,8,0.1); padding:2px 8px; border-radius:3px;">Menunggu Verifikasi</span>
+      <% } else if(user.status === 'REJECTED') { %>
+        <span style="color:#ef4444; font-weight:800; font-size:0.75rem; background:rgba(239,68,68,0.1); padding:2px 8px; border-radius:3px;">Ditolak</span>
+      <% } else { %>
+        <span style="color:#22c55e; font-weight:800; font-size:0.75rem; background:rgba(34,197,94,0.1); padding:2px 8px; border-radius:3px;">Terverifikasi</span>
+      <% } %>
+    </div>
+    
+    <% if(user.status !== 'PENDING' && user.status !== 'REJECTED') { %>
+      <a href="/info-santri" class="admin-dd-item">Pengumuman & Info</a>
+      <% if (user.isBiodataEmpty) { %>
+        <a href="/form" class="admin-dd-item biodata-warning">Isi Biodata (Wajib)</a>
+      <% } else if (user.biodataRejected) { %>
+        <!-- Rejection Accordion (Dropdown) -->
+        <div class="admin-dd-item danger" style="flex-direction:column; align-items:stretch; gap:0; padding:0; background:transparent; border:none; color:var(--danger);">
+          <div onclick="toggleReason(this)" style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; cursor:pointer;">
+             <span style="font-weight:600;">Biodata (Ditolak)</span>
+             <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
+          <div class="reason-box" style="display:none;">
+             <a href="/form" class="admin-dd-item" style="font-size:0.85rem; padding:10px 16px 10px 32px; color:#ef4444;">
+               Alasan: <%= user.biodataReason || 'Mohon perbaiki data Anda.' %>
+             </a>
+          </div>
+        </div>
+      <% } else if (!user.biodataVerified) { %>
+        <a href="/form" class="admin-dd-item biodata-pending">Biodata (Sedang Diverifikasi)</a>
+      <% } else { %>
+        <a href="/form" class="admin-dd-item">Edit Biodata</a>
+      <% } %>
+    <% } %>
+
+    <% if (!user.isBiodataEmpty && user.status !== 'PENDING' && user.status !== 'REJECTED') { %>
+        <% 
+          let paymentClass = '';
+          let paymentText = 'Shodaqoh Operasional';
+          if (user.hasPaid) {
+            // Verified - no class, normal text
+          } else if (user.paymentPending) {
+            paymentClass = ' payment-pending'; // Orange
+            paymentText = 'Shodaqoh Operasional (Menunggu Verifikasi)';
+          } else {
+            paymentClass = ' payment-warning'; // Red
+            paymentText = 'Shodaqoh Operasional (Wajib)';
+          }
+        %>
+        <a href="/pembayaran" class="admin-dd-item<%= paymentClass %>"><%= paymentText %></a>
+    <% } %>
+
+    <a class="admin-dd-item danger" href="/logout">Logout</a>
+  </div>
+  <div id="santriDdScrim" class="admin-dd-scrim"></div>
+
+  <aside id="panelSantri" class="panel-pengurus" hidden>
+    <div class="panel-head"><div><div class="panel-title">Menu Santri</div><div class="panel-sub">Halo, <%= user.name %></div></div><button class="panel-close" id="closePanelSantri">×</button></div>
+    <nav class="panel-body">
+      <div class="panel-link" style="display:block; cursor:default;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span>Status Akun</span>
+          <% if(user.status === 'PENDING') { %>
+            <span style="color:#eab308; font-weight:800; font-size:0.75rem; background:rgba(234,179,8,0.1); padding:2px 8px; border-radius:3px;">Menunggu Verifikasi</span>
+          <% } else if(user.status === 'REJECTED') { %>
+             <!-- Badge hidden, using main box below -->
+             <span style="color:#ef4444; font-weight:800; font-size:0.75rem; background:rgba(239,68,68,0.1); padding:2px 8px; border-radius:3px;">Ditolak</span>
+          <% } else { %>
+            <span style="color:#22c55e; font-weight:800; font-size:0.75rem; background:rgba(34,197,94,0.1); padding:2px 8px; border-radius:3px;">Terverifikasi</span>
+          <% } %>
+        </div>
+
+        <% if(user.status === 'REJECTED') { %>
+          <div style="display:block; text-align:center; padding:16px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.4); border-radius:4px; margin-top:12px;">
+            <strong style="display:block; color:#ef4444; font-size:0.95rem; margin-bottom:6px;">Akun Ditolak</strong>
+            <span style="display:block; font-size:0.85rem; color:#ef4444; opacity:0.9; line-height:1.4;"><%= user.alasan_tolak || "Hubungi pengurus untuk info lebih lanjut." %></span>
+            <div style="margin-top:8px; font-size:0.75rem; color:#ef4444; text-decoration:underline;">Harap Hubungi Admin</div>
+          </div>
+        <% } %>
+      </div>
+      
+      <% if(user.status !== 'PENDING' && user.status !== 'REJECTED') { %>
+        <a href="/info-santri" class="panel-link">Pengumuman & Info</a>
+        <% if (user.isBiodataEmpty) { %>
+          <a href="/form" class="panel-link biodata-warning">Isi Biodata (Wajib)</a>
+        <% } else if (user.biodataRejected) { %>
+          <div style="border-bottom:1px solid var(--border);">
+            <div class="panel-link" onclick="toggleReason(this)" style="justify-content:space-between; color:#ef4444; cursor:pointer;">
+              <span>Biodata (Ditolak)</span>
+              <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div class="reason-box" style="display:none;">
+               <a href="/form" class="panel-link" style="font-size:0.85rem; color:#ef4444; padding-left:36px;">
+                  Alasan: <%= user.biodataReason || '-' %>
+               </a>
+            </div>
+          </div>
+        <% } else if (!user.biodataVerified) { %>
+          <a href="/form" class="panel-link biodata-pending">Biodata (Menunggu Verifikasi)</a>
+        <% } else { %>
+          <a href="/form" class="panel-link">Edit Biodata Lengkap</a>
+        <% } %>
+      <% } %>
+      
+      <% if (!user.isBiodataEmpty && user.status !== 'PENDING' && user.status !== 'REJECTED') { %>
+        <% 
+          let paymentClass = '';
+          let paymentText = 'Shodaqoh Operasional';
+          if (user.hasPaid) {
+            // Verified - no class, normal text
+          } else if (user.paymentPending) {
+            paymentClass = ' payment-pending'; // Orange
+            paymentText = 'Shodaqoh Operasional (Menunggu Verifikasi)';
+          } else {
+            paymentClass = ' payment-warning'; // Red
+            paymentText = 'Shodaqoh Operasional (Wajib)';
+          }
+        %>
+        <a href="/pembayaran" class="panel-link<%= paymentClass %>"><%= paymentText %></a>
+      <% } %>
+
+    </nav>
+    <div class="panel-footer"><a href="/logout" class="logout-btn">Logout</a></div>
+  </aside>
+  <div class="panel-scrim" id="panelSantriScrim"></div>
+<% } %>
+
+
+<% if (user && ['admin', 'keuangan', 'ketua', 'panitia'].includes(user.role)) { %>
+  
+  <div id="adminDropdownMobile" class="admin-dd" hidden>
+    <div class="admin-dd-head"><div class="admin-dd-title"><%= user.role.toUpperCase() %></div><div class="admin-dd-sub">Halo, <%= user.name %></div></div>
+    
+    <a class="admin-dd-item" href="/pengurus/home">Beranda Admin</a>
+    <a class="admin-dd-item" href="/">Halaman Utama</a>
+    <div style="height:1px; background:var(--border); margin:4px 0;"></div>
+    
+    <% if (user.role === 'admin') { %>
+        <a class="admin-dd-item" href="/pengurus">Data Santri</a>
+        <a class="admin-dd-item" href="/pengurus/verifikasi">Verifikasi Pendaftaran</a>
+        <a class="admin-dd-item" href="/pengurus/verifikasi-pembayaran">Verifikasi Pembayaran</a>
+        <a class="admin-dd-item" href="/pengurus/laporan-pembayaran">Laporan Pembayaran</a>
+        <a class="admin-dd-item" href="/pengurus/laporan-masuk">Laporan Pembayaran Masuk</a>
+
+        <a class="admin-dd-item" href="/pengurus/kelola-akun">Kelola Akun Pengurus</a>
+        <a class="admin-dd-item" href="/pengurus/kelola-pengumuman">Kelola Pengumuman</a>
+    <% } %>
+
+    <% if (user.role === 'panitia') { %>
+        <a class="admin-dd-item" href="/pengurus">Data Santri</a>
+        <a class="admin-dd-item" href="/pengurus/verifikasi">Verifikasi Pendaftaran</a>
+        <a class="admin-dd-item" href="/pengurus/kelola-pengumuman">Kelola Pengumuman</a>
+    <% } %>
+
+    <% if (user.role === 'keuangan') { %>
+        <a class="admin-dd-item" href="/pengurus/verifikasi-pembayaran">Verifikasi Pembayaran</a>
+        <a class="admin-dd-item" href="/pengurus/laporan-pembayaran">Laporan Pembayaran</a>
+    <% } %>
+
+    <% if (user.role === 'ketua') { %>
+        <a class="admin-dd-item" href="/pengurus">Data Santri</a>
+        <a class="admin-dd-item" href="/pengurus/laporan-masuk">Laporan Pembayaran Masuk</a>
+
+    <% } %>
+
+    <a class="admin-dd-item danger" href="/logout">Logout</a>
+  </div>
+  <div id="adminDdScrim" class="admin-dd-scrim" hidden></div>
+
+  <aside id="panelPengurus" class="panel-pengurus" hidden>
+    <div class="panel-head"><div><div class="panel-title"><%= user.role.toUpperCase() %></div><div class="panel-sub">Halo, <%= user.name %></div></div><button class="panel-close" id="closePanelPengurus">×</button></div>
+    <nav class="panel-body">
+      <a href="/pengurus/home" class="panel-link">Beranda Admin</a>
+      <a href="/" class="panel-link" style="color:var(--accent)">Halaman Utama ↗</a>
+      <div style="height:1px; background:var(--border); margin:10px 0;"></div>
+
+      <% if (user.role === 'admin') { %>
+        <a href="/pengurus" class="panel-link">Data Santri</a>
+        <a href="/pengurus/verifikasi" class="panel-link">Verifikasi Pendaftaran</a>
+        <a href="/pengurus/verifikasi-pembayaran" class="panel-link">Verifikasi Pembayaran</a>
+        <a href="/pengurus/laporan-pembayaran" class="panel-link">Laporan Pembayaran</a>
+        <a href="/pengurus/laporan-masuk" class="panel-link">Laporan Pembayaran Masuk</a>
+
+        <a href="/pengurus/kelola-akun" class="panel-link">Kelola Akun Pengurus</a>
+        <a href="/pengurus/kelola-pengumuman" class="panel-link">Kelola Pengumuman</a>
+      <% } %>
+
+      <% if (user.role === 'panitia') { %>
+        <a href="/pengurus" class="panel-link">Data Santri</a>
+        <a href="/pengurus/verifikasi" class="panel-link">Verifikasi Pendaftaran</a>
+        <a href="/pengurus/kelola-pengumuman" class="panel-link">Kelola Pengumuman</a>
+      <% } %>
+
+      <% if (user.role === 'keuangan') { %>
+        <a href="/pengurus/verifikasi-pembayaran" class="panel-link">Verifikasi Pembayaran</a>
+        <a href="/pengurus/laporan-pembayaran" class="panel-link">Laporan Pembayaran</a>
+      <% } %>
+
+      <% if (user.role === 'ketua') { %>
+        <a href="/pengurus" class="panel-link">Data Santri</a>
+        <a href="/pengurus/laporan-masuk" class="panel-link">Laporan Pembayaran Masuk</a>
+
+      <% } %>
+
+    </nav>
+    <div class="panel-footer"><a href="/logout" class="logout-btn">Logout</a></div>
+  </aside>
+  <div class="panel-scrim" id="panelPengurusScrim" hidden></div>
+<% } %>
+
+
+<section id="beranda" class="hero" style="--hero:url('/img/ppm.jpg')">
+    <div class="hero-content reveal">
+      <h1>Selamat Datang di <span style="color: var(--accent);">PPM Nurul Hakim</span></h1>
+      <p>Membentuk Generasi Qur'ani, Berakhlak Mulia, dan Mandiri di Jatinangor</p>
+      
+      <% if (!user) { %>
+      <div style="margin-top: 32px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+        <a href="/register" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="17" y1="11" x2="23" y2="11"/></svg>
+          Daftar Sekarang
+        </a>
+      </div>
+      <% } %>
+    </div>
+</section>
+
+<!-- Profil Section (Static) -->
+<section id="profil" class="section">
+  <div class="container">
+    <h2>Profil Pondok</h2>
+    <p class="lead">PPM Nurul Hakim adalah lembaga pendidikan yang berfokus pada pembinaan karakter dan keilmuan Islam.</p>
+    
+    <div class="cards" style="margin-top: 32px;">
+      <!-- Visi -->
+      <article class="card">
+        <div style="width: 50px; height: 50px; background: rgba(34, 197, 94, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <h3>Visi</h3>
+        <p>Pondok Pesantren Mahasiswa Nurul Hakim sebagai wahana pembinaan yang menghasilkan sarjana yang muballigh ataupun muballigh yang sarjana dengan pengetahuan dan pemahaman agama Islam yang memadai, berbudi mulia, profesional, religius, dan mandiri.</p>
+      </article>
+      
+      <!-- Misi -->
+      <article class="card">
+        <div style="width: 50px; height: 50px; background: rgba(34, 197, 94, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </div>
+        <h3>Misi</h3>
+        <ul style="text-align: left; padding-left: 20px;">
+          <li>Melestarikan pendidikan Al-Qur'an dan Al-Hadits sebagai pedoman utama ajaran umat Islam.</li>
+          <li>Memfasilitasi mahasiswa/mahasiswi untuk dapat mempelajari agama Islam di sela-sela kesibukan menjalani kegiatan akademik di kampus.</li>
+          <li>Mengembangkan dakwah Islam yang sejuk, sebagai agama rahmatan lil'aalamiin.</li>
+          <li>Menjalin hubungan baik dengan seluruh komponen masyarakat dengan menghargai perbedaan dan kebhinekaan.</li>
+          <li>Memberikan kontribusi yang nyata kepada masyarakat, bangsa dan negara dalam membentuk sumberdaya manusia yang unggul dan berbudi mulia.</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Target Santri (New Section) -->
+<section id="target-santri" class="section alt">
+  <div class="container">
+    <h2>Target Santri PPM</h2>
+    <p class="lead">Capaian santri dalam 3,5 tahun di PPM Nurul Hakim</p>
+    
+    <div style="max-width: 900px; margin: 32px auto;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+            <!-- Khatam Al-Qur'an -->
+            <div style="background: var(--bg-2); padding: 24px; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid var(--border);">
+                <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="20" height="20"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                </div>
+                <h3 style="margin: 0 0 8px; font-size: 1.1rem; font-weight: 700; color: var(--text);">Khatam Al-Qur'an</h3>
+                <p style="margin: 0; font-size: 0.9rem; color: var(--muted); line-height: 1.5;">Makna dan keterangan</p>
+            </div>
+            <!-- Khatam Seluruh Al Hadits -->
+            <div style="background: var(--bg-2); padding: 24px; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid var(--border);">
+                <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="20" height="20"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                </div>
+                <h3 style="margin: 0 0 8px; font-size: 1.1rem; font-weight: 700; color: var(--text);">Khatam Seluruh Al Hadits</h3>
+                <p style="margin: 0; font-size: 0.9rem; color: var(--muted); line-height: 1.5;">Himpunan + Materi Kelas</p>
+            </div>
+            <!-- Materi Manajemen -->
+            <div style="background: var(--bg-2); padding: 24px; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid var(--border);">
+                <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="20" height="20"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <h3 style="margin: 0 0 8px; font-size: 1.1rem; font-weight: 700; color: var(--text);">Materi Manajemen</h3>
+                <p style="margin: 0; font-size: 0.9rem; color: var(--muted); line-height: 1.5;">Manajemen Organisasi & Dakwah</p>
+            </div>
+            <!-- Tes Muballigh/ghot -->
+            <div style="background: var(--bg-2); padding: 24px; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid var(--border);">
+                <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="20" height="20"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <h3 style="margin: 0 0 8px; font-size: 1.1rem; font-weight: 700; color: var(--text);">Tes Muballigh/ghot</h3>
+            </div>
+            <!-- Lanjutan (Muballigh) -->
+            <div style="background: var(--bg-2); padding: 24px; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid var(--border);">
+                <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="20" height="20"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </div>
+                <h3 style="margin: 0 0 8px; font-size: 1.1rem; font-weight: 700; color: var(--text);">Lanjutan (Muballigh)</h3>
+                <p style="margin: 0; font-size: 0.9rem; color: var(--muted); line-height: 1.5;">Khatam Sunan Nasa'i, Sunan Ibnu Majah, dan Shohih Muslim</p>
+            </div>
+            <!-- Hafalan -->
+            <div style="background: var(--bg-2); padding: 24px; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid var(--border);">
+                <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="20" height="20"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                </div>
+                <h3 style="margin: 0 0 8px; font-size: 1.1rem; font-weight: 700; color: var(--text);">Hafalan</h3>
+                <p style="margin: 0; font-size: 0.9rem; color: var(--muted); line-height: 1.5;">Surat Al Qur'an, dalil, serta do'a-do'a</p>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 40px;">
+            <span style="display: inline-block; background: var(--accent); color: #fff; padding: 14px 40px; border-radius: 50px; font-weight: 700; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);">Target Waktu: 3,5 Tahun</span>
+        </div>
+    </div>
+  </div>
+</section>
+
+<!-- Manajemen Kesantrian (New Section) -->
+<section id="kesantrian" class="section">
+    <div class="container">
+      <h2>Manajemen Kesantrian</h2>
+      <p class="lead">Ketentuan dan tata tertib santri PPM Nurul Hakim</p>
+      
+      <div style="max-width: 800px; margin: 32px auto; display: grid; gap: 16px;">
+          <div style="display: flex; gap: 16px; align-items: start; background: var(--bg-2); padding: 20px; border-radius: 12px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" width="24" height="24" style="flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg>
+              <p style="margin: 0; line-height: 1.6;">Bersedia dan sanggup menaati tata tertib dan amrin jami' di PPM Nurul Hakim.</p>
+          </div>
+          <div style="display: flex; gap: 16px; align-items: start; background: var(--bg-2); padding: 20px; border-radius: 12px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" width="24" height="24" style="flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg>
+              <p style="margin: 0; line-height: 1.6;">Membawa dan memiliki <strong>Al Qur'an</strong> makna dan bacaan, <strong>Hadits</strong> Himpunan dan <strong>Materi kelas</strong>, <strong>Shohih Muslim</strong> bagi yang sudah mubaligh /mubalighot ditambah <strong>hadits Sunan Nasa’I</strong>, Sunan Ibnu Majah, dan <strong>Shohih Muslim</strong>.</p>
+          </div>
+          <div style="display: flex; gap: 16px; align-items: start; background: var(--bg-2); padding: 20px; border-radius: 12px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" width="24" height="24" style="flex-shrink: 0;"><polyline points="20 6 9 17 4 12"/></svg>
+              <p style="margin: 0; line-height: 1.6;">Membawa dan memakai <strong>pakaian syar'i</strong>.</p>
+          </div>
+      </div>
+    </div>
+</section>
+
+<!-- Agenda Rutin Section (Updated) -->
+<section id="agenda" class="section alt">
+  <div class="container">
+    <h2>Agenda Rutin</h2>
+    <p class="lead">Kegiatan rutin santri PPM Nurul Hakim</p>
+    
+    <div style="margin: 32px auto;">
+        <!-- Agenda Tabs - Pill Style -->
+      <div id="agenda-tabs" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; justify-content: center; background: var(--bg); padding: 8px; border-radius: 50px; max-width: fit-content; margin-left: auto; margin-right: auto;">
+        <button class="agenda-tab active" onclick="showAgendaTab('harian')" style="padding: 10px 20px; border-radius: 50px; border: none; font-weight: 600; cursor: pointer; white-space: nowrap;">Harian</button>
+        <button class="agenda-tab" onclick="showAgendaTab('mingguan')" style="padding: 10px 20px; border-radius: 50px; border: none; font-weight: 600; cursor: pointer; white-space: nowrap;">Mingguan</button>
+        <button class="agenda-tab" onclick="showAgendaTab('bulanan')" style="padding: 10px 20px; border-radius: 50px; border: none; font-weight: 600; cursor: pointer; white-space: nowrap;">Bulanan</button>
+        <button class="agenda-tab" onclick="showAgendaTab('tahunan')" style="padding: 10px 20px; border-radius: 50px; border: none; font-weight: 600; cursor: pointer; white-space: nowrap;">Tahunan</button>
+      </div>
+
+      <!-- Harian -->
+      <div id="agenda-harian" class="agenda-content">
+         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+         <% ["Pengajian ba'da subuh (Al Hadits)", "Pengajian ba'da magrib (Al Qur'an)", "Pengajian Kitab Sunan Nasa'I (mahasiswa MT)", "Apel 1/3 malam", "Mentoring bacaan"].forEach((item, i) => { %>
+         <div style="background: var(--bg-2); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid var(--border); display: flex; align-items: center; gap: 16px;">
+           <div style="width: 36px; height: 36px; background: rgba(34, 197, 94, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+             <span style="color: var(--accent); font-weight: 700; font-size: 0.9rem;"><%= i + 1 %></span>
+           </div>
+           <span style="font-weight: 500; color: var(--text);"><%= item %></span>
+         </div>
+         <% }); %>
+         </div>
+      </div>
+
+      <!-- Mingguan -->
+      <div id="agenda-mingguan" class="agenda-content" style="display: none;">
+         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+         <% ["Latihan Nasehat", "Hafalan Target Materi Pondok", "Penyampaian Materi Kelas", "Penghimpunan Tabungan Qurban"].forEach((item, i) => { %>
+         <div style="background: var(--bg-2); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid var(--border); display: flex; align-items: center; gap: 16px;">
+           <div style="width: 36px; height: 36px; background: rgba(34, 197, 94, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+             <span style="color: var(--accent); font-weight: 700; font-size: 0.9rem;"><%= i + 1 %></span>
+           </div>
+           <span style="font-weight: 500; color: var(--text);"><%= item %></span>
+         </div>
+         <% }); %>
+         </div>
+      </div>
+
+      <!-- Bulanan -->
+      <div id="agenda-bulanan" class="agenda-content" style="display: none;">
+         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+         <% ["Kegiatan olahraga", "Piket akbar", "Pengajian muda mudi"].forEach((item, i) => { %>
+         <div style="background: var(--bg-2); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid var(--border); display: flex; align-items: center; gap: 16px;">
+           <div style="width: 36px; height: 36px; background: rgba(34, 197, 94, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+             <span style="color: var(--accent); font-weight: 700; font-size: 0.9rem;"><%= i + 1 %></span>
+           </div>
+           <span style="font-weight: 500; color: var(--text);"><%= item %></span>
+         </div>
+         <% }); %>
+         </div>
+      </div>
+
+      <!-- Tahunan -->
+      <div id="agenda-tahunan" class="agenda-content" style="display: none;">
+         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+         <% ["Keakraban", "Olimpiade olahraga", "Metamorph", "Open house", "Asrama liburan", "Kegiatan praktek manasik", "Kegiatan tim kreatif", "Cek kesehatan", "Tour barokah", "Reuni akbar alumni"].forEach((item, i) => { %>
+         <div style="background: var(--bg-2); padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid var(--border); display: flex; align-items: center; gap: 12px;">
+           <div style="width: 32px; height: 32px; background: rgba(34, 197, 94, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+             <span style="color: var(--accent); font-weight: 700; font-size: 0.8rem;"><%= i + 1 %></span>
+           </div>
+           <span style="font-weight: 500; color: var(--text); font-size: 0.95rem;"><%= item %></span>
+         </div>
+         <% }); %>
+         </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Alur Pendaftaran Section -->
+<section id="about" class="section">
+  <div class="container">
+    <h2>Alur Pendaftaran</h2>
+    <p class="lead">Langkah-langkah mendaftar menjadi santri PPM Nurul Hakim</p>
+    
+    <div style="margin: 32px auto;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px;">
+        <!-- Step 1 -->
+        <div style="background: var(--bg-2); padding: 24px; border-radius: 16px; border: 1px solid var(--border); text-align: center;">
+          <div style="width: 56px; height: 56px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: #fff; font-weight: 800; font-size: 1.3rem;">1</div>
+          <h3 style="margin: 0 0 8px; font-weight: 700; color: var(--text);">Registrasi Online</h3>
+          <p style="margin: 0; color: var(--muted); font-size: 0.9rem;">Daftar melalui website dan isi data awal</p>
+        </div>
+        <!-- Step 2 -->
+        <div style="background: var(--bg-2); padding: 24px; border-radius: 16px; border: 1px solid var(--border); text-align: center;">
+          <div style="width: 56px; height: 56px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: #fff; font-weight: 800; font-size: 1.3rem;">2</div>
+          <h3 style="margin: 0 0 8px; font-weight: 700; color: var(--text);">Verifikasi Akun</h3>
+          <p style="margin: 0; color: var(--muted); font-size: 0.9rem;">Tunggu verifikasi dari admin PPM</p>
+        </div>
+        <!-- Step 3 -->
+        <div style="background: var(--bg-2); padding: 24px; border-radius: 16px; border: 1px solid var(--border); text-align: center;">
+          <div style="width: 56px; height: 56px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: #fff; font-weight: 800; font-size: 1.3rem;">3</div>
+          <h3 style="margin: 0 0 8px; font-weight: 700; color: var(--text);">Isi Biodata Lengkap</h3>
+          <p style="margin: 0; color: var(--muted); font-size: 0.9rem;">Lengkapi data diri dan upload dokumen</p>
+        </div>
+        <!-- Step 4 -->
+        <div style="background: var(--bg-2); padding: 24px; border-radius: 16px; border: 1px solid var(--border); text-align: center;">
+          <div style="width: 56px; height: 56px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: #fff; font-weight: 800; font-size: 1.3rem;">4</div>
+          <h3 style="margin: 0 0 8px; font-weight: 700; color: var(--text);">Pembayaran</h3>
+          <p style="margin: 0; color: var(--muted); font-size: 0.9rem;">Upload bukti pembayaran shodaqoh operasional</p>
+        </div>
+        <!-- Step 5 -->
+        <div style="background: var(--bg-2); padding: 24px; border-radius: 16px; border: 1px solid var(--border); text-align: center;">
+          <div style="width: 56px; height: 56px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: #fff; font-weight: 800; font-size: 1.3rem;">5</div>
+          <h3 style="margin: 0 0 8px; font-weight: 700; color: var(--text);">Selesai</h3>
+          <p style="margin: 0; color: var(--muted); font-size: 0.9rem;">Anda resmi terdaftar sebagai calon santri!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Manajemen Administrasi Section (Biaya) -->
+<section id="biaya" class="section alt">
+  <div class="container">
+    <h2>Manajemen Administrasi</h2>
+    <p class="lead">Informasi biaya pendidikan santri PPM Nurul Hakim</p>
+    
+    <div style="max-width: 800px; margin: 32px auto;">
+      <!-- Main Fee Card -->
+      <div style="background: var(--bg-2); border-radius: 20px; padding: 40px; text-align: center; border: 2px solid var(--accent); box-shadow: 0 8px 30px rgba(34, 197, 94, 0.15);">
+        <h3 style="margin: 0 0 8px; color: var(--muted); font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Shodaqoh Operasional PPM & Biaya Internal Santri</h3>
+        <div style="margin: 24px 0;">
+          <span style="font-size: 2.5rem; font-weight: 800; color: var(--accent);">Rp3.000.000,-</span>
+          <span style="font-size: 1.5rem; color: var(--muted); margin: 0 8px;">+</span>
+          <span style="font-size: 2rem; font-weight: 700; color: var(--text);">Rp500.000,-</span>
+        </div>
+        <p style="color: var(--muted); font-size: 1rem; margin: 0;">per orang / per tahun</p>
+      </div>
+      
+      <!-- Payment Info -->
+      <div style="margin-top: 24px; background: var(--bg-2); border-radius: 12px; padding: 20px; border: 1px solid var(--border);">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" width="24" height="24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <p style="margin: 0; color: var(--text); font-weight: 600;">Pembayaran dilakukan tiap <strong>awal tahun ajaran</strong></p>
+        </div>
+        <p style="margin: 12px 0 0; color: var(--muted); text-align: center;">Paling lambat tanggal <strong style="color: var(--danger);">25 Agustus</strong></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Fasilitas Section (Scroll horizontal di mobile) -->
+<section id="fasilitas" class="section alt reveal">
+  <div class="container">
+    <h2>Fasilitas PPM</h2>
+    <p class="lead">Sarana pendukung kenyamanan dan kegiatan belajar mengajar santri</p>
+    
+    <div style="position: relative; margin-top: 32px;">
+      <div id="fasilitas-gallery" class="gallery" style="display: flex; overflow-x: auto; padding-bottom: 20px; gap: 20px; scroll-snap-type: x mandatory; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none;">
+      <!-- Item 1: Masjid -->
+      <div style="min-width: 320px; scroll-snap-align: start; flex-shrink: 0; position: relative; overflow: hidden; border-radius: 12px; height: 180px;">
+        <img src="/img_home/asrama_putri.jpg" alt="Asrama Putri" style="width:100%; height:100%; object-fit:cover; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <div style="position: absolute; bottom:0; left:0; right:0; padding: 12px; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); color: white; font-weight: 600; font-size: 0.9rem;">Asrama Putri</div>
+      </div>
+      <!-- Item 7: Dapur -->
+      <div style="min-width: 320px; scroll-snap-align: start; flex-shrink: 0; position: relative; overflow: hidden; border-radius: 12px; height: 180px;">
+        <img src="/img_home/dapur.jpg" alt="Dapur" style="width:100%; height:100%; object-fit:cover; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <div style="position: absolute; bottom:0; left:0; right:0; padding: 12px; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); color: white; font-weight: 600; font-size: 0.9rem;">Dapur Umum</div>
+      </div>
+      <!-- Item 8: Ruang Tamu -->
+      <div style="min-width: 320px; scroll-snap-align: start; flex-shrink: 0; position: relative; overflow: hidden; border-radius: 12px; height: 180px;">
+        <img src="/img_home/ruang_tamu.jpg" alt="Ruang Tamu" style="width:100%; height:100%; object-fit:cover; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <div style="position: absolute; bottom:0; left:0; right:0; padding: 12px; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); color: white; font-weight: 600; font-size: 0.9rem;">Ruang Tamu</div>
+      </div>
+      <!-- Item 9: Kamar Tamu -->
+      <div style="min-width: 320px; scroll-snap-align: start; flex-shrink: 0; position: relative; overflow: hidden; border-radius: 12px; height: 180px;">
+        <img src="/img_home/ruang_tamu.png" alt="Kamar Tamu" style="width:100%; height:100%; object-fit:cover; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <div style="position: absolute; bottom:0; left:0; right:0; padding: 12px; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); color: white; font-weight: 600; font-size: 0.9rem;">Kamar Tamu</div>
+      </div>
+      <!-- Item 10: Ruang Kelas -->
+      <div style="min-width: 320px; scroll-snap-align: start; flex-shrink: 0; position: relative; overflow: hidden; border-radius: 12px; height: 180px;">
+        <img src="/img_home/ruang_kelas.jpg" alt="Ruang Kelas" style="width:100%; height:100%; object-fit:cover; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <div style="position: absolute; bottom:0; left:0; right:0; padding: 12px; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); color: white; font-weight: 600; font-size: 0.9rem;">Ruang Kelas</div>
+      </div>
+      <!-- Item 11: Kamar Santri -->
+      <div style="min-width: 320px; scroll-snap-align: start; flex-shrink: 0; position: relative; overflow: hidden; border-radius: 12px; height: 180px;">
+        <img src="/img_home/kamar_santri.png" alt="Kamar Santri" style="width:100%; height:100%; object-fit:cover; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <div style="position: absolute; bottom:0; left:0; right:0; padding: 12px; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); color: white; font-weight: 600; font-size: 0.9rem;">Kamar Santri</div>
+      </div>
+      <!-- Item 12: Lapangan/Olahraga -->
+      <div style="min-width: 320px; scroll-snap-align: start; flex-shrink: 0; position: relative; overflow: hidden; border-radius: 12px; height: 180px;">
+        <img src="/img_home/lapangan_bulutangkis_graha_aulia_jatinangor_lt.3.png" alt="Sarana Olahraga" style="width:100%; height:100%; object-fit:cover; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <div style="position: absolute; bottom:0; left:0; right:0; padding: 12px; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); color: white; font-weight: 600; font-size: 0.9rem;">Sarana Olahraga</div>
+      </div>
+       <!-- Item 13: Poskestren -->
+       <div style="min-width: 320px; scroll-snap-align: start; flex-shrink: 0; position: relative; overflow: hidden; border-radius: 12px; height: 180px;">
+        <img src="/img_home/unit_kesehatan_pondok.png" alt="Unit Kesehatan" style="width:100%; height:100%; object-fit:cover; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <div style="position: absolute; bottom:0; left:0; right:0; padding: 12px; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); color: white; font-weight: 600; font-size: 0.9rem;">Unit Kesehatan Pondok</div>
+      </div>
+      <!-- Item 14: Area Parkir -->
+       <div style="min-width: 320px; scroll-snap-align: start; flex-shrink: 0; position: relative; overflow: hidden; border-radius: 12px; height: 180px;">
+        <img src="/img_home/area_parkir.jpg" alt="Area Parkir" style="width:100%; height:100%; object-fit:cover; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <div style="position: absolute; bottom:0; left:0; right:0; padding: 12px; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); color: white; font-weight: 600; font-size: 0.9rem;">Area Parkir</div>
+      </div>
+      <!-- Item 15: Rumah Dewan Guru -->
+       <div style="min-width: 320px; scroll-snap-align: start; flex-shrink: 0; position: relative; overflow: hidden; border-radius: 12px; height: 180px;">
+        <img src="/img_home/rumah_dewan_guru.jpg" alt="Rumah Dewan Guru" style="width:100%; height:100%; object-fit:cover; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <div style="position: absolute; bottom:0; left:0; right:0; padding: 12px; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); color: white; font-weight: 600; font-size: 0.9rem;">Rumah Dewan Guru</div>
+      </div>
+    </div>
+    <!-- Fasilitas Nav Arrows -->
+    <button onclick="scrollFasilitas(-1)" class="btn btn-outline desktop-only" style="position: absolute; top: 50%; left: -22px; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; padding: 0; background: var(--bg-2); color: var(--text); border: 1px solid var(--border); z-index: 10; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg);">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="24" height="24"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <button onclick="scrollFasilitas(1)" class="btn btn-outline desktop-only" style="position: absolute; top: 50%; right: -22px; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; padding: 0; background: var(--bg-2); color: var(--text); border: 1px solid var(--border); z-index: 10; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg);">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="24" height="24"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    </div><!-- close position relative wrapper -->
+  </div>
+</section>
+
+<!-- Galeri Section -->
+<section id="galeri" class="section reveal">
+  <div class="container">
+    <h2>Galeri Kegiatan</h2>
+    <p class="lead">Momen kebersamaan dan aktivitas santri di pondok</p>
+
+    <!-- Slideshow Container -->
+    <div id="galeri-slideshow" class="card" style="position: relative; max-width: 800px; margin: 32px auto; padding: 0; overflow: hidden;">
+      <div style="position: relative; width: 100%; aspect-ratio: 16/9;">
+        <!-- Slides are managed by JS -->
+        <div class="galeri-slide" style="position: absolute; inset: 0; opacity: 1; transition: opacity 0.6s ease;">
+          <img src="/img_home/Join.jpg" alt="Join PPM" style="width: 100%; height: 100%; object-fit: cover;">
+          <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 24px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); color: white;">
+            <p style="margin: 0; font-weight: 700; font-size: 1.1rem;">Join PPM Nurul Hakim</p>
+          </div>
+        </div>
+        <!-- ... (Slide 2, 3, 4, 5 managed by JS or static list) ... -->
+        <div class="galeri-slide" style="position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s ease;">
+          <img src="/img_home/Kekaraban.jpg" alt="Keakraban" style="width: 100%; height: 100%; object-fit: cover;">
+          <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 24px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); color: white;">
+            <p style="margin: 0; font-weight: 700; font-size: 1.1rem;">Keakraban Santri</p>
+          </div>
+        </div>
+        <div class="galeri-slide" style="position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s ease;">
+          <img src="/img_home/Metamorph.jpg" alt="Metamorph" style="width: 100%; height: 100%; object-fit: cover;">
+          <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 24px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); color: white;">
+            <p style="margin: 0; font-weight: 700; font-size: 1.1rem;">Metamorphosis Santri</p>
+          </div>
+        </div>
+        <div class="galeri-slide" style="position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s ease;">
+          <img src="/img_home/Congraduation.jpg" alt="Wisuda" style="width: 100%; height: 100%; object-fit: cover;">
+          <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 24px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); color: white;">
+            <p style="margin: 0; font-weight: 700; font-size: 1.1rem;">Wisuda & Kelulusan</p>
+          </div>
+        </div>
+        <div class="galeri-slide" style="position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s ease;">
+          <img src="/img_home/Mini Soccer.jpg" alt="Soccer" style="width: 100%; height: 100%; object-fit: cover;">
+          <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 24px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); color: white;">
+            <p style="margin: 0; font-weight: 700; font-size: 1.1rem;">Mini Soccer & Olahraga</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nav Arrows -->
+      <button onclick="changeGaleriSlide(-1)" class="btn btn-outline" style="position: absolute; top: 50%; left: 16px; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; padding: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); color: white; border: none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="24" height="24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button onclick="changeGaleriSlide(1)" class="btn btn-outline" style="position: absolute; top: 50%; right: 16px; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; padding: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); color: white; border: none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="24" height="24"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+
+      <!-- Indicators -->
+      <div style="position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px;">
+        <button class="galeri-dot" onclick="goToGaleriSlide(0)" style="width: 8px; height: 8px; border-radius: 50%; border: none; background: var(--accent); cursor: pointer; transition: 0.3s;"></button>
+        <button class="galeri-dot" onclick="goToGaleriSlide(1)" style="width: 8px; height: 8px; border-radius: 50%; border: none; background: rgba(255,255,255,0.3); cursor: pointer; transition: 0.3s;"></button>
+        <button class="galeri-dot" onclick="goToGaleriSlide(2)" style="width: 8px; height: 8px; border-radius: 50%; border: none; background: rgba(255,255,255,0.3); cursor: pointer; transition: 0.3s;"></button>
+        <button class="galeri-dot" onclick="goToGaleriSlide(3)" style="width: 8px; height: 8px; border-radius: 50%; border: none; background: rgba(255,255,255,0.3); cursor: pointer; transition: 0.3s;"></button>
+        <button class="galeri-dot" onclick="goToGaleriSlide(4)" style="width: 8px; height: 8px; border-radius: 50%; border: none; background: rgba(255,255,255,0.3); cursor: pointer; transition: 0.3s;"></button>
+      </div>
+    </div>
+</section>
+    <script>
+      let galeriIdx = 0;
+      const galeriSlides = document.querySelectorAll('.galeri-slide');
+      const galeriDots = document.querySelectorAll('.galeri-dot');
+      
+    function showGaleriSlide(n) {
+      if (n >= galeriSlides.length) galeriIdx = 0;
+      else if (n < 0) galeriIdx = galeriSlides.length - 1;
+      else galeriIdx = n;
+      
+      galeriSlides.forEach(s => s.style.opacity = '0');
+      galeriDots.forEach(d => {
+        d.style.background = 'rgba(255,255,255,0.3)';
+        d.style.width = '8px';
+      });
+      
+      if(galeriSlides[galeriIdx]) galeriSlides[galeriIdx].style.opacity = '1';
+      if(galeriDots[galeriIdx]) {
+        galeriDots[galeriIdx].style.background = 'var(--accent)';
+        galeriDots[galeriIdx].style.width = '24px';
+        galeriDots[galeriIdx].style.borderRadius = '10px';
+      }
+    }
+      
+      function changeGaleriSlide(n) { showGaleriSlide(galeriIdx + n); }
+      function goToGaleriSlide(n) { showGaleriSlide(n); }
+      
+      setInterval(() => changeGaleriSlide(1), 5000); // Auto slide every 5s
+    </script>
+
+</section>
+
+<!-- Lokasi Section (New) -->
+<section id="lokasi" class="section reveal">
+  <div class="container">
+    <h2>Lokasi PPM</h2>
+    <p class="lead">Strategis, dekat dengan kampus utama di Jatinangor</p>
+    
+    <div style="max-width: 1000px; margin: 32px auto;">
+      <!-- Single Card Layout -->
+      <div class="card" style="padding: 0; overflow: hidden;">
+        <!-- Header with Address -->
+        <div style="padding: 24px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+          <div style="width: 48px; height: 48px; background: rgba(16, 185, 129, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" width="24" height="24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div style="flex: 1; min-width: 200px;">
+            <h3 style="margin: 0 0 4px; font-size: 1.1rem; font-weight: 700; color: var(--text);">PPM Nurul Hakim</h3>
+            <p style="margin: 0; color: var(--muted); font-size: 0.95rem;">Jl. Raya Jatinangor No. 138 RT 01/RW 01, Kec. Jatinangor, Kab. Sumedang</p>
+          </div>
+          <a href="https://maps.app.goo.gl/PPMNurulHakim" target="_blank" class="btn btn-primary" style="padding: 12px 24px; border-radius: 50px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Buka Maps
+          </a>
+        </div>
+        
+        <!-- Maps Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1px; background: var(--border);">
+          <!-- Denah Lokasi -->
+          <div style="padding: 24px; background: var(--bg-2);">
+            <p style="margin: 0 0 16px; font-weight: 600; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Denah Lokasi</p>
+            <div style="border-radius: 12px; background: var(--bg); padding: 12px; height: 100%; display: flex; align-items: center; justify-content: center;">
+              <img src="/img/peta_lokasi.png" alt="Peta Lokasi PPM" style="width: 100%; height: auto; display: block; border-radius: 8px; max-height: 400px; object-fit: contain;">
+            </div>
+          </div>
+          
+          <!-- Google Maps Embed -->
+          <div style="padding: 24px; background: var(--bg-2);">
+            <p style="margin: 0 0 16px; font-weight: 600; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Google Maps</p>
+            <div style="border-radius: 12px; overflow: hidden; height: 400px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+              <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.672879555139!2d107.773356!3d-6.929657!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68c34f3c7e7e43%3A0x6b0a1a0f8b1a8a0!2sPPM%20Nurul%20Hakim!5e0!3m2!1sen!2sid!4v1620000000000!5m2!1sen!2sid" width="100%" height="100%" style="border:0; display: block;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Kontak Section (Instagram Only) -->
+<section id="kontak" class="section alt reveal">
+    <div class="container">
+      <h2>Kontak Kami</h2>
+
+      <div style="display: flex; justify-content: center; gap: 16px; margin-top: 24px; flex-wrap: wrap;">
+        <!-- Instagram -->
+        <a href="https://www.instagram.com/ppm_nh" target="_blank" class="btn btn-outline" style="min-width: 180px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><circle cx="17.5" cy="6.5" r="1.5"/></svg>
+          @ppm_nh
+        </a>
+        
+        <!-- WhatsApp -->
+        <% 
+           let displayWa = (cms && cms.kontak_hp) ? cms.kontak_hp : '08157123736';
+           let cleanWa = displayWa.replace(/[^0-9]/g, '');
+           if (cleanWa.startsWith('0')) cleanWa = '62' + cleanWa.substring(1);
+        %>
+        <a href="https://wa.me/<%= cleanWa %>" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: var(--bg-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#25D366';this.style.color='#25D366';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          <%= displayWa.includes('-') ? displayWa : displayWa.replace(/(\d{4})(\d{4})(\d+)/, '$1-$2-$3') %>
+        </a>
+      </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-bar">
+      <span>© <%= new Date().getFullYear() %> PPM Nurul Hakim. All rights reserved.</span>
+      <a href="/panel-admin">Pengurus</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--bg-2);
+    border-top: 1px solid var(--border);
+    margin-top: 48px;
+  }
+  .footer-bar {
+    padding: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .footer-bar a {
+    color: var(--muted);
+    opacity: 0.6;
+    transition: all 0.2s;
+  }
+  .footer-bar a:hover { 
+    opacity: 1; 
+    color: var(--accent); 
+  }
+  @media (max-width: 480px) {
+    .footer-bar { 
+      flex-direction: column; 
+      gap: 8px; 
+      text-align: center; 
+    }
+  }
+</style>
+
+<div id="loginModal" class="login-modal-overlay" style="display:none;">
+  <div class="login-modal-box">
+    <div class="login-modal-header">
+      <h3 class="login-modal-title">Login</h3>
+      <button type="button" id="closeLogin" class="login-modal-close">&times;</button>
+    </div>
+    
+    <div id="loginAlert" style="display:none; padding:12px; border-radius:8px; margin-bottom:16px; font-size:0.9rem;"></div>
+    
+    <form id="loginForm" method="POST" action="/login">
+      <div style="display:grid; gap:16px;">
+        <div>
+          <label style="display:block; margin-bottom:6px; font-weight:600; font-size:0.9rem">Email</label>
+          <input type="email" name="email" placeholder="Email" required style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text);" />
+        </div>
+        <div>
+          <label style="display:block; margin-bottom:6px; font-weight:600; font-size:0.9rem">Password</label>
+          <input type="password" name="password" placeholder="Password" required style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text);" />
+        </div>
+      </div>
+      
+      <div style="margin-top: 24px; display:flex; gap:12px;">
+        <button type="button" onclick="closeLogin()" class="login-btn-cancel">Batal</button>
+        <button type="submit" class="login-btn-submit">Login</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  /* Login Modal Styling - Consistent with Verification Modals */
+  .login-modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1100; display: none; justify-content: center; align-items: center; padding: 20px;
+  }
+  .login-modal-box {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 400px;
+    padding: 24px;
+    position: relative;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    animation: loginModalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes loginModalPop {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .login-modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .login-modal-title {
+    font-size: 1.25rem; font-weight: 700; margin: 0; color: var(--text);
+  }
+  .login-modal-close {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all .2s;
+    line-height: 1;
+    padding: 0;
+  }
+  .login-modal-close:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+  }
+  
+  /* Login Buttons */
+  .login-btn-cancel, .login-btn-submit {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+  .login-btn-cancel {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .login-btn-cancel:hover {
+    background: var(--bg-2);
+    border-color: var(--muted);
+  }
+  .login-btn-submit {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+  .login-btn-submit:hover {
+    background: var(--accent);
+    color: #08110a;
+  }
+
+  /* Fasilitas Gallery Scrollbar Hide */
+  #fasilitas-gallery {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  #fasilitas-gallery::-webkit-scrollbar {
+    display: none;
+  }
+
+</style>
+
+<button id="themeFab" class="theme-fab" aria-label="Ganti tema" title="Ganti tema"></button>
+
+<script>
+  /* --- 0. Reset scroll position on page load --- */
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+  window.scrollTo(0, 0);
+
+  /* --- 1. Logic Login Modal --- */
+  const loginModal = document.getElementById('loginModal');
+  const closeLoginBtn = document.getElementById('closeLogin');
+  function openLogin(preserveAlert){ 
+    loginModal.style.display = 'flex'; 
+    document.body.style.overflow = 'hidden'; 
+    const a = document.getElementById('loginAlert'); 
+    if(a && !preserveAlert) a.style.display = 'none'; 
+  }
+  function closeLogin(){ 
+    loginModal.style.display = 'none'; 
+    document.body.style.overflow = ''; 
+  }
+  document.querySelectorAll('.js-open-login').forEach(el=> el.addEventListener('click', e=>{ e.preventDefault(); openLogin(); }));
+  if(closeLoginBtn) closeLoginBtn.addEventListener('click', closeLogin);
+  // Click outside to close
+  if(loginModal) loginModal.addEventListener('click', e => { if(e.target === loginModal) closeLogin(); });
+
+  /* --- 2. LOGIC MOBILE MENU (GUEST) --- */
+  setupUnifiedMenu('btnMobileMenu', 'mobile-menu', 'mobileScrim', null, null, null);
+
+  /* --- 3. Logic Unified Menu (Santri & Pengurus) --- */
+  function setupUnifiedMenu(btnId, popupId, popupScrimId, sidebarId, sidebarScrimId, sidebarCloseId) {
+    const btn = document.getElementById(btnId);
+    const popup = document.getElementById(popupId);
+    const popupScrim = document.getElementById(popupScrimId);
+    const sidebar = document.getElementById(sidebarId);
+    const sidebarScrim = document.getElementById(sidebarScrimId);
+    const sidebarClose = document.getElementById(sidebarCloseId);
+
+    if(!btn) return;
+
+    let scrollPosition = 0;
+
+    function openAll() {
+      // Simple scroll lock - just hide overflow
+      document.body.style.overflow = 'hidden';
+      
+      btn.classList.add('active'); 
+      btn.setAttribute('aria-expanded', 'true');
+      // Ensure button is above scrim
+      btn.style.zIndex = '1200';
+      btn.style.position = 'relative';
+
+      if(popup) { 
+        popup.hidden = false; 
+        popupScrim.hidden = false; 
+        setTimeout(() => { 
+            popup.classList.add('open'); 
+            popupScrim.classList.add('open'); 
+        }, 10); 
+      }
+      if(sidebar) { 
+        sidebar.hidden = false; 
+        sidebarScrim.hidden = false; 
+        setTimeout(() => { 
+            sidebar.classList.add('open'); 
+            sidebarScrim.classList.add('open'); 
+        }, 10); 
+      }
+    }
+
+    function closeAll() {
+      btn.classList.remove('active'); 
+      btn.setAttribute('aria-expanded', 'false');
+      btn.style.zIndex = ''; // Reset z-index
+
+      if(popup) { 
+        popup.classList.remove('open'); 
+        popupScrim.classList.remove('open'); 
+        setTimeout(() => { popup.hidden = true; popupScrim.hidden = true; }, 300); 
+      }
+      if(sidebar) { 
+        sidebar.classList.remove('open'); 
+        sidebarScrim.classList.remove('open'); 
+        setTimeout(() => { sidebar.hidden = true; sidebarScrim.hidden = true; }, 300); 
+      }
+      
+      // Simple scroll unlock
+      setTimeout(() => {
+        document.body.style.overflow = '';
+      }, 300);
+    }
+
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const isOpen = btn.classList.contains('active');
+      isOpen ? closeAll() : openAll();
+    });
+
+    if(popupScrim) popupScrim.addEventListener('click', closeAll);
+    if(sidebarScrim) sidebarScrim.addEventListener('click', closeAll);
+    if(sidebarClose) sidebarClose.addEventListener('click', closeAll);
+    
+    // Auto-close when clicking any link/button inside the popup (IMPORTANT FOR USER EXPERIENCE)
+    if(popup) {
+        popup.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('click', closeAll);
+        });
+    }
+  }
+
+  setupUnifiedMenu('santriToggle', 'santriDropdownMobile', 'santriDdScrim', 'panelSantri', 'panelSantriScrim', 'closePanelSantri');
+  setupUnifiedMenu('pengurusToggle', 'adminDropdownMobile', 'adminDdScrim', 'panelPengurus', 'panelPengurusScrim', 'closePanelPengurus');
+  
+  /* --- Real-time Santri Status Refresh --- */
+  <% if (user && user.role === 'santri') { %>
+  (function() {
+    const santriBtn = document.getElementById('santriToggle');
+    if (!santriBtn) return;
+    
+    // Refresh status when menu button is clicked
+    santriBtn.addEventListener('click', async function() {
+      try {
+        const res = await fetch('/api/santri-status');
+        const status = await res.json();
+        if (status.error) return;
+        
+        // Update badge on hamburger button
+        const badge = santriBtn.querySelector('span[style*="border-radius:50%"]');
+        let badgeColor = '';
+        
+        if (status.isBiodataEmpty) {
+          badgeColor = '#ef4444'; // Red
+        } else if (!status.biodataVerified) {
+          badgeColor = '#f59e0b'; // Orange
+        } else if (status.paymentPending) {
+          badgeColor = '#f59e0b'; // Orange
+        } else if (!status.hasPaid) {
+          badgeColor = '#ef4444'; // Red
+        }
+        // No badge if all good
+        
+        if (badge) {
+          if (badgeColor) {
+            badge.style.background = badgeColor;
+            badge.style.display = 'block';
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+        
+        // Update biodata link text in menu
+        const updateBiodataLinks = (container) => {
+          if (!container) return;
+          const links = container.querySelectorAll('a[href="/form"]');
+          links.forEach(link => {
+            if (status.isBiodataEmpty) {
+              link.textContent = 'Isi Biodata (Wajib)';
+              link.className = link.className.replace(/biodata-\w+/g, '') + ' biodata-warning';
+            } else if (!status.biodataVerified) {
+              if (status.biodataRejected) {
+                 let reasonText = status.biodataReason || 'Klik untuk perbaiki';
+                 link.innerHTML = 'Alasan: ' + reasonText;
+                 link.style.cssText = 'font-size:0.85rem; color:#ef4444; padding-left:36px;';
+                 link.className = 'panel-link';
+              } else {
+                 link.innerHTML = 'Biodata (Menunggu Verifikasi)';
+                 link.style.cssText = ''; 
+                 link.className = 'panel-link biodata-pending'; 
+              }
+            } else {
+              link.textContent = 'Edit Biodata Lengkap';
+              link.className = link.className.replace(/biodata-\w+/g, '').replace('biodata-warning', '').replace('biodata-pending', '');
+            }
+          });
+        };
+        
+        // Update payment link in menu
+        const updatePaymentLinks = (container) => {
+          if (!container) return;
+          const links = container.querySelectorAll('a[href="/pembayaran"]');
+          links.forEach(link => {
+            if (status.hasPaid) {
+              link.textContent = 'Shodaqoh Operasional';
+              link.className = link.className.replace(/payment-\w+/g, '');
+            } else if (status.paymentPending) {
+              link.textContent = 'Shodaqoh Operasional (Menunggu Verifikasi)';
+              link.className = link.className.replace(/payment-\w+/g, '') + ' payment-pending';
+            } else {
+              link.textContent = 'Shodaqoh Operasional (Wajib)';
+              link.className = link.className.replace(/payment-\w+/g, '') + ' payment-warning';
+            }
+          });
+        };
+        
+        updateBiodataLinks(document.getElementById('santriDropdownMobile'));
+        updateBiodataLinks(document.getElementById('panelSantri'));
+        updatePaymentLinks(document.getElementById('santriDropdownMobile'));
+        updatePaymentLinks(document.getElementById('panelSantri'));
+        
+      } catch (e) {
+        console.log('Status refresh error:', e);
+      }
+    });
+  })();
+  <% } %>
+  
+  // Auth Dropdown (Desktop Only - Guest)
+  // (setupUnifiedMenu removed to prevent scroll lock on desktop. Using IIFE below.)
+
+  /* --- Brand Dropdown (Mobile - Click Logo) --- */
+  (() => {
+    const brandToggle = document.getElementById('brandToggle');
+    const brandDropdown = document.getElementById('brandDropdown');
+    
+    if (!brandToggle || !brandDropdown) return;
+    
+    // Only for mobile
+    function isMobile() { return window.innerWidth <= 768; }
+    
+    brandToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!isMobile()) return;
+      brandToggle.classList.toggle('open');
+      brandDropdown.classList.toggle('open');
+    });
+    
+    // Close when clicking links
+    brandDropdown.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        brandToggle.classList.remove('open');
+        brandDropdown.classList.remove('open');
+      });
+    });
+    
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!isMobile()) return;
+      if (!brandToggle.contains(e.target) && !brandDropdown.contains(e.target)) {
+        brandToggle.classList.remove('open');
+        brandDropdown.classList.remove('open');
+      }
+    });
+  })();
+
+  /* --- 4. Alert & Theme --- */
+  (function(){
+    const params = new URLSearchParams(window.location.search);
+    const a = document.getElementById('loginAlert');
+    
+    // CUSTOM MODAL FOR REGISTRATION SUCCESS
+    if (params.get('register') === 'success') {
+      history.replaceState({}, '', window.location.pathname);
+      
+      // Create modal dynamically
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); z-index:9999; display:flex; justify-content:center; align-items:center; padding:20px;';
+      modal.innerHTML = `
+        <div style="background:var(--bg-2); border:1px solid var(--border); border-radius:16px; max-width:400px; width:100%; padding:24px; text-align:center; box-shadow:0 25px 50px rgba(0,0,0,0.5); animation:modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+          <div style="width:60px; height:60px; background:rgba(34, 197, 94, 0.1); color:#22c55e; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="32" height="32"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h3 style="margin:0 0 8px; font-size:1.25rem; font-weight:800; color:var(--text);">Registrasi Berhasil!</h3>
+          <p style="margin:0 0 20px; color:var(--muted); line-height:1.5; font-size:0.95rem;">
+            Anda telah login otomatis.<br><br>
+            Mohon tunggu verifikasi dari admin terlebih dahulu sebelum dapat mengisi biodata.
+          </p>
+          <button id="closeSuccessModal" style="background:var(--accent); color:#000; border:none; padding:12px 24px; border-radius:8px; font-weight:700; cursor:pointer; width:100%; font-size:1rem; transition:transform 0.1s;">Mengerti</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      
+      // Add animation style
+      const style = document.createElement('style');
+      style.textContent = '@keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }';
+      document.head.appendChild(style);
+      
+      document.getElementById('closeSuccessModal').onclick = () => {
+        modal.style.opacity = '0';
+        setTimeout(() => modal.remove(), 200);
+      };
+      
+    } else if (params.get('login') === '1' && a) {
+      a.style.display='block'; a.style.background='#fee2e2'; a.style.color='#b91c1c';
+      const reason = params.get('reason');
+      
+      if (reason === 'notfound') {
+        a.innerHTML=`<strong>❌ Email Belum Terdaftar</strong><br>Silakan daftar terlebih dahulu. <a href="/register" style="color:#b91c1c; text-decoration:underline;">Daftar Sekarang</a>`;
+      } else if (reason === 'wrongpass') {
+        a.innerHTML=`<strong>❌ Password Salah</strong><br>Silakan coba lagi.`;
+      } else if (reason === 'rejected') {
+        const msg = params.get('msg');
+        a.innerHTML=`<strong>❌ Akun Ditolak</strong><br>${msg ? decodeURIComponent(msg) : 'Mohon maaf, pendaftaran Anda ditolak.'}`;
+      } else if (reason === 'pending') {
+        a.innerHTML=`<strong>⏳ Menunggu Verifikasi</strong><br>Akun Anda sedang dalam proses verifikasi.`;
+      } else if (reason === 'error') {
+        a.innerHTML=`<strong>❌ Kesalahan Sistem</strong><br>Terjadi kesalahan, silakan coba lagi.`;
+      } else {
+        a.textContent='Email atau password salah.';
+      }
+      
+      openLogin(true);
+      history.replaceState({}, '', window.location.pathname);
+    }
+  })();
+
+  /* --- 4. Auth Dropdown Toggle (Desktop Only) --- */
+  (() => {
+    const authToggle = document.getElementById('authToggle');
+    const authDropdown = document.getElementById('authDropdown');
+    
+    if (!authToggle || !authDropdown) return;
+    
+    function toggle() {
+      const isOpen = !authDropdown.hidden;
+      
+      if (isOpen) {
+        authToggle.classList.remove('active');
+        authDropdown.classList.remove('open');
+        setTimeout(() => {
+          authDropdown.hidden = true;
+        }, 200);
+      } else {
+        authToggle.classList.add('active');
+        authDropdown.hidden = false;
+        setTimeout(() => {
+          authDropdown.classList.add('open');
+        }, 10);
+      }
+    }
+    
+    authToggle.addEventListener('click', toggle);
+    
+    // Close saat klik di luar dropdown
+    document.addEventListener('click', (e) => {
+      if (!authDropdown.hidden && !authToggle.contains(e.target) && !authDropdown.contains(e.target)) {
+        toggle();
+      }
+    });
+    
+    // Close saat klik item di dalam dropdown (Login / Register)
+    authDropdown.querySelectorAll('a, button').forEach(el => {
+        el.addEventListener('click', () => {
+             if(!authDropdown.hidden) toggle();
+        });
+    });
+  })();
+
+  const root = document.documentElement;
+  function setIcon(t){ const s='<svg class="icon" viewBox="0 0 24 24"><path d="M6.76 4.84l-1.8-1.79L3.5 4.5l1.79 1.79 1.47-1.45zM1 13h3v-2H1v2zm10-9h2V1h-2v3zm7.24.84L18.5 4.5l-1.46 1.47 1.79 1.79 1.41-1.41zM20 13h3v-2h-3v2zm-7 7h2v-3h-2v3zm5.74-2. 16l1.79 1.79 1.41-1.41-1.79-1.79-1.41 1.41zM4.5 18.5l1.79-1.79-1.41-1.41-1.79 1.79 1.41 1.41zM12 6a6 6 0 1 1 0 12 6 6 0 0 1 0-12z"></path></svg>'; const m='<svg class="icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>'; document.getElementById('themeFab').innerHTML=(t==='light')?m:s; }
+  function applyTheme(t){ if(t==='light') root.setAttribute('data-theme','light'); else root.removeAttribute('data-theme'); localStorage.setItem('theme', t); setIcon(t); }
+  (function(){ const s = localStorage.getItem('theme'); if(s) applyTheme(s); else { const p = window.matchMedia('(prefers-color-scheme: light)').matches; applyTheme(p?'light':'dark'); } document.getElementById('themeFab')?.addEventListener('click',()=>{ const l=root.getAttribute('data-theme')==='light'; applyTheme(l?'dark':'light'); }); })();
+  // Agenda Tabs Function
+  function switchAgenda(type) {
+    const tabs = document.querySelectorAll('.agenda-tab');
+    const contents = document.querySelectorAll('.agenda-content');
+    
+    tabs.forEach(t => t.classList.remove('active'));
+    contents.forEach(c => c.style.display = 'none');
+    
+    document.getElementById(`tab-${type}`).classList.add('active');
+    const content = document.getElementById(`agenda-${type}`);
+    content.style.display = 'block';
+  }
+
+  // Fasilitas Slideshow Functions
+  let currentSlide = 0;
+  function changeSlide(direction) {
+    const slides = document.querySelectorAll('.fasilitas-slide');
+    const dots = document.querySelectorAll('.slide-dot');
+    if (slides.length === 0) return;
+    
+    currentSlide += direction;
+    if (currentSlide >= slides.length) currentSlide = 0;
+    if (currentSlide < 0) currentSlide = slides.length - 1;
+    
+    slides.forEach((slide, idx) => {
+      slide.style.opacity = idx === currentSlide ? '1' : '0';
+    });
+    dots.forEach((dot, idx) => {
+      dot.style.background = idx === currentSlide ? 'var(--accent)' : 'rgba(255,255,255,0.5)';
+    });
+  }
+  
+  function goToSlide(index) {
+    const slides = document.querySelectorAll('.fasilitas-slide');
+    const dots = document.querySelectorAll('.slide-dot');
+    if (slides.length === 0) return;
+    
+    currentSlide = index;
+    slides.forEach((slide, idx) => {
+      slide.style.opacity = idx === currentSlide ? '1' : '0';
+    });
+    dots.forEach((dot, idx) => {
+      dot.style.background = idx === currentSlide ? 'var(--accent)' : 'rgba(255,255,255,0.5)';
+    });
+  }
+  
+  // Auto slideshow every 5 seconds
+  setInterval(() => {
+    const slides = document.querySelectorAll('.fasilitas-slide');
+    if (slides.length > 1) changeSlide(1);
+  }, 5000);
+  function toggleReason(header) {
+    const parent = header.parentElement; // div wrapper
+    const box = parent.querySelector('.reason-box');
+    const arrow = header.querySelector('.arrow');
+    
+    if (box.style.display === 'none') {
+      box.style.display = 'block';
+      arrow.style.transform = 'rotate(180deg)';
+      header.style.background = 'rgba(0,0,0,0.02)';
+    } else {
+      box.style.display = 'none';
+      arrow.style.transform = 'rotate(0deg)';
+      header.style.background = 'transparent';
+    }
+  }
+
+  // Scroll Fasilitas Gallery
+  function scrollFasilitas(direction) {
+    const gallery = document.getElementById('fasilitas-gallery');
+    if (!gallery) return;
+    const scrollAmount = 340; // Card width (320) + gap (20)
+    gallery.scrollBy({
+      left: direction * scrollAmount,
+      behavior: 'smooth'
+    });
+  }
+</script>
+
+<script src="/toast.js"></script>
+
+<script>
+  // Handle toast notifications from URL params
+  document.addEventListener('DOMContentLoaded', function() {
+    const params = new URLSearchParams(window.location.search);
+    const toastType = params.get('toast');
+    
+    if (toastType) {
+      setTimeout(() => {
+        switch(toastType) {
+          case 'login_success':
+            showToast('success', 'Login Berhasil', 'Selamat datang kembali!');
+            break;
+          case 'register_success':
+            showToast('success', 'Registrasi Berhasil', 'Akun Anda berhasil dibuat. Silakan tunggu verifikasi admin.');
+            break;
+          case 'logout_success':
+            showToast('info', 'Logout Berhasil', 'Anda telah keluar dari akun.');
+            break;
+          case 'biodata_success':
+            showToast('success', 'Biodata Tersimpan', 'Data Anda berhasil disimpan. Menunggu verifikasi panitia.');
+            break;
+          case 'biodata_rejected':
+            showToast('error', 'Biodata Ditolak', 'Biodata Anda ditolak. Silakan perbaiki dan kirim ulang.');
+            break;
+          case 'account_deleted':
+            showToast('success', 'Akun Dihapus', 'Akun berhasil dihapus dari sistem.');
+            break;
+          case 'account_approved':
+            showToast('success', 'Akun Disetujui', 'Akun santri berhasil diverifikasi.');
+            break;
+          case 'account_rejected':
+            showToast('info', 'Akun Ditolak', 'Akun santri telah ditolak.');
+            break;
+          case 'payment_success':
+            showToast('success', 'Pembayaran Dikirim', 'Bukti pembayaran berhasil diupload. Menunggu verifikasi.');
+            break;
+          case 'error':
+            showToast('error', 'Terjadi Kesalahan', params.get('msg') || 'Silakan coba lagi.');
+            break;
+        }
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }, 300);
+    }
+  });
+</script>
+
+<% if (typeof user !== 'undefined' && user && user.biodataRejected) { %>
+<script>
+  // Auto show biodata rejected toast
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+      showToast('error', 'Biodata Ditolak!', 'Biodata Anda ditolak oleh panitia. Silakan isi ulang formulir biodata.');
+    }, 500);
+  });
+</script>
+<% } %>
+
+  <script>
+    // --- Reveal Animation Observer ---
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+          // Optional: stop observing once revealed
+          // revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+  </script>
+</body>
+</html>
+

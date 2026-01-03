@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/duty.css" />
+  
+  <style>
+    /* Tab Styling */
+    .tab-container {
+      margin-bottom: 20px;
+    }
+    .tab-buttons {
+      display: flex;
+      gap: 10px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px;
+    }
+    .tab-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+    .tab-btn:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+    .tab-btn.active {
+      background: var(--accent);
+      color: #000;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* Improved Table Styling */
+    .table-card {
+      padding: 0;
+      overflow: hidden;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-2);
+    }
+    .table thead {
+      background: var(--bg-3);
+    }
+    :root[data-theme="light"] .table thead {
+      background: #f8fafc;
+    }
+    .table th {
+      padding: 16px 20px;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      border-bottom: 2px solid var(--border);
+    }
+    .table td {
+      padding: 16px 20px;
+      vertical-align: middle;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    .table tr:last-child td { border-bottom: none; }
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .page-header { 
+        flex-direction: column; 
+        align-items: stretch !important; 
+        gap: 16px; 
+        margin-bottom: 20px !important;
+      }
+      .page-title { font-size: 1.3rem !important; margin: 0 !important; }
+      .btn-export { width: 100%; justify-content: center; }
+      
+      /* Stat cards smaller */
+      .stat-row { gap: 10px !important; flex-wrap: wrap; }
+      .stat-card { 
+        padding: 12px 16px !important; 
+        min-width: 100px; 
+        flex: 1;
+      }
+      .stat-card .value { font-size: 1.4rem !important; }
+      .stat-card .label { font-size: 0.7rem !important; }
+      
+      /* Tab buttons */
+      .tab-buttons { gap: 6px; padding: 4px; }
+      .tab-btn { 
+        padding: 10px 12px; 
+        font-size: 0.75rem; 
+        gap: 4px;
+      }
+      .tab-btn svg { width: 14px; height: 14px; }
+      
+      .table-card { 
+        overflow-x: auto;
+        border-radius: var(--radius-md);
+      }
+      .table {
+        min-width: 600px;
+      }
+      .table th, .table td {
+        font-size: 0.85rem !important;
+        padding: 14px 12px !important;
+      }
+      
+      .bukti-thumb {
+        width: 45px !important;
+        height: 45px !important;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .table { min-width: 500px; }
+      .table th, .table td { font-size: 0.8rem !important; padding: 12px 10px !important; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="container nav-inner">
+    <div class="brand-wrap">
+      <a href="/pengurus/home" class="btn-back-inline" title="Kembali">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </a>
+      <div class="brand">Laporan Pembayaran</div>
+    </div>
+    <div class="right-actions">
+      <button id="navToggle" class="nav-toggle" style="display:flex !important;" aria-label="Menu">
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      </button>
+    </div>
+  </div>
+</header>
+
+<%- include('partials/pengurus_sidebar', { currentPage: 'laporan-bayar', user: user, stat: null }) %>
+
+<main class="section">
+  <div class="container">
+    
+    <!-- Header Row: Stats + Export Button -->
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; margin-bottom: 20px;">
+      <div class="stat-card" style="flex: 1; min-width: 120px;">
+        <div class="value"><%= pembayaran.length %></div>
+        <div class="label">Sudah Bayar</div>
+      </div>
+      <% if (user.role !== 'ketua' && belumBayar) { %>
+      <div class="stat-card" style="flex: 1; min-width: 120px; border-color: #ef4444;">
+        <div class="value" style="color: #ef4444;"><%= belumBayar.length %></div>
+        <div class="label">Belum Bayar</div>
+      </div>
+      <% } %>
+      <% if (user.role === 'admin' || user.role === 'keuangan') { %>
+      <a href="/pengurus/laporan-pembayaran/export" class="btn-export" style="display: flex; align-items: center; height: auto; padding: 10px 14px; font-size: 0.85rem;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export
+      </a>
+      <% } %>
+    </div>
+    
+    <!-- TAB SWITCHER -->
+    <div class="tab-container">
+      <div class="tab-buttons">
+        <button class="tab-btn active" onclick="switchTab('sudah')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Sudah Bayar (<%= pembayaran.length %>)
+        </button>
+        <% if (user.role !== 'ketua' && belumBayar) { %>
+        <button class="tab-btn" onclick="switchTab('belum')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          Belum Bayar (<%= belumBayar.length %>)
+        </button>
+        <% } %>
+      </div>
+    </div>
+    
+    <!-- TAB CONTENT: SUDAH BAYAR -->
+    <div id="tab-sudah" class="tab-content active">
+      <% if(pembayaran.length === 0) { %>
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          <h4>Belum ada data</h4>
+          <p>Verifikasi pembayaran dulu di menu Verifikasi Pembayaran</p>
+        </div>
+      <% } else { %>
+        <div class="card table-card">
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="text-align:center" width="60">No</th>
+                <th width="80">Bukti</th>
+                <th>Nama Santri</th>
+                <th>Tanggal Upload</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% pembayaran.forEach((p, i) => { %>
+                <tr>
+                  <td style="text-align:center; color:var(--muted); font-size:0.9rem"><%= i + 1 %></td>
+                  <td>
+                    <div style="width:50px; height:50px; border-radius:8px; overflow:hidden; border:1px solid var(--border); background:var(--bg);">
+                      <img src="<%= p.bukti_path %>" alt="Bukti" style="width:100%; height:100%; object-fit:cover; cursor:pointer;" onclick="openZoom('<%= p.bukti_path %>')">
+                    </div>
+                  </td>
+                  <td style="font-weight:700"><%= p.nama_santri %></td>
+                  <td style="color:var(--muted); font-size:0.85rem"><%= p.tanggal_upload %></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+    
+    <% if (user.role !== 'ketua' && belumBayar) { %>
+    <!-- TAB CONTENT: BELUM BAYAR -->
+    <div id="tab-belum" class="tab-content">
+      <% if(belumBayar.length === 0) { %>
+        <div class="empty-state" style="border-color: var(--accent);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <h4>Semua santri sudah bayar!</h4>
+          <p>Tidak ada santri yang belum membayar.</p>
+        </div>
+      <% } else { %>
+        <div class="card table-card">
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="text-align:center" width="60">No</th>
+                <th>Nama Lengkap</th>
+                <th>Informasi Kontak (WA)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% belumBayar.forEach((s, i) => { %>
+                <tr>
+                  <td style="text-align:center; color:var(--muted); font-size:0.9rem"><%= i + 1 %></td>
+                  <td style="font-weight:700"><%= s.nama %></td>
+                  <td>
+                    <% if (s.wa) { %>
+                      <a href="https://wa.me/<%= s.wa.replace(/\D/g,'') %>" target="_blank" style="color: var(--accent); text-decoration: none; font-weight: 500;">
+                        <%= s.wa %>
+                      </a>
+                    <% } else { %>
+                      <span style="color: var(--muted);">-</span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+    <% } %>
+  </div>
+</main>
+
+<!-- Modal Zoom -->
+<div id="zoomModal" class="modal-overlay" onclick="closeZoom()">
+  <button class="modal-close" onclick="closeZoom()">×</button>
+  <img id="zoomImg" src="" alt="Bukti Pembayaran" class="modal-img">
+</div>
+
+<button id="themeFab" class="theme-fab"></button>
+
+<script>
+  function switchTab(tab) {
+    // Remove active from all buttons and contents
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+    // Add active to selected tab
+    if (tab === 'sudah') {
+      document.querySelectorAll('.tab-btn')[0].classList.add('active');
+      document.getElementById('tab-sudah').classList.add('active');
+    } else {
+      document.querySelectorAll('.tab-btn')[1].classList.add('active');
+      document.getElementById('tab-belum').classList.add('active');
+    }
+  }
+  
+  function openZoom(src) {
+    document.getElementById('zoomImg').src = src;
+    document.getElementById('zoomModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeZoom() {
+    document.getElementById('zoomModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+</script>
+
+<%- include('partials/pengurus_nav_script') %>
+
+</body>
+</html>
+
+

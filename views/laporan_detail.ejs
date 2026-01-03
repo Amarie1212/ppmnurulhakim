@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/duty.css" />
+</head>
+<body>
+
+<header class="navbar">
+  <div class="container nav-inner">
+    <div class="brand-wrap">
+      <a href="/pengurus/laporan-masuk" class="btn-back-inline" title="Kembali">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </a>
+      <div class="brand">Detail Laporan</div>
+    </div>
+    <div class="right-actions">
+      <button id="navToggle" class="nav-toggle" style="display:flex !important;" aria-label="Menu">
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      </button>
+    </div>
+  </div>
+</header>
+
+<%- include('partials/pengurus_sidebar', { currentPage: 'laporan-masuk', user: user, stat: null }) %>
+
+<main class="section">
+  <div class="container">
+    <!-- Laporan Info -->
+    <div class="card" style="margin-bottom: 24px; padding: 24px;">
+      <h3 style="margin: 0 0 16px; font-size: 1.2rem;">Informasi Laporan</h3>
+      <div style="display: grid; gap: 12px;">
+        <div style="display: flex; gap: 8px;">
+          <span style="color: var(--muted); min-width: 120px;">Periode:</span>
+          <strong><%= laporan.periode_mulai %> - <%= laporan.periode_akhir %></strong>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <span style="color: var(--muted); min-width: 120px;">Total Pembayaran:</span>
+          <strong style="color: var(--accent);"><%= laporan.total_pembayaran %> pembayaran</strong>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <span style="color: var(--muted); min-width: 120px;">Dibuat oleh:</span>
+          <strong><%= laporan.nama_pembuat %></strong>
+        </div>
+        <% if (laporan.catatan) { %>
+          <div style="display: flex; gap: 8px;">
+            <span style="color: var(--muted); min-width: 120px;">Catatan:</span>
+            <span><%= laporan.catatan %></span>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Bukti Pembayaran -->
+    <div class="page-header" style="margin-bottom: 20px;">
+      <h2 class="page-title">Bukti Pembayaran Terverifikasi</h2>
+      <p class="page-sub">Total <%= pembayaran.length %> bukti pembayaran</p>
+    </div>
+
+    <% if (pembayaran.length === 0) { %>
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <h3>Belum ada data</h3>
+        <p>Tidak ada bukti pembayaran terverifikasi</p>
+      </div>
+    <% } else { %>
+      <div class="card table-card">
+        <table class="table">
+          <thead>
+            <tr>
+              <th style="text-align:center" width="50">No</th>
+              <th>Bukti</th>
+              <th>Nama Santri</th>
+              <th>Keterangan</th>
+              <th>Tanggal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% pembayaran.forEach((p, i) => { %>
+              <tr>
+                <td style="text-align:center; color:var(--muted)"><%= i + 1 %></td>
+                <td>
+                  <img src="<%= p.bukti_path %>" alt="Bukti" class="bukti-thumb" onclick="openZoom('<%= p.bukti_path %>')">
+                </td>
+                <td style="font-weight:700"><%= p.nama_santri %></td>
+                <td><%= p.keterangan || '-' %></td>
+                <td style="color:var(--muted); font-size:0.85rem"><%= p.tanggal %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<!-- Modal Zoom -->
+<div id="zoomModal" class="modal-overlay" onclick="closeZoom()">
+  <button class="modal-close" onclick="closeZoom()">×</button>
+  <img id="zoomImg" src="" alt="Bukti Pembayaran" class="modal-img">
+</div>
+
+<button id="themeFab" class="theme-fab"></button>
+
+<script>
+  function openZoom(src) {
+    document.getElementById('zoomImg').src = src;
+    document.getElementById('zoomModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeZoom() {
+    document.getElementById('zoomModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+</script>
+
+<%- include('partials/pengurus_nav_script') %>
+
+</body>
+</html>
+
+

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/duty.css" />
+  <link rel="stylesheet" href="/toast.css" />
+  
+  <%- include('partials/notify') %>
+
+  <style>
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .page-title { font-size: 1.5rem; font-weight: 800; margin: 0; }
+    .page-subtitle { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+    
+    /* Modern Toolbar Design */
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .search-group {
+      position: relative;
+      flex: 1;
+      min-width: 280px;
+    }
+    .search-group svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      width: 18px;
+      height: 18px;
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%;
+      padding: 12px 16px 12px 42px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-2);
+      color: var(--text);
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-sm);
+    }
+    .search-input:focus {
+      border-color: var(--accent);
+      background: var(--bg-2);
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1), var(--shadow-md);
+      outline: none;
+    }
+    
+    .filter-group {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .filter-select {
+      appearance: none;
+      padding: 12px 40px 12px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E") no-repeat right 12px center;
+      background-size: 16px;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-width: 150px;
+      box-shadow: var(--shadow-sm);
+    }
+    .filter-select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+      outline: none;
+    }
+
+    .btn-export {
+      padding: 12px 20px;
+      border-radius: 12px;
+      background: var(--accent);
+      color: #000 !important;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s;
+      box-shadow: var(--shadow-md);
+      font-size: 0.9rem;
+      border: none;
+    }
+    .btn-export:hover {
+      filter: brightness(1.1);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    .btn-export svg { width: 18px; height: 18px; color: #000 !important; }
+    
+    /* Spreadsheet Style Table - Enhanced Consistency */
+    .spreadsheet-wrap {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .spreadsheet-container {
+      overflow-x: auto;
+      max-height: 70vh;
+    }
+    .spreadsheet {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+    .spreadsheet thead {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--bg-3);
+    }
+    :root[data-theme="light"] .spreadsheet thead {
+      background: #f8fafc;
+    }
+    .spreadsheet th {
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: left;
+      padding: 14px 16px;
+      border-bottom: 2px solid var(--border);
+      border-right: 1px solid var(--border);
+    }
+    .spreadsheet th:last-child { border-right: none; }
+    .spreadsheet td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: middle;
+    }
+    .spreadsheet td:last-child { border-right: none; }
+    .spreadsheet tbody tr:hover { background: rgba(16, 185, 129, 0.05); }
+    .spreadsheet tbody tr:nth-child(even) { background: rgba(0,0,0,0.02); }
+    
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .badge-l { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+    .badge-p { background: rgba(236, 72, 153, 0.1); color: #ec4899; }
+    .badge-verified { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+    .badge-pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+    
+    .stat-bar {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+    }
+    .stat-count {
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+    .stat-label { color: var(--muted); }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+    .empty-state svg { width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5; }
+    
+    @media (max-width: 768px) {
+      .page-header { flex-direction: column; align-items: flex-start; }
+      .toolbar { flex-direction: column; }
+      .search-box { max-width: 100%; }
+      .stat-bar { gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="container nav-inner">
+    <div class="brand-wrap">
+      <a href="/pengurus/home" class="btn-back-inline" title="Kembali ke Dashboard">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </a>
+      <div class="brand">Laporan Data Santri</div>
+    </div>
+    <div class="right-actions">
+      <button id="navToggle" class="nav-toggle" style="display:flex !important;" aria-label="Menu">
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      </button>
+    </div>
+  </div>
+</header>
+
+<%- include('partials/pengurus_sidebar', { currentPage: 'laporan-santri', user: user, stat: null }) %>
+
+<main class="section">
+  <div class="container">
+    <div class="page-header">
+      <div>
+        <h2 class="page-title">📊 Laporan Data Santri</h2>
+        <p class="page-subtitle">Data lengkap seluruh calon santri yang terdaftar</p>
+      </div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stat-bar">
+      <div class="stat-item">
+        <span class="stat-count"><%= santri.length %></span>
+        <span class="stat-label">Total Santri</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-count badge-l" style="background:#3b82f6;color:white;padding:4px 12px;border-radius:20px;"><%= santri.filter(s => s.jk === 'L').length %></span>
+        <span class="stat-label">Putra</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-count badge-p" style="background:#ec4899;color:white;padding:4px 12px;border-radius:20px;"><%= santri.filter(s => s.jk === 'P').length %></span>
+        <span class="stat-label">Putri</span>
+      </div>
+      <% 
+        const periodStats = santri.reduce((acc, s) => {
+          if (s.angkatan) acc[s.angkatan] = (acc[s.angkatan] || 0) + 1;
+          return acc;
+        }, {});
+        const sortedYears = Object.keys(periodStats).sort((a,b) => b-a);
+        sortedYears.slice(0, 2).forEach(year => { 
+      %>
+        <div class="stat-item">
+          <span class="stat-count" style="color:var(--accent);"><%= periodStats[year] %></span>
+          <span class="stat-label">Periode <%= year %></span>
+        </div>
+      <% }) %>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-group">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" id="searchInput" class="search-input" placeholder="Cari nama, email, atau alamat...">
+      </div>
+      
+      <div class="filter-group">
+        <select class="filter-select" id="filterJK">
+          <option value="">Semua JK</option>
+          <option value="L">Laki-laki</option>
+          <option value="P">Perempuan</option>
+        </select>
+        
+        <select class="filter-select" id="filterStatus">
+          <option value="">Semua Status</option>
+          <option value="VERIFIED">Terverifikasi</option>
+          <option value="PENDING">Pending</option>
+        </select>
+        
+        <select class="filter-select" id="filterPeriode">
+          <option value="">Semua Periode</option>
+          <% 
+            const periodList = [...new Set(santri.map(s => s.angkatan))].filter(Boolean).sort((a,b) => b-a);
+            periodList.forEach(p => { 
+          %>
+            <option value="<%= p %>">Angkatan <%= p %></option>
+          <% }) %>
+        </select>
+        
+        <a href="/pengurus/export-santri" class="btn-export">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span>Export</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Spreadsheet Table -->
+    <div class="spreadsheet-wrap">
+      <% if (santri.length === 0) { %>
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <p>Belum ada data santri</p>
+        </div>
+      <% } else { %>
+        <div class="spreadsheet-container">
+          <table class="spreadsheet" id="santriTable">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Nama Lengkap</th>
+                <th>JK</th>
+                <th>No WhatsApp</th>
+                <th>Email</th>
+                <th>Kelompok</th>
+                <th>Desa</th>
+                <th>Daerah</th>
+                <th>Alamat</th>
+                <th>Pendidikan</th>
+                <th>Nama Ayah</th>
+                <th>Nama Ibu</th>
+                <th>Status Biodata</th>
+              </tr>
+            </thead>
+            <tbody id="santriBody">
+              <% santri.forEach((s, i) => { %>
+              <tr data-jk="<%= s.jk || '' %>" data-status="<%= s.status_biodata || 'PENDING' %>" data-periode="<%= s.angkatan || '' %>">
+                <td><%= i + 1 %></td>
+                <td><strong><%= s.nama || '-' %></strong></td>
+                <td>
+                  <% if (s.jk === 'L') { %>
+                    <span class="badge badge-l">L</span>
+                  <% } else if (s.jk === 'P') { %>
+                    <span class="badge badge-p">P</span>
+                  <% } else { %>
+                    -
+                  <% } %>
+                </td>
+                <td><%= s.wa || '-' %></td>
+                <td><%= s.email || '-' %></td>
+                <td><%= s.kelompok || '-' %></td>
+                <td><%= s.desa || '-' %></td>
+                <td><%= s.daerah || '-' %></td>
+                <td><%= s.alamat || '-' %></td>
+                <td><%= s.sekolah_asal || '-' %></td>
+                <td><%= s.nama_ayah || '-' %></td>
+                <td><%= s.nama_ibu || '-' %></td>
+                <td>
+                  <% if (s.status_biodata === 'VERIFIED') { %>
+                    <span class="badge badge-verified">Verified</span>
+                  <% } else { %>
+                    <span class="badge badge-pending">Pending</span>
+                  <% } %>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</main>
+
+<button id="themeFab" class="theme-fab"></button>
+
+<%- include('partials/pengurus_nav_script') %>
+
+<script>
+  // Search & Filter
+  const searchInput = document.getElementById('searchInput');
+  const filterJK = document.getElementById('filterJK');
+  const filterStatus = document.getElementById('filterStatus');
+  const tbody = document.getElementById('santriBody');
+
+  function filterTable() {
+    const search = searchInput.value.toLowerCase();
+    const jk = filterJK.value;
+    const status = filterStatus.value;
+    const periode = document.getElementById('filterPeriode').value;
+
+    const rows = tbody.querySelectorAll('tr');
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      const rowJK = row.dataset.jk;
+      const rowStatus = row.dataset.status;
+      const rowPeriode = row.dataset.periode;
+
+      const matchSearch = text.includes(search);
+      const matchJK = !jk || rowJK === jk;
+      const matchStatus = !status || rowStatus === status;
+      const matchPeriode = !periode || rowPeriode === periode;
+
+      row.style.display = (matchSearch && matchJK && matchStatus && matchPeriode) ? '' : 'none';
+    });
+  }
+
+  searchInput?.addEventListener('input', filterTable);
+  filterJK?.addEventListener('change', filterTable);
+  filterStatus?.addEventListener('change', filterTable);
+  document.getElementById('filterPeriode')?.addEventListener('change', filterTable);
+</script>
+
+</body>
+</html>

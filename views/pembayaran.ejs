@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title><%= title %></title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/styles.css"/>
+  <link rel="stylesheet" href="/form.css"/>
+  <link rel="stylesheet" href="/duty.css"/>
+  <link rel="stylesheet" href="/toast.css"/>
+  <style>
+    .brand-wrap { display: flex; align-items: center; gap: 12px; }
+    
+    .stats-row { display: flex; gap: 12px; margin-bottom: 20px; }
+    .stat-box {
+      flex: 1;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 14px 10px;
+      text-align: center;
+    }
+    :root[data-theme="light"] .stat-box { background: #f1f5f9; }
+    .stat-box .num { font-size: 1.4rem; font-weight: 700; }
+    .stat-box .num.pending { color: #eab308; }
+    .stat-box .num.verified { color: #22c55e; }
+    .stat-box .num.rejected { color: #ef4444; }
+    .stat-box .lbl { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+    
+    .bank-info {
+      background: rgba(34, 197, 94, 0.08);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      border-radius: 4px;
+      padding: 16px;
+      margin-bottom: 20px;
+      text-align: center;
+      line-height: 1.6;
+    }
+    .bank-info .bank-name { font-size: 0.85rem; color: var(--muted); }
+    .bank-info .rekening { 
+      font-size: 1.25rem; font-weight: 700; color: var(--accent); 
+      margin: 6px 0; letter-spacing: 1px;
+      cursor: pointer; 
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .bank-info .rekening:hover { opacity: 0.8; }
+    .bank-info .rekening .copy-icon { width: 16px; height: 16px; opacity: 0.6; }
+    .bank-info .nominal { font-size: 0.85rem; color: var(--text); }
+    .copy-toast { font-size: 0.75rem; color: var(--accent); margin-top: 4px; display: none; }
+    
+    .preview-wrap { margin-top: 12px; display: inline-block; position: relative; }
+    .preview-wrap img { max-width: 200px; max-height: 200px; border-radius: 4px; object-fit: contain; }
+    .preview-wrap .btn-remove {
+      position: absolute; top: -8px; right: -8px;
+      width: 24px; height: 24px; border-radius: 50%;
+      background: #ef4444; color: #fff; border: none;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .preview-wrap .btn-remove:hover { background: #dc2626; }
+    
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .history-item:last-child { border-bottom: none; }
+    .history-date { font-size: 0.9rem; color: var(--text); }
+    .history-note { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+    
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+    .badge-pending { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+    .badge-verified { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+    .badge-rejected { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+    
+    .empty-msg { text-align: center; padding: 24px; color: var(--muted); font-size: 0.9rem; }
+    
+    .warning-card {
+      background: rgba(234, 179, 8, 0.1);
+      border: 1px solid rgba(234, 179, 8, 0.3);
+      border-radius: 4px;
+      padding: 24px;
+      text-align: center;
+    }
+    .warning-card strong { color: #eab308; display: block; margin-bottom: 8px; }
+    .warning-card p { color: var(--muted); font-size: 0.9rem; margin-bottom: 16px; }
+  </style>
+</head>
+<body class="form-page layout-form">
+
+<header class="navbar">
+  <div class="container nav-inner">
+    <div class="brand-wrap">
+      <a href="/" class="btn-back-inline" aria-label="Kembali" title="Kembali">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </a>
+      <div class="brand">PPM Nurul Hakim</div>
+    </div>
+  </div>
+</header>
+
+<main class="form-wrap">
+  <h2 class="form-title">Shodaqoh Operasional</h2>
+  <p style="text-align:center; margin-bottom:24px; font-size:0.95rem; color:var(--muted);">
+    Halo, <strong style="color:var(--text)"><%= user.name %></strong>!
+  </p>
+
+  <% if (!user.santri_id) { %>
+    <div class="warning-card">
+      <strong>⚠️ Biodata Belum Lengkap</strong>
+      <p>Lengkapi biodata terlebih dahulu sebelum upload bukti pembayaran.</p>
+      <a href="/form" class="btn-nav" style="text-decoration:none;">Lengkapi Biodata</a>
+    </div>
+  <% } else { %>
+
+    <% if (user.status === 'APPROVED') { %>
+    <!-- Stats - Hanya untuk santri terverifikasi -->
+    <div class="stats-row">
+      <div class="stat-box"><div class="num pending"><%= pendingCount %></div><div class="lbl">Menunggu</div></div>
+      <div class="stat-box"><div class="num verified"><%= verifiedCount %></div><div class="lbl">Terverifikasi</div></div>
+      <div class="stat-box"><div class="num rejected"><%= rejectedCount %></div><div class="lbl">Ditolak</div></div>
+    </div>
+    <% } %>
+
+    <!-- Bank Info -->
+    <div class="bank-info">
+      <div class="bank-name">Bank Syariah Indonesia (BSI) a.n. PPM Nurul Hakim</div>
+      <div class="rekening" id="copyRekening" onclick="copyRekening()" title="Klik untuk salin">
+        <span id="rekeningText">7777772206</span>
+        <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+      </div>
+      <div class="copy-toast" id="copyToast">Nomor rekening disalin!</div>
+      <div class="nominal">Nominal: <strong>Rp 3.500.000,-</strong></div>
+    </div>
+
+    <!-- Form Card -->
+    <form class="form-card" action="/pembayaran" method="POST" enctype="multipart/form-data">
+      <div class="grid-12">
+        
+        <div class="col-12"><h3 class="sec-title">Upload Bukti</h3></div>
+        
+        <div class="col-12">
+          <label class="label">Nama Penyetor <span class="hint">(Opsional)</span></label>
+          <input class="input" type="text" name="nama_pengisi" placeholder="Kosongkan jika sama dengan pendaftar">
+        </div>
+        
+        <div class="col-12">
+          <label class="label">Bukti Transfer (JPG/PNG, maks 5MB)</label>
+          <input type="file" class="file" name="bukti" id="buktiInput" accept=".jpg,.jpeg,.png" required>
+          <div class="preview-wrap" id="previewWrap" style="display:none;">
+            <img id="previewImg" alt="Preview">
+            <button type="button" class="btn-remove" id="btnRemove" title="Hapus">✕</button>
+          </div>
+        </div>
+        
+        <div class="col-12">
+          <button class="btn-nav" type="submit" style="width:100%;">Kirim Bukti Pembayaran</button>
+        </div>
+        
+        <div class="col-12"><div class="divider"></div></div>
+        
+        <div class="col-12"><h3 class="sec-title">Riwayat</h3></div>
+        
+        <div class="col-12">
+          <% if (history.length > 0) { %>
+            <% history.forEach(h => { %>
+              <div class="history-item">
+                <div>
+                  <div class="history-date"><%= h.tgl %></div>
+                  <% if (h.keterangan) { %><div class="history-note"><%= h.keterangan %></div><% } %>
+                  <% if (h.status === 'REJECTED' && h.alasan_tolak) { %>
+                    <div class="history-note" style="color:#ef4444; font-weight:600; margin-top:4px;">Ditolak: <%= h.alasan_tolak %></div>
+                  <% } %>
+                </div>
+                <% if (h.status === 'PENDING') { %>
+                  <span class="badge badge-pending">Menunggu</span>
+                <% } else if (h.status === 'VERIFIED') { %>
+                  <span class="badge badge-verified">Terverifikasi</span>
+                <% } else { %>
+                  <span class="badge badge-rejected">Ditolak</span>
+                <% } %>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="empty-msg">Belum ada riwayat pembayaran</div>
+          <% } %>
+        </div>
+        
+      </div>
+    </form>
+
+  <% } %>
+</main>
+
+<button id="themeFab" class="theme-fab" aria-label="Ganti tema" title="Ganti tema"></button>
+
+<footer class="footer">
+  <div class="container"><p>© <%= new Date().getFullYear() %> PPM Nurul Hakim Jatinangor</p></div>
+</footer>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<script>
+  // Copy rekening
+  function copyRekening() {
+    const text = document.getElementById('rekeningText').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const toast = document.getElementById('copyToast');
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 2000);
+    });
+  }
+
+  // Image preview
+  const input = document.getElementById('buktiInput');
+  const preview = document.getElementById('previewImg');
+  const previewWrap = document.getElementById('previewWrap');
+  const btnRemove = document.getElementById('btnRemove');
+  
+  if (input) {
+    input.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          preview.src = ev.target.result;
+          previewWrap.style.display = 'inline-block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+  
+  if (btnRemove) {
+    btnRemove.addEventListener('click', () => {
+      input.value = '';
+      preview.src = '';
+      previewWrap.style.display = 'none';
+    });
+  }
+
+  // Theme
+  const root = document.documentElement;
+  function setFabIcon(theme) {
+    const sun = '<svg class="icon" viewBox="0 0 24 24"><path d="M6.76 4.84l-1.8-1.79L3.5 4.5l1.79 1.79 1.47-1.45zM1 13h3v-2H1v2zm10-9h2V1h-2v3zm7.24.84L18.5 4.5l-1.46 1.47 1.79 1.79 1.41-1.41zM20 13h3v-2h-3v2zm-7 7h2v-3h-2v3zm5.74-2.16l1.79 1.79 1.41-1.41-1.79-1.79-1.41 1.41zM4.5 18.5l1.79-1.79-1.41-1.41-1.79 1.79 1.41 1.41zM12 6a6 6 0 1 1 0 12 6 6 0 0 1 0-12z"></path></svg>';
+    const moon = '<svg class="icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+    const fab = document.getElementById('themeFab');
+    if (fab) fab.innerHTML = (theme === 'light') ? moon : sun;
+  }
+  function applyTheme(theme) {
+    if (theme === 'light') root.setAttribute('data-theme', 'light');
+    else root.removeAttribute('data-theme');
+    localStorage.setItem('theme', theme);
+    setFabIcon(theme);
+  }
+  (function initTheme() {
+    const saved = localStorage.getItem('theme');
+    if (saved) applyTheme(saved);
+    else applyTheme('dark');
+    document.getElementById('themeFab')?.addEventListener('click', () => {
+      const isLight = root.getAttribute('data-theme') === 'light';
+      applyTheme(isLight ? 'dark' : 'light');
+    });
+  })();
+
+  // Toast
+  function showToast(msg, type = 'success', title = '') {
+    const c = document.getElementById('toastContainer');
+    if (!c) return;
+    
+    const icons = { success: '✓', error: '✕', info: 'ℹ' };
+    const titles = { success: 'Berhasil', error: 'Gagal', info: 'Info' };
+    
+    const t = document.createElement('div');
+    t.className = 'toast ' + type;
+    t.innerHTML = `
+      <div class="toast-icon">${icons[type] || icons.info}</div>
+      <div class="toast-content">
+        <div class="toast-title">${title || titles[type]}</div>
+        <div class="toast-message">${msg}</div>
+      </div>
+      <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+    `;
+    c.appendChild(t);
+    setTimeout(() => { t.classList.add('hiding'); setTimeout(() => t.remove(), 300); }, 4000);
+  }
+
+  const params = new URLSearchParams(location.search);
+  if (params.get('toast') === 'payment_success') {
+    showToast('Bukti pembayaran berhasil diupload!', 'success');
+    history.replaceState({}, '', '/pembayaran');
+  }
+  if (params.get('error')) {
+    const e = params.get('error');
+    showToast(e === 'nobukti' ? 'Bukti wajib diupload!' : e === 'nobiodata' ? 'Lengkapi biodata dulu.' : 'Terjadi kesalahan.', 'error');
+    history.replaceState({}, '', '/pembayaran');
+  }
+</script>
+</body>
+</html>
+
+

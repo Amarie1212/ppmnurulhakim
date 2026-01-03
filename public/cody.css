@@ -1,0 +1,193 @@
+/* ===== Halaman Kode: selaras dengan pengurus.ejs ===== */
+body {
+  background-color: #242424;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-attachment: fixed;
+  color: var(--text);
+}
+
+:root[data-theme="light"] body {
+  background-color: #d8d8d8;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+}
+
+/* Back inline + brand */
+.brand-wrap{ display:flex; align-items:center; gap:10px; }
+
+.btn-back-inline{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:36px; height:36px; border-radius:10px;
+  border:1px solid var(--border);
+  background: rgba(0, 0, 0, 0.08);   /* kontras di dark */
+  color: var(--text);                   /* ikon ikut warna teks */
+  transition: transform .2s, background .2s, border-color .2s, box-shadow .2s;
+}
+.btn-back-inline:hover{
+  transform: translateX(-2px);
+  background: rgba(255,255,255,0.18);
+}
+.btn-back-inline:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(34,197,94,.28);
+}
+
+.btn-back-inline .icon{
+  width:18px; height:18px;
+  fill: none;                /* pakai stroke agar jelas */
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Mode terang */
+:root[data-theme="light"] .btn-back-inline{
+  background: rgba(0,0,0,0.05);
+  border-color: rgba(0,0,0,0.10);
+  color: #111;
+}
+:root[data-theme="light"] .btn-back-inline:hover{
+  background: rgba(0,0,0,0.12);
+}
+/* Section spacing */
+.section{ padding:calc(var(--nav-h,72px) + 10px) 0 72px; }
+.page-title{ text-align:center; margin:18px 0; font-size:clamp(22px,3.6vw,30px); }
+
+/* Kartu & form */
+.code-card{ margin-bottom:16px; }
+.lbl{ font-weight:700; display:block; margin-bottom:6px; }
+.form-row{ display:flex; gap:10px; flex-wrap:wrap; }
+.input{
+  width:100%; padding:10px 12px; border-radius:10px;
+  border:1px solid var(--border); background:transparent; color:var(--text);
+  outline:none; transition:border-color .2s, box-shadow .2s;
+}
+.input:focus{ border-color:rgba(34,197,94,.45); box-shadow:0 0 0 3px rgba(34,197,94,.15); }
+
+.meta{ color:var(--muted); font-size:.92rem; margin-top:6px; }
+
+/* Kode aktif box */
+.code-box{
+  display:flex; align-items:center; justify-content:center;
+  font-weight:800; letter-spacing:.5px;
+  padding:12px 14px; border-radius:12px;
+  border:1px dashed rgba(34,197,94,.45); background:rgba(34,197,94,.10);
+}
+:root[data-theme="light"] .code-box{ background:rgba(16,185,129,.10); }
+
+/* Alerts */
+.alert-ok{ color:#10b981; font-weight:700; margin-bottom:10px; }
+.alert-err{ color:#ef4444; font-weight:700; margin-bottom:10px; }
+
+/* ===== Admin controls (copy gaya pengurus) ===== */
+
+/* Tombol titik-tiga (mobile) */
+.icon-btn{
+  width:44px; height:44px; display:inline-flex; align-items:center; justify-content:center;
+  border-radius:12px; border:1px solid var(--border); background:rgba(255,255,255,.08);
+  transition:transform .35s ease, background .25s, border-color .25s;
+}
+:root[data-theme="light"] .icon-btn{ background:rgba(0,0,0,.06); }
+.icon-btn:hover{ transform:translateY(-1px); }
+
+.icon-btn.dots .dot{
+  width:6px; height:6px; background:#f1f5f9; border-radius:50%;
+  margin:0 2px; transition:transform .35s ease, border-radius .2s ease;
+}
+:root[data-theme="light"] .icon-btn.dots .dot{ background:#0b0e14; }
+.icon-btn.dots.active{ transform:rotate(180deg); }
+.icon-btn.dots.active .dot:nth-child(1){ transform:translateX(2px) scaleX(1.8); border-radius:3px; }
+.icon-btn.dots.active .dot:nth-child(2){ transform:scaleX(2.4); border-radius:3px; }
+.icon-btn.dots.active .dot:nth-child(3){ transform:translateX(-2px) scaleX(1.8); border-radius:3px; }
+
+/* Sidebar trigger (desktop) */
+.nav-toggle{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:44px; height:44px; border-radius:12px;
+  border:1px solid var(--border); background:rgba(255,255,255,.08);
+  position:relative; overflow:hidden; transition:transform .5s ease, background .4s ease, border-color .4s ease;
+}
+:root[data-theme="light"] .nav-toggle{ background:rgba(0,0,0,.06); }
+.nav-toggle .bar{
+  position:absolute; width:22px; height:2.5px; background:#f1f5f9; border-radius:2px; transition:all .45s ease;
+}
+:root[data-theme="light"] .nav-toggle .bar{ background:#0b0e14; }
+.nav-toggle .bar:nth-child(1){ transform:translateY(-7px); }
+.nav-toggle .bar:nth-child(2){ transform:translateY(0); }
+.nav-toggle .bar:nth-child(3){ transform:translateY(7px); }
+.nav-toggle.active .bar:nth-child(1){ transform:rotate(45deg); background:#22c55e; }
+.nav-toggle.active .bar:nth-child(2){ opacity:0; }
+.nav-toggle.active .bar:nth-child(3){ transform:rotate(-45deg); background:#22c55e; }
+
+/* Dropdown pengurus (mobile) */
+.admin-dd[hidden]{ display:none !important; }
+.admin-dd{
+  position:fixed; top:calc(var(--nav-h,72px) + 8px); right:14px; z-index:56;
+  width:min(280px,88vw); background:var(--bg-2, rgba(0,0,0,.82));
+  border:1px solid var(--border); border-radius:14px; box-shadow:0 16px 40px rgba(0,0,0,.35);
+  transform-origin: top right; transform:scale(.96); opacity:.0; transition:transform .18s ease, opacity .18s ease;
+}
+.admin-dd.open{ transform:scale(1); opacity:1; }
+.admin-dd-head{ padding:12px 14px; border-bottom:1px solid var(--border); }
+.admin-dd-title{ font-weight:700; }
+.admin-dd-sub{ color:var(--muted); font-size:.92rem; }
+.admin-dd-item{ display:block; padding:12px 14px; text-decoration:none; color:var(--text); border-bottom:1px solid var(--border); transition:background .2s; }
+.admin-dd-item:last-child{ border-bottom:none; }
+.admin-dd-item:hover{ background:rgba(255,255,255,.08); }
+.admin-dd-item.danger{ color:#ef4444; font-weight:700; }
+.admin-dd-scrim{ position:fixed; inset:0; z-index:55; background:transparent; }
+
+/* Sidebar pengurus (desktop) */
+.panel-pengurus{
+  position:fixed; top:0; right:0; bottom:0; width:min(320px,90vw);
+  background:var(--bg-2, rgba(0,0,0,.9));
+  border-left:1px solid var(--border);
+  box-shadow:-6px 0 28px rgba(0,0,0,.22);
+  transform:translateX(100%); transition:transform .3s ease; z-index:60;
+  display:flex; flex-direction:column;
+}
+.panel-pengurus.open{ transform:translateX(0); }
+.panel-head{ display:flex; align-items:center; justify-content:space-between; padding:16px 18px; border-bottom:1px solid var(--border); }
+.panel-title{ font-weight:700; }
+.panel-sub{ color:var(--muted); font-size:.95rem; }
+.panel-close{ border:1px solid var(--border); border-radius:10px; background:transparent; color:var(--text); width:36px; height:36px; cursor:pointer; }
+.panel-nav .panel-link{ display:block; padding:14px 18px; text-decoration:none; color:var(--text); border-bottom:1px solid var(--border); transition:background .25s; }
+.panel-link:hover{ background:rgba(255,255,255,.08); }
+.panel-link.danger{ color:#ef4444; }
+.panel-body{ flex:1; overflow:auto; }
+.panel-footer{ border-top:1px solid var(--border); padding:14px; display:flex; justify-content:center; align-items:center; }
+.logout-btn{
+  display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:9999px;
+  border:1px solid var(--border); background:transparent; color:#ef4444; font-weight:800;
+  transition:background .25s, border-color .25s, transform .2s;
+}
+.logout-btn:hover{ background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.5); transform:translateY(-1px); }
+.logout-btn svg{ width:18px; height:18px; fill:#ef4444; }
+
+/* Theme FAB */
+.theme-fab{
+  position:fixed; left:18px; bottom:18px; width:52px; height:52px;
+  display:grid; place-items:center; border-radius:999px;
+  border:1px solid var(--border); background:rgba(255,255,255,.08);
+  z-index:70; box-shadow:0 10px 28px rgba(0,0,0,.25);
+  transition:transform .2s;
+}
+.theme-fab:hover{ transform:translateY(-2px); }
+.theme-fab .icon{ width:22px; height:22px; fill:var(--text); }
+.theme-fab.spin{ animation:spinOnce .4s ease; }
+@keyframes spinOnce{ from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+/* Responsif */
+@media (min-width:1024px){
+  /* pastikan dropdown tidak tampil di desktop */
+  .admin-dd{ display:none !important; }
+}
+@media (max-width:640px){
+  .btn-back-inline{ width:30px; height:30px; border-radius:8px; }
+  .btn-back-inline .icon{ width:16px; height:16px; }
+}

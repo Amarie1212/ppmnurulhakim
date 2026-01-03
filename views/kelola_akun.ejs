@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/duty.css" />
+  <link rel="stylesheet" href="/toast.css" />
+  <%- include('partials/notify') %>
+  
+  <style>
+    .btn-add {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 4px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-add:hover { filter: brightness(1.1); }
+    .btn-add svg { width: 18px; height: 18px; }
+    
+    /* Improved Table Styling */
+    .table-card {
+      padding: 0;
+      overflow: hidden;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .table-responsive {
+      overflow-x: auto;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .table thead {
+      background: var(--bg-3);
+    }
+    :root[data-theme="light"] .table thead {
+      background: #f8fafc;
+    }
+    .table th {
+      padding: 16px 20px;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      border-bottom: 2px solid var(--border);
+    }
+    .table td {
+      padding: 14px 20px;
+      vertical-align: middle;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+    .table tr:last-child td { border-bottom: none; }
+    .table tr:hover td { background: rgba(0,0,0,0.015); }
+    :root[data-theme="dark"] .table tr:hover td { background: rgba(255,255,255,0.015); }
+
+    .cell-no { width: 60px; text-align: center; color: var(--muted); }
+    .cell-nama { font-weight: 700; }
+    .cell-email { color: var(--muted); }
+    
+    .role-badge {
+      display: inline-flex;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    
+    .btn-edit-sm {
+      padding: 6px 12px;
+      background: rgba(59, 130, 246, 0.1);
+      color: #3b82f6;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-edit-sm:hover { background: #3b82f6; color: #fff; }
+    
+    .btn-delete-sm {
+      padding: 6px 12px;
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-delete-sm:hover { background: #ef4444; color: #fff; }
+
+    /* Page Header Fix */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .table-responsive {
+        margin: 0 -20px;
+        padding: 0 20px;
+      }
+      .table { min-width: 700px; }
+      .table th, .table td { padding: 12px 14px; }
+      
+      .page-header { 
+        flex-direction: column; 
+        align-items: stretch; 
+        gap: 16px; 
+      }
+      .btn-add { width: 100%; justify-content: center; }
+    }
+    
+    @media (max-width: 480px) {
+      .page-title { font-size: 1.2rem !important; }
+      .user-card { padding: 14px; }
+      .user-avatar { width: 38px; height: 38px; font-size: 0.9rem; }
+      .user-name { font-size: 0.95rem; }
+      .detail-value { font-size: 0.85rem; }
+      .user-actions .btn-edit,
+      .user-actions .btn-delete { 
+        padding: 10px 12px !important;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="container nav-inner">
+    <div class="brand-wrap">
+      <a href="/pengurus/home" class="btn-back-inline" title="Kembali">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </a>
+      <div class="brand">Kelola Akun Pengurus</div>
+    </div>
+    <div class="right-actions">
+      <button id="navToggle" class="nav-toggle" style="display:flex !important;" aria-label="Menu">
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      </button>
+    </div>
+  </div>
+</header>
+
+<%- include('partials/pengurus_sidebar', { currentPage: 'akun', user: user, stat: null }) %>
+
+<main class="section">
+  <div class="container">
+    <% if (typeof success !== 'undefined' && success) { %>
+      <div class="notify notify-success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <%= success %>
+      </div>
+    <% } %>
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="notify notify-error">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <%= error %>
+      </div>
+    <% } %>
+    
+    <div style="margin-bottom: 20px;">
+      <button class="btn-add" onclick="openAddModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Tambah Pengurus
+      </button>
+    </div>
+
+    <% if(!pengurus || pengurus.length === 0) { %>
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <h3>Belum ada pengurus</h3>
+        <p>Tambah akun pengurus baru untuk mengelola sistem.</p>
+      </div>
+    <% } else { %>
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th class="cell-no">No</th>
+                <th>Nama Pengurus</th>
+                <th>Role</th>
+                <th>Email</th>
+                <th style="text-align: right;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% pengurus.forEach((p, i) => { %>
+              <tr>
+                <td class="cell-no"><%= i + 1 %></td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #10b981); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; color: #000;">
+                      <%= p.nama.charAt(0).toUpperCase() %>
+                    </div>
+                    <span class="cell-nama"><%= p.nama %></span>
+                  </div>
+                </td>
+                <td>
+                  <span class="role-badge role-<%= p.role %>"><%= p.role %></span>
+                </td>
+                <td class="cell-email"><%= p.email %></td>
+                <td>
+                  <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                    <button class="btn-edit-sm btn-edit" data-id="<%= p.id %>" data-nama="<%= p.nama %>" data-email="<%= p.email %>" data-role="<%= p.role %>">Edit</button>
+                    <% if(p.id !== user.id) { %>
+                      <form action="/pengurus/kelola-akun/delete" method="POST" style="margin:0;" onsubmit="return confirm('Hapus akun ini?')">
+                        <input type="hidden" name="id" value="<%= p.id %>">
+                        <button type="submit" class="btn-delete-sm">Hapus</button>
+                      </form>
+                    <% } %>
+                  </div>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<!-- Modal Tambah -->
+<div id="addModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>Tambah Pengurus Baru</h3>
+      <button class="modal-close" onclick="closeModal('addModal')">×</button>
+    </div>
+    <form action="/pengurus/kelola-akun/add" method="POST">
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Nama</label>
+          <input type="text" name="nama" placeholder="Nama lengkap" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="Email" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" placeholder="Password" required minlength="6">
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <select name="role" required>
+            <option value="">Pilih Role</option>
+            <option value="panitia">Panitia</option>
+            <option value="keuangan">Keuangan</option>
+            <option value="ketua">Ketua</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" onclick="closeModal('addModal')">Batal</button>
+        <button type="submit" class="btn-submit">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Edit -->
+<div id="editModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>Edit Pengurus</h3>
+      <button class="modal-close" onclick="closeModal('editModal')">×</button>
+    </div>
+    <form action="/pengurus/kelola-akun/edit" method="POST">
+      <input type="hidden" name="id" id="editId">
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Nama</label>
+          <input type="text" name="nama" id="editNama" placeholder="Nama lengkap" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" id="editEmail" placeholder="Email" required>
+        </div>
+        <div class="form-group">
+          <label>Password Baru (kosongkan jika tidak diubah)</label>
+          <input type="password" name="password" placeholder="Password baru" minlength="6">
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <select name="role" id="editRole" required>
+            <option value="panitia">Panitia</option>
+            <option value="keuangan">Keuangan</option>
+            <option value="ketua">Ketua</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" onclick="closeModal('editModal')">Batal</button>
+        <button type="submit" class="btn-submit">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<button id="themeFab" class="theme-fab"></button>
+
+<script>
+  function openAddModal() {
+    document.getElementById('addModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  
+  document.querySelectorAll('.btn-edit').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.getElementById('editId').value = this.dataset.id;
+      document.getElementById('editNama').value = this.dataset.nama;
+      document.getElementById('editEmail').value = this.dataset.email;
+      document.getElementById('editRole').value = this.dataset.role;
+      document.getElementById('editModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+  
+  function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  
+  document.querySelectorAll('.modal-overlay').forEach(modal => {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal(modal.id);
+    });
+  });
+</script>
+
+<%- include('partials/pengurus_nav_script') %>
+<script src="/toast.js"></script>
+
+</body>
+</html>
+
+

@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="/duty.css" />
   
   <style>
-    /* Zoom Modal Styling */
+    /* Zoom Modal Styling (Payment Specific) */
     #zoomModal {
       display: none;
       z-index: 10001;
@@ -30,94 +30,32 @@
       border-radius: 4px;
       box-shadow: 0 25px 50px rgba(0,0,0,0.5);
     }
-    
-    /* Improved Table Styling */
-    .table-card {
-      padding: 0;
-      overflow: hidden;
+
+    /* Tab Styling (Shared) */
+    .tab-container { margin-bottom: 20px; }
+    .tab-buttons {
+      display: flex; gap: 10px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 4px; padding: 6px;
     }
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-      background: var(--bg-2);
+    .tab-btn {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 16px;
+      border: none; border-radius: 4px; background: transparent; color: var(--muted);
+      font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
     }
-    .table thead {
-      background: var(--bg-3);
-    }
-    :root[data-theme="light"] .table thead {
-      background: #f8fafc;
-    }
-    .table th {
-      padding: 16px 20px;
-      text-align: left;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--muted);
-      border-bottom: 2px solid var(--border);
-    }
-    .table td {
-      padding: 16px 20px;
-      vertical-align: middle;
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-    }
-    .table tr:last-child td { border-bottom: none; }
-    
-    /* Mobile responsive */
-    @media (max-width: 768px) {
-      .page-title, h2 { font-size: 1.3rem !important; }
-      .page-sub, p { font-size: 0.8rem !important; }
-      
-      .table-card { 
-        overflow-x: auto;
-        border-radius: var(--radius-md);
-      }
-      .table {
-        min-width: 700px; /* More width for bukti + info */
-      }
-      .table th, .table td {
-        font-size: 0.85rem !important;
-        padding: 14px 12px !important;
-      }
-      
-      .bukti-thumb {
-        width: 45px !important;
-        height: 45px !important;
-      }
-      .btn-detail {
-        padding: 8px 14px !important;
-        font-size: 0.8rem !important;
-      }
-      .status-badge {
-        font-size: 0.75rem !important;
-        padding: 6px 14px !important;
-      }
-      
-      .modal-box { width: 95% !important; max-width: 400px !important; padding: 16px !important; }
-    }
-    
-    @media (max-width: 480px) {
-      .table { min-width: 600px; }
-      .table th, .table td { font-size: 0.8rem !important; padding: 12px 10px !important; }
-    }
-    
-    /* Modal Styling - Match verifikasi.ejs */
+    .tab-btn svg { width: 18px; height: 18px; }
+    .tab-btn:hover { background: var(--bg); color: var(--text); }
+    .tab-btn.active { background: var(--accent); color: #000; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* MODAL - Dark Theme */
     .modal-overlay { 
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-      background: rgba(0, 0, 0, 0.6); 
-      backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
       z-index: 9999; display: none; justify-content: center; align-items: center; padding: 20px; 
     }
     .modal-box { 
-      background: var(--bg-2); 
-      border: 1px solid var(--border); 
-      border-radius: 6px; 
-      width: 100%; 
-      max-width: 500px; 
-      padding: 24px;
-      position: relative; 
+      background: var(--bg-2); border: 1px solid var(--border); border-radius: 6px; 
+      width: 100%; max-width: 500px; padding: 24px; position: relative; 
       box-shadow: 0 25px 50px rgba(0,0,0,0.5);
       animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
     }
@@ -128,84 +66,93 @@
     
     .modal-header { 
       display: flex; justify-content: space-between; align-items: center; 
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border); 
+      margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); 
     }
-    .modal-title { font-size: 1.2rem; font-weight: 700; margin: 0; color: var(--text); }
+    .modal-title { font-size: 1.25rem; font-weight: 700; margin: 0; color: var(--text); line-height: 1.2; }
     .modal-close { 
-      background: var(--bg); 
-      border: 1px solid var(--border); 
-      width: 36px; height: 36px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.25rem; 
-      color: var(--muted); 
-      cursor: pointer; 
-      border-radius: 4px; 
-      transition: all .2s;
-      line-height: 1;
+      background: var(--bg); border: 1px solid var(--border); width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center; font-size: 1.5rem; 
+      color: var(--muted); cursor: pointer; border-radius: 8px; transition: all .2s;
+      line-height: 1; padding: 0; padding-bottom: 2px;
     }
     .modal-close:hover { 
-      background: rgba(239, 68, 68, 0.1); 
-      border-color: rgba(239, 68, 68, 0.3);
-      color: #ef4444; 
+      background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: #ef4444; 
     }
     
+    /* Section Cards - Dark Theme */
     .biodata-section {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 16px;
-      margin-bottom: 16px;
+      background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 16px; margin-bottom: 16px;
     }
     .biodata-section-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--accent);
-      margin: 0 0 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-size: 0.95rem; font-weight: 700; color: var(--accent); margin: 0 0 14px;
+      display: flex; align-items: center; gap: 8px;
     }
     .biodata-section-title svg { width: 18px; height: 18px; }
     
     .info-row { 
-      display: flex; justify-content: space-between; align-items: flex-start; 
-      padding: 10px 0;
-      border-bottom: 1px dashed var(--border);
+      display: flex; justify-content: space-between; align-items: flex-start; /* Specific for payment */
+      padding: 12px 0; border-bottom: 1px solid var(--border);
     }
     .info-row:last-child { border-bottom: none; }
-    .info-label { color: var(--muted); font-size: 0.9rem; }
+    .info-label { color: var(--muted); font-size: 0.9rem; font-weight: 500; }
     .info-val { 
       font-weight: 600; text-align: right; word-break: break-word; 
-      max-width: 60%; color: var(--text); font-size: 0.9rem;
+      max-width: 60%; color: var(--text); font-size: 0.95rem;
     }
     
-    .modal-actions { display: flex; gap: 12px; margin-top: 8px; }
+    .modal-actions { display: flex; gap: 12px; padding: 20px 24px; border-top: 1px solid var(--border); }
+    .modal-actions-single { display: block; padding: 20px 24px; border-top: 1px solid var(--border); }
     .btn-action { 
-      flex: 1; padding: 12px 16px; border-radius: 4px; border: none; 
+      flex: 1; padding: 12px 16px; border-radius: 8px; border: none; 
       font-weight: 600; cursor: pointer; font-size: 0.9rem; 
-      display: flex; align-items: center; justify-content: center; gap: 6px; 
+      display: flex; align-items: center; justify-content: center; gap: 8px; 
       transition: all .2s;
     }
     .btn-reject { 
-      background: transparent; 
-      color: #ef4444; 
-      border: 1px solid rgba(239, 68, 68, 0.3); 
+      background: transparent; color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); 
     }
     .btn-reject:hover { 
-      background: rgba(239, 68, 68, 0.1); 
-      border-color: #ef4444; 
-      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1); border-color: #ef4444; color: #ef4444;
     }
     .btn-accept { 
-      background: transparent; 
-      color: var(--accent); 
-      border: 1px solid var(--accent); 
+      background: transparent; color: var(--accent); border: 1px solid var(--accent); 
     }
     .btn-accept:hover { 
-      background: var(--accent); 
-      color: #000; 
+      background: var(--accent); color: #000; 
+    }
+    .btn-check { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
+    
+
+    
+    .btn-small { padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; transition: all .2s; }
+    .btn-detail-link { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.15); }
+    .btn-detail-link:hover { background: #3b82f6; color: #fff; }
+    
+    .status-badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+    .status-badge.pending { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+    
+    .page-title { margin-bottom: 24px; font-weight: 800; }
+
+    /* Mobile responsive (Standardized) */
+    @media (max-width: 768px) {
+      .page-title { font-size: 1.3rem !important; }
+      .tab-buttons { gap: 6px; padding: 4px; }
+      .tab-btn { padding: 10px 12px; font-size: 0.75rem; gap: 4px; }
+      .tab-btn svg { width: 14px; height: 14px; }
+
+
+      .btn-small { padding: 6px 12px !important; font-size: 0.75rem !important; }
+      
+      .modal-box { width: 95% !important; max-width: 400px !important; padding: 16px !important; }
+      .modal-title { font-size: 1rem !important; }
+      .info-label { font-size: 0.75rem !important; }
+      .info-val { font-size: 0.8rem !important; }
+      .btn-action { padding: 10px !important; font-size: 0.85rem !important; }
+    }
+    
+    @media (max-width: 480px) {
+      .table th, .table td { font-size: 0.7rem !important; padding: 8px 4px !important; }
+      .btn-small { padding: 5px 8px !important; font-size: 0.7rem !important; }
     }
   </style>
 </head>
@@ -215,7 +162,7 @@
   <div class="container nav-inner">
     <div class="brand-wrap">
       <a href="/pengurus/home" class="btn-back-inline" title="Kembali">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
       </a>
       <div class="brand">Verifikasi Pembayaran</div>
     </div>
@@ -241,15 +188,14 @@
         <p>Semua pembayaran sudah diproses.</p>
       </div>
     <% } else { %>
-      <div class="card table-card">
+      <div class="table-card">
         <table class="table">
           <thead>
             <tr>
               <th style="text-align:center" width="60">No</th>
-              <th width="80">Bukti</th>
               <th>Nama Santri</th>
-              <th>Keterangan Pembayaran</th>
               <th>Tanggal Upload</th>
+              <th width="100" style="text-align:center">Bukti</th>
               <th style="text-align:center">Aksi</th>
             </tr>
           </thead>
@@ -257,16 +203,18 @@
             <% pembayaran.forEach((p, i) => { %>
               <tr>
                 <td style="text-align:center; color:var(--muted); font-size:0.9rem"><%= i + 1 %></td>
-                <td>
-                  <div style="width:50px; height:50px; border-radius:8px; overflow:hidden; border:1px solid var(--border); background:var(--bg);">
-                    <img src="<%= p.bukti_path %>" alt="Bukti" style="width:100%; height:100%; object-fit:cover; cursor:pointer;" onclick="openZoom('<%= p.bukti_path %>')">
-                  </div>
-                </td>
-                <td style="font-weight:700"><%= p.nama_santri %></td>
-                <td style="font-size:0.9rem"><%= p.keterangan || '-' %></td>
-                <td style="color:var(--muted); font-size:0.85rem"><%= p.tanggal_upload %></td>
+                 <td style="font-weight:700"><%= p.nama_santri %></td>
+                 <td style="color:var(--muted); font-size:0.85rem"><%= p.tanggal_upload %></td>
+                 <td>
+                   <div style="display:flex; justify-content:center;">
+                     <button type="button" onclick="openZoom('<%= p.bukti_path %>')" style="background:var(--bg-2); border:1px solid var(--border); border-radius:6px; padding:4px 8px; display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; color:var(--text); transition:all .2s;">
+                        <img src="<%= p.bukti_path %>" style="width:24px; height:24px; object-fit:cover; border-radius:4px;">
+                        Lihat
+                     </button>
+                   </div>
+                 </td>
                 <td style="text-align:center">
-                  <button type="button" class="btn btn-detail" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); padding: 8px 16px; font-size: 0.85rem;" onclick="showDetailModal('<%= p.id %>', '<%= p.nama_santri %>', '<%= p.keterangan || '-' %>', '<%= p.bukti_path %>', '<%= p.tanggal_upload %>')">Pemeriksaan</button>
+                  <button type="button" class="btn-small btn-detail-link" onclick="showDetailModal('<%= p.id %>', '<%= p.nama_santri %>', '<%= p.keterangan || '-' %>', '<%= p.bukti_path %>', '<%= p.tanggal_upload %>')">Proses</button>
                 </td>
               </tr>
             <% }) %>
@@ -315,8 +263,8 @@
     
     <!-- PAYMENT ACTIONS - Outside the info section -->
     <div id="paymentInitialActions" class="modal-actions" style="margin-top: 16px;">
-      <button type="button" class="btn-action btn-reject" onclick="showRejectModal()">✖ Tolak</button>
-      <button type="submit" class="btn-action btn-accept" onclick="showVerifyModal()" style="flex:1;">✔ Terima Pembayaran</button>
+      <button type="button" class="btn-action btn-reject" onclick="showRejectModal()" style="box-shadow:none; border:none; color:#fff; background:#ef4444;">✖ Tolak</button>
+      <button type="submit" class="btn-action btn-accept" onclick="showVerifyModal()" style="flex:1; box-shadow:none; border:none; color:#000; background:var(--accent);">✔ Terima Pembayaran</button>
     </div>
 
 <!-- Hidden Form for Submission -->
@@ -364,11 +312,11 @@
           Pastikan bukti transfer valid dan nominal sesuai.<br>Status santri akan berubah menjadi <strong>Terverifikasi</strong>.
         </p>
         <div style="display:flex; gap:12px;">
-              <button type="button" id="cancelVerifyBtn" style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:12px; border-radius:4px; font-weight:600; cursor:pointer; transition:all .2s;">Batal</button>
+              <button type="button" id="cancelVerifyBtn" style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:12px; border-radius:8px; font-weight:600; cursor:pointer; transition:all .2s; box-shadow:none;">Batal</button>
           <form action="/pengurus/verifikasi-pembayaran" method="POST" style="flex:1;">
              <input type="hidden" name="id" value="${currentPaymentId}">
              <input type="hidden" name="aksi" value="verify">
-              <button type="submit" style="width:100%; background:transparent; border:1px solid var(--accent); color:var(--accent); padding:12px; border-radius:4px; font-weight:600; cursor:pointer; transition:all .2s;" onmouseover="this.style.background='var(--accent)';this.style.color='#000'" onmouseout="this.style.background='transparent';this.style.color='var(--accent)'">Ya, Terima</button>
+              <button type="submit" style="width:100%; background:var(--accent); border:none; color:#000; padding:12px; border-radius:8px; font-weight:600; cursor:pointer; transition:all .2s; box-shadow:none;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Ya, Terima</button>
           </form>
         </div>
       </div>
@@ -398,10 +346,10 @@
         <form action="/pengurus/verifikasi-pembayaran" method="POST">
             <input type="hidden" name="id" value="${currentPaymentId}">
             <input type="hidden" name="aksi" value="reject">
-            <textarea name="alasan" required placeholder="Tulis alasan penolakan di sini..." style="width:100%; height:100px; background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:4px; padding:14px; color:var(--text); font-family:inherit; margin-bottom:20px; resize:none; outline:none; font-size:0.95rem; line-height:1.5;"></textarea>
+            <textarea name="alasan" required placeholder="Tulis alasan penolakan di sini..." style="width:100%; height:100px; background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:8px; padding:14px; color:var(--text); font-family:inherit; margin-bottom:20px; resize:none; outline:none; font-size:0.95rem; line-height:1.5;"></textarea>
             <div style="display:flex; gap:12px;">
-              <button type="button" id="cancelRejectBtn" style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:12px; border-radius:4px; font-weight:600; cursor:pointer; transition:all .2s;">Batal</button>
-              <button type="submit" style="flex:1; background:transparent; border:1px solid #ef4444; color:#ef4444; padding:12px; border-radius:4px; font-weight:600; cursor:pointer; transition:all .2s;" onmouseover="this.style.background='#ef4444';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#ef4444'">Kirim Penolakan</button>
+              <button type="button" id="cancelRejectBtn" style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:12px; border-radius:8px; font-weight:600; cursor:pointer; transition:all .2s; box-shadow:none;">Batal</button>
+              <button type="submit" style="flex:1; background:#ef4444; border:none; color:#fff; padding:12px; border-radius:8px; font-weight:600; cursor:pointer; transition:all .2s; box-shadow:none;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Kirim Penolakan</button>
             </div>
         </form>
       </div>

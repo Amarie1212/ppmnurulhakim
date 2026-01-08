@@ -101,39 +101,7 @@
     }
     .btn-export svg { width: 18px; height: 18px; }
     
-    /* Improved Table Styling */
-    .table-card {
-      padding: 0;
-      overflow: hidden; /* Round corners on the table itself */
-    }
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-      background: var(--bg-2);
-    }
-    .table thead {
-      background: var(--bg-3); /* Subtle dark background for header */
-    }
-    :root[data-theme="light"] .table thead {
-      background: #f8fafc;
-    }
-    .table th {
-      padding: 16px 20px;
-      text-align: left;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--muted);
-      border-bottom: 2px solid var(--border);
-    }
-    .table td {
-      padding: 16px 20px;
-      vertical-align: middle;
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-    }
-    .table tr:last-child td { border-bottom: none; }
+
     
     /* Mobile responsive */
     @media (max-width: 768px) {
@@ -145,18 +113,7 @@
       .btn-export { flex: 1; justify-content: center; }
       .btn-export span { display: block; }
       
-      .table-card { 
-        overflow-x: auto;
-        border-radius: var(--radius-md);
-        margin: 0 -10px;
-      }
-      .table {
-        min-width: 600px; /* Forces horizontal scroll instead of squishing */
-      }
-      .table th, .table td {
-        font-size: 0.85rem !important; /* Larger than before for readability */
-        padding: 14px 12px !important;
-      }
+
       .cell-nama {
         font-weight: 700;
       }
@@ -188,7 +145,7 @@
   <div class="container nav-inner">
     <div class="brand-wrap">
       <a href="/pengurus/home" class="btn-back-inline" title="Kembali ke Dashboard">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
       </a>
       <div class="brand">Data Santri</div>
     </div>
@@ -233,7 +190,7 @@
       </div>
     </div>
 
-    <div class="card table-card">
+    <div class="table-card">
       <table class="table" id="santriTable">
         <thead>
           <tr>
@@ -322,8 +279,8 @@
           Tindakan ini tidak dapat dibatalkan.
         </p>
         <div style="display:flex; gap:12px;">
-          <button id="cancelDelete" style="flex:1; background:transparent; border:1px solid var(--border); color:var(--text); padding:10px; border-radius:6px; font-weight:600; cursor:pointer;">Batal</button>
-          <button id="confirmDeleteBtn" style="flex:1; background:#ef4444; color:#fff; border:none; padding:10px; border-radius:6px; font-weight:600; cursor:pointer;">Ya, Hapus</button>
+          <button id="cancelDelete" style="flex:1; background:transparent; border:1px solid var(--border); color:var(--text); padding:10px; border-radius:8px; font-weight:600; cursor:pointer; box-shadow:none;">Batal</button>
+          <button id="confirmDeleteBtn" style="flex:1; background:#ef4444; color:#fff; border:none; padding:10px; border-radius:8px; font-weight:600; cursor:pointer; box-shadow:none;">Ya, Hapus</button>
         </div>
       </div>
     `;

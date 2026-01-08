@@ -103,7 +103,7 @@ body.form-page {
 .input, .select, .file, textarea {
   width: 100%;
   padding: 14px 18px;
-  border-radius: 3px;
+  border-radius: var(--radius-md);
   border: 2.5px solid var(--input-border); /* Thicker border for better visibility */
   background: var(--input-bg);
   color: var(--text);
@@ -148,7 +148,7 @@ body.form-page {
 /* 7. BOXES & AVATAR */
 .smooth-box {
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: var(--radius-md);
   padding: 16px;
   background: rgba(0,0,0,0.25);
 }
@@ -156,7 +156,7 @@ body.form-page {
 
 .avatar {
   width: 80px; height: 80px;
-  border-radius: 4px;
+  border-radius: var(--radius-md);
   object-fit: cover;
   border: 2px solid var(--border);
   background: var(--bg);
@@ -175,7 +175,7 @@ body.form-page {
   align-items: center;
   justify-content: center;
   padding: 12px 24px;
-  border-radius: 4px;
+  border-radius: var(--radius-md);
   font-weight: 700;
   text-decoration: none;
   cursor: pointer;
@@ -203,27 +203,12 @@ body.form-page {
   background: var(--bg);
 }
 
-/* Tombol Back Inline */
-.btn-back-inline {
-  display: inline-flex;
-  align-items: center; justify-content: center;
-  width: 40px; height: 40px; border-radius: 4px;
-  border: 1px solid var(--border);
-  background: var(--bg-2);
-  color: var(--text);
-  text-decoration: none;
-  transition: all .2s;
-}
-.btn-back-inline:hover {
-  border-color: var(--accent);
-  background: var(--bg-2);
-}
-.btn-back-inline svg { width: 20px; height: 20px; }
+
 
 /* Tombol Masuk (Outline) */
 .mobile-btn-login {
   display: flex; align-items: center; justify-content: center;
-  padding: 12px; border-radius: 4px;
+  padding: 12px; border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background: transparent; color: var(--text);
   font-weight: 700; text-decoration: none;
@@ -232,7 +217,7 @@ body.form-page {
 /* Tombol Daftar (Solid Hijau) */
 .mobile-btn-register {
   display: flex; align-items: center; justify-content: center;
-  padding: 12px; border-radius: 4px;
+  padding: 12px; border-radius: var(--radius-md);
   background: var(--accent); color: #08110a; /* Teks Gelap biar kontras */
   font-weight: 800; text-decoration: none;
   border: none;

@@ -20,26 +20,7 @@
     }
     .page-title { font-weight: 800; margin: 0; }
     
-    .btn-back {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 20px;
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      color: var(--text);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.9rem;
-      transition: all .2s;
-    }
-    .btn-back:hover {
-      background: var(--accent);
-      color: #000;
-      border-color: var(--accent);
-    }
-    .btn-back svg { width: 18px; height: 18px; }
+
     
     /* Profile Card */
     .profile-card {
@@ -208,7 +189,7 @@
         gap: 12px;
       }
       .page-title { font-size: 1.3rem !important; }
-      .btn-back { width: 100%; justify-content: center; }
+      .btn-back-inline { width: 40px; }
       
       .profile-header { 
         flex-direction: column; 
@@ -245,7 +226,7 @@
     
     @media (max-width: 480px) {
       .page-title { font-size: 1.1rem !important; }
-      .btn-back { padding: 8px 16px; font-size: 0.85rem; }
+
       
       .profile-header { padding: 12px; }
       .profile-foto, .profile-foto-placeholder { width: 60px; height: 60px; }
@@ -286,9 +267,8 @@
   <div class="container">
     <div class="page-header">
       <h2 class="page-title">Data Lengkap Santri</h2>
-      <a href="/pengurus" class="btn-back">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        Kembali
+      <a href="/pengurus" class="btn-back-inline" title="Kembali">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
       </a>
     </div>
 

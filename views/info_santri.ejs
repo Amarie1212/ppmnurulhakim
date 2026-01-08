@@ -9,728 +9,183 @@
   <link rel="stylesheet" href="/styles.css" />
   <link rel="stylesheet" href="/form.css" />
   <style>
-    /* ==========================================
-       PENGUMUMAN PAGE - SIMPLE DESIGN
-       ========================================== */
+    /* Custom styles specific to Info Page features */
+    .countdown-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+    .countdown-icon { width: 52px; height: 52px; border-radius: 4px; background: rgba(34, 197, 94, 0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .countdown-icon svg { width: 26px; height: 26px; color: var(--accent); }
+    .countdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+    .countdown-item { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 12px 6px; text-align: center; }
+    .countdown-number { font-size: 1.5rem; font-weight: 800; color: var(--accent); line-height: 1; margin-bottom: 4px; }
+    .countdown-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+    .countdown-message { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 4px; padding: 14px; color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
     
-    /* Background dengan gambar seperti form.css */
-    .announcement-page {
-      min-height: 100vh;
-      padding-top: calc(var(--nav-h) + 30px);
-      padding-bottom: 60px;
-      background:
-        radial-gradient(circle at 1px 1px, rgba(255,255,255,.05) 1px, transparent 0) 0 0/24px 24px repeat,
-        linear-gradient(rgba(24, 24, 27, 0.75), rgba(24, 24, 27, 0.85)),
-        url("/img/ppm.jpg") center/cover fixed no-repeat;
-    }
-    
-    :root[data-theme="light"] .announcement-page {
-      background:
-        radial-gradient(circle at 1px 1px, rgba(0,0,0,.05) 1px, transparent 0) 0 0/24px 24px repeat,
-        linear-gradient(rgba(244, 244, 245, 0.75), rgba(244, 244, 245, 0.85)),
-        url("/img/ppm.jpg") center/cover fixed no-repeat;
-    }
-    
-    .announcement-container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
+    .rule-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; margin-bottom: 8px; }
+    .rule-number { width: 24px; height: 24px; border-radius: 2px; background: rgba(34, 197, 94, 0.15); color: var(--accent); font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .rule-text { color: var(--text); font-size: 0.9rem; line-height: 1.5; }
 
-    /* Simple Header */
-    .announce-hero {
-      text-align: center;
-      margin-bottom: 32px;
-      padding: 20px 0;
-    }
-    
-    .announce-hero h1 {
-      font-size: clamp(1.5rem, 3.5vw, 2rem);
-      font-weight: 700;
-      margin-bottom: 8px;
-      color: var(--text);
-    }
-    
-    .announce-hero .greeting {
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-    
-    .announce-hero .greeting strong {
-      color: var(--text);
-    }
+    .brand-wrap { display: flex; align-items: center; gap: 12px; }
 
-    /* Countdown Section */
-    .countdown-section {
-      margin-bottom: 20px;
-    }
+    /* Contacts Grid */
+    .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+    .contact-item { display: flex; align-items: center; gap: 14px; padding: 16px 18px; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; text-decoration: none; color: var(--text); transition: all 0.2s; }
+    .contact-item:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .contact-icon-wrap { width: 44px; height: 44px; border-radius: 3px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .contact-icon-wrap svg { width: 22px; height: 22px; }
     
-    .countdown-card {
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 24px;
-      position: relative;
-      overflow: hidden;
-    }
+    .contact-icon-wrap.whatsapp { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
+    .contact-icon-wrap.email { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+    .contact-icon-wrap.instagram { background: rgba(225, 48, 108, 0.12); color: #E1306C; }
+    .contact-icon-wrap.phone { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
     
-    .countdown-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--accent), #4ade80, var(--accent));
-      background-size: 200% 100%;
-      animation: gradient-shift 3s ease infinite;
-    }
-    
-    @keyframes gradient-shift {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-    }
-    
-    .countdown-header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 24px;
-    }
-    
-    .countdown-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: 4px;
-      background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.1));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    
-    .countdown-icon svg {
-      width: 26px;
-      height: 26px;
-      color: var(--accent);
-    }
-    
-    .countdown-title {
-      font-size: 1.15rem;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-    
-    .countdown-date {
-      color: var(--accent);
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-    
-    .countdown-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    
-    .countdown-item {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 16px 10px;
-      text-align: center;
-      transition: all 0.3s;
-    }
-    
-    .countdown-item:hover {
-      border-color: rgba(34, 197, 94, 0.3);
-      transform: translateY(-2px);
-    }
-    
-    .countdown-number {
-      font-size: clamp(1.6rem, 4vw, 2.2rem);
-      font-weight: 800;
-      color: var(--accent);
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-    
-    .countdown-label {
-      font-size: 0.75rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-weight: 600;
-    }
-    
-    .countdown-message {
-      background: rgba(34, 197, 94, 0.1);
-      border: 1px solid rgba(34, 197, 94, 0.2);
-      border-radius: 4px;
-      padding: 14px 18px;
-      color: var(--muted);
-      font-size: 0.9rem;
-      line-height: 1.6;
-    }
-    
-    .countdown-message strong {
-      color: var(--accent);
-    }
+    .contact-info { flex: 1; min-width: 0; }
+    .contact-label { font-weight: 600; font-size: 0.9rem; margin-bottom: 2px; }
+    .contact-value { color: var(--muted); font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* Simple Card Design */
-    .info-section {
-      margin-bottom: 20px;
-    }
-    
-    .premium-card {
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 24px;
-    }
-    
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    
-    .card-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 3px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      background: rgba(34, 197, 94, 0.15);
-    }
-    
-    .card-icon svg {
-      width: 20px;
-      height: 20px;
-      color: var(--accent);
-    }
-    
-    .card-title {
-      font-size: 1rem;
-      font-weight: 700;
-    }
-    
-    .card-subtitle {
-      color: var(--muted);
-      font-size: 0.8rem;
-      margin-top: 2px;
-    }
-
-    /* Rules List */
-    .rules-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    
-    .rule-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 12px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      margin-bottom: 8px;
-    }
-    
-    .rule-item:last-child {
-      margin-bottom: 0;
-    }
-    
-    .rule-number {
-      width: 24px;
-      height: 24px;
-      border-radius: 2px;
-      background: rgba(34, 197, 94, 0.15);
-      color: var(--accent);
-      font-weight: 700;
-      font-size: 0.8rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    
-    .rule-text {
-      color: var(--text);
-      font-size: 0.9rem;
-      line-height: 1.5;
-    }
-
-    /* Contact Cards */
-    .contact-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 14px;
-    }
-    
-    .contact-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px 18px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      text-decoration: none;
-      color: var(--text);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .contact-item::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.02) 100%);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    
-    .contact-item:hover {
-      border-color: transparent;
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    }
-    
-    .contact-item:hover::before {
-      opacity: 1;
-    }
-    
-    .contact-item.whatsapp:hover {
-      border-color: rgba(34, 197, 94, 0.4);
-      box-shadow: 0 8px 24px rgba(34, 197, 94, 0.15);
-    }
-    
-    .contact-item.email:hover {
-      border-color: rgba(239, 68, 68, 0.4);
-      box-shadow: 0 8px 24px rgba(239, 68, 68, 0.15);
-    }
-    
-    .contact-item.instagram:hover {
-      border-color: rgba(225, 48, 108, 0.4);
-      box-shadow: 0 8px 24px rgba(225, 48, 108, 0.15);
-    }
-    
-    .contact-item.phone:hover {
-      border-color: rgba(59, 130, 246, 0.4);
-      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
-    }
-    
-    .contact-icon-wrap {
-      width: 44px;
-      height: 44px;
-      border-radius: 3px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    
-    .contact-icon-wrap.whatsapp {
-      background: rgba(34, 197, 94, 0.12);
-    }
-    
-    .contact-icon-wrap.whatsapp svg {
-      color: #22c55e;
-    }
-    
-    .contact-icon-wrap.email {
-      background: rgba(239, 68, 68, 0.12);
-    }
-    
-    .contact-icon-wrap.email svg {
-      color: #ef4444;
-    }
-    
-    .contact-icon-wrap.instagram {
-      background: linear-gradient(135deg, rgba(131,58,180,0.12), rgba(253,29,29,0.12), rgba(252,176,69,0.12));
-    }
-    
-    .contact-icon-wrap.instagram svg {
-      color: #E1306C;
-    }
-    
-    .contact-icon-wrap.phone {
-      background: rgba(59, 130, 246, 0.12);
-    }
-    
-    .contact-icon-wrap.phone svg {
-      color: #3b82f6;
-    }
-    
-    .contact-icon-wrap svg {
-      width: 22px;
-      height: 22px;
-    }
-    
-    .contact-info {
-      flex: 1;
-      min-width: 0;
-    }
-    
-    .contact-label {
-      font-weight: 600;
-      font-size: 0.9rem;
-      margin-bottom: 2px;
-    }
-    
-    .contact-value {
-      color: var(--muted);
-      font-size: 0.82rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    
-    .contact-arrow {
-      color: var(--muted);
-      transition: transform 0.2s, color 0.2s;
-    }
-    
-    .contact-item:hover .contact-arrow {
-      transform: translateX(4px);
-      color: var(--text);
-    }
-    
-    .empty-contact {
-      text-align: center;
-      padding: 30px;
-      color: var(--muted);
-      font-style: italic;
-    }
-
-    /* Back Button */
-    .btn-back-inline {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 42px;
-      height: 42px;
-      border-radius: 4px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      color: var(--text);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-decoration: none;
-    }
-    
-    .btn-back-inline:hover {
-      transform: translateX(-3px);
-      background: var(--bg-2);
-      border-color: var(--accent);
-    }
-    
-    .btn-back-inline .icon {
-      width: 20px;
-      height: 20px;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    /* Brand Wrap */
-    .brand-wrap {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    /* Mobile Responsive */
     @media (max-width: 640px) {
-      .announcement-page {
-        padding-top: calc(var(--nav-h) + 20px);
-      }
-      
-      .announce-hero {
-        padding: 16px 0;
-        margin-bottom: 24px;
-      }
-      
-      .announce-hero h1 {
-        font-size: 1.4rem;
-      }
-      
-      .countdown-card {
-        padding: 20px;
-        border-radius: 16px;
-      }
-      
-      .countdown-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
-      }
-      
-      .countdown-item {
-        padding: 12px 6px;
-        border-radius: 10px;
-      }
-      
-      .countdown-number {
-        font-size: 1.4rem;
-      }
-      
-      .countdown-label {
-        font-size: 0.65rem;
-      }
-      
-      .premium-card {
-        padding: 18px;
-        border-radius: 16px;
-      }
-      
-      .card-icon {
-        width: 42px;
-        height: 42px;
-      }
-      
-      .rule-item {
-        padding: 12px;
-      }
-      
-      .contact-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .btn-back-inline {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
-      }
+      .countdown-grid { gap: 8px; }
+      .countdown-number { font-size: 1.2rem; }
+      .contact-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
-<body class="announcement-page">
+<body class="form-page layout-form">
 
 <header class="navbar">
   <div class="container nav-inner">
     <div class="brand-wrap">
-      <a href="/" class="btn-back-inline" aria-label="Kembali ke Beranda" title="Kembali ke Beranda">
-        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+      <a href="/" class="btn-back-inline" aria-label="Kembali" title="Kembali">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
       </a>
       <div class="brand">PPM Nurul Hakim</div>
     </div>
   </div>
 </header>
 
-<main class="announcement-container">
-  
-  <!-- Simple Header -->
-  <div class="announce-hero">
-    <h1>Informasi Penting</h1>
-    <p class="greeting">Assalamu'alaikum, <strong><%= user.name %></strong>!</p>
-  </div>
+<main class="form-wrap">
+  <div class="form-card">
+    <h2 class="form-title">Informasi Penting</h2>
+    <p style="text-align:center; margin-bottom:24px; font-size:0.95rem; color:var(--muted);">
+      Assalamu'alaikum, <strong style="color:var(--text)"><%= user.name %></strong>!
+    </p>
 
-  <!-- Countdown Section -->
-  <div class="countdown-section">
-    <div class="countdown-card">
-      <div class="countdown-header">
-        <div class="countdown-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-          </svg>
-        </div>
-        <div>
-          <div class="countdown-title">Jadwal Kedatangan / Open House</div>
+    <div class="grid-12">
+      
+      <!-- Countdown Section -->
+      <div class="col-12">
+        <div class="smooth-box">
+          <div class="countdown-header">
+            <div class="countdown-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            </div>
+            <div>
+              <div style="font-weight:700; font-size:1.1rem; margin-bottom:4px;">Jadwal Kedatangan</div>
+              <% if (cms.tanggal_kedatangan) { %>
+                <div style="color:var(--accent); font-weight:600;"><%= new Date(cms.tanggal_kedatangan).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></div>
+              <% } else { %>
+                <div style="color:var(--muted);">Akan diumumkan</div>
+              <% } %>
+            </div>
+          </div>
+          
           <% if (cms.tanggal_kedatangan) { %>
-            <div class="countdown-date"><%= new Date(cms.tanggal_kedatangan).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></div>
+          <div class="countdown-grid" id="countdownGrid">
+             <div class="countdown-item"><div class="countdown-number" id="days">0</div><div class="countdown-label">Hari</div></div>
+             <div class="countdown-item"><div class="countdown-number" id="hours">0</div><div class="countdown-label">Jam</div></div>
+             <div class="countdown-item"><div class="countdown-number" id="minutes">0</div><div class="countdown-label">Menit</div></div>
+             <div class="countdown-item"><div class="countdown-number" id="seconds">0</div><div class="countdown-label">Detik</div></div>
+          </div>
+          <% } %>
+          
+          <div class="countdown-message">
+            <strong>📋 Pengumuman:</strong> <%= cms.pengumuman || 'Pastikan Anda sudah melengkapi biodata dan pembayaran shodaqoh operasional sebelum tanggal kedatangan.' %>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12"><div class="divider"></div></div>
+      
+      <!-- Rules Section -->
+      <div class="col-12"><h3 class="sec-title">Peraturan & Ketentuan</h3></div>
+      <div class="col-12">
+        <div class="smooth-box">
+          <div style="margin-bottom:16px; display:flex; align-items:center; gap:10px;">
+             <div style="width:36px; height:36px; background:rgba(34,197,94,0.1); border-radius:4px; display:flex; align-items:center; justify-content:center; color:var(--accent);">
+               <svg style="width:18px;height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+             </div>
+             <div>
+               <div style="font-weight:700;">Barang Bawaan Santri</div>
+               <div style="font-size:0.8rem; color:var(--muted);">Daftar perlengkapan yang wajib dibawa</div>
+             </div>
+          </div>
+          
+          <% 
+            const peraturan = Array.isArray(cms.peraturan) ? cms.peraturan : []; 
+          %>
+          <% if (peraturan.length > 0) { %>
+            <div class="rules-list">
+              <% peraturan.forEach((rule, idx) => { %>
+                <div class="rule-item">
+                  <div class="rule-number"><%= idx + 1 %></div>
+                  <div class="rule-text"><%= rule %></div>
+                </div>
+              <% }) %>
+            </div>
           <% } else { %>
-            <div class="countdown-date">Akan diumumkan</div>
+            <div style="text-align:center; color:var(--muted); padding:20px; font-style:italic;">Belum ada data peraturan.</div>
           <% } %>
         </div>
       </div>
-      
-      <% if (cms.tanggal_kedatangan) { %>
-      <div class="countdown-grid" id="countdownGrid">
-        <div class="countdown-item">
-          <div class="countdown-number" id="days">--</div>
-          <div class="countdown-label">Hari</div>
-        </div>
-        <div class="countdown-item">
-          <div class="countdown-number" id="hours">--</div>
-          <div class="countdown-label">Jam</div>
-        </div>
-        <div class="countdown-item">
-          <div class="countdown-number" id="minutes">--</div>
-          <div class="countdown-label">Menit</div>
-        </div>
-        <div class="countdown-item">
-          <div class="countdown-number" id="seconds">--</div>
-          <div class="countdown-label">Detik</div>
-        </div>
-      </div>
-      <% } %>
-      
-      <div class="countdown-message">
-        <strong>📋 Pengumuman:</strong> <%= cms.pengumuman || 'Pastikan Anda sudah melengkapi biodata dan pembayaran shodaqoh operasional sebelum tanggal kedatangan.' %>
-      </div>
-    </div>
-  </div>
 
-  <!-- Peraturan Santri -->
-  <div class="info-section">
-    <div class="premium-card">
-      <div class="card-header">
-        <div class="card-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="16" y1="13" x2="8" y2="13"></line>
-            <line x1="16" y1="17" x2="8" y2="17"></line>
-          </svg>
-        </div>
-        <div>
-          <div class="card-title">Peraturan Santri</div>
-          <div class="card-subtitle">Wajib dipatuhi selama di pondok</div>
-        </div>
-      </div>
-      
-      <ul class="rules-list">
-        <% const peraturan = Array.isArray(cms.peraturan) ? cms.peraturan : []; %>
-        <% if (peraturan.length > 0) { %>
-          <% peraturan.forEach((p, idx) => { %>
-            <li class="rule-item">
-              <span class="rule-number"><%= idx + 1 %></span>
-              <span class="rule-text"><%= p %></span>
-            </li>
-          <% }); %>
+      <div class="col-12"><div class="divider"></div></div>
+
+      <!-- Contacts Section -->
+      <div class="col-12"><h3 class="sec-title">Kontak Panitia</h3></div>
+      <div class="col-12">
+        <% 
+          const kontakPanitia = (cms && cms.kontak_panitia) 
+            ? (typeof cms.kontak_panitia === 'string' ? JSON.parse(cms.kontak_panitia) : cms.kontak_panitia) 
+            : [];
+        %>
+        <% if (kontakPanitia && kontakPanitia.length > 0) { %>
+          <div class="contact-grid">
+            <% kontakPanitia.forEach(kontak => { 
+                let iconClass = 'phone';
+                let iconSvg = '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>';
+                
+                const type = (kontak.tipe || '').toLowerCase(); // Changed from 'jenis' to 'tipe' to match original
+                const label = kontak.label || 'Kontak';
+                let val = kontak.value; // Changed from 'nilai' to 'value' to match original
+                let href = '#';
+                
+                if (type === 'whatsapp') {
+                  iconClass = 'whatsapp';
+                  iconSvg = '<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.304-1.654a11.882 11.882 0 005.713 1.456h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>';
+                  href = 'https://wa.me/' + val.replace(/^0/, '62').replace(/\D/g, '');
+                } else if (type === 'email') {
+                  iconClass = 'email';
+                  iconSvg = '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>';
+                  href = 'mailto:' + val;
+                } else if (type === 'instagram') {
+                  iconClass = 'instagram';
+                  iconSvg = '<rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/>';
+                  href = val.startsWith('http') ? val : 'https://instagram.com/' + val.replace('@','');
+                }
+            %>
+            <a href="<%= href %>" class="contact-item" target="_blank">
+              <div class="contact-icon-wrap <%= iconClass %>">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><%- iconSvg %></svg>
+              </div>
+              <div class="contact-info">
+                <div class="contact-label"><%= label %></div>
+                <div class="contact-value"><%= val %></div>
+              </div>
+            </a>
+            <% }) %>
+          </div>
         <% } else { %>
-          <li class="rule-item">
-            <span class="rule-number">1</span>
-            <span class="rule-text">Wajib mengikuti seluruh kegiatan pondok (sholat berjamaah, kajian, piket).</span>
-          </li>
-          <li class="rule-item">
-            <span class="rule-number">2</span>
-            <span class="rule-text">Dilarang membawa kendaraan bermotor ke area pondok.</span>
-          </li>
-          <li class="rule-item">
-            <span class="rule-number">3</span>
-            <span class="rule-text">Wajib menjaga kebersihan kamar dan lingkungan asrama.</span>
-          </li>
-          <li class="rule-item">
-            <span class="rule-number">4</span>
-            <span class="rule-text">Dilarang merokok dan membawa barang terlarang.</span>
-          </li>
-          <li class="rule-item">
-            <span class="rule-number">5</span>
-            <span class="rule-text">Wajib meminta izin kepada pengurus jika berhalangan mengikuti kegiatan.</span>
-          </li>
-          <li class="rule-item">
-            <span class="rule-number">6</span>
-            <span class="rule-text">Mematuhi jam malam yang telah ditetapkan.</span>
-          </li>
-          <li class="rule-item">
-            <span class="rule-number">7</span>
-            <span class="rule-text">Berpakaian sopan dan rapi sesuai syariat Islam.</span>
-          </li>
+          <div style="text-align:center; color:var(--muted); padding:20px;">Belum ada kontak panitia.</div>
         <% } %>
-      </ul>
-    </div>
-  </div>
 
-  <!-- Kontak Panitia -->
-  <div class="info-section">
-    <div class="premium-card">
-      <div class="card-header">
-        <div class="card-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-          </svg>
-        </div>
-        <div>
-          <div class="card-title">Kontak Panitia</div>
-          <div class="card-subtitle">Hubungi kami jika ada pertanyaan</div>
-        </div>
-      </div>
-      
-      <% 
-        const kontakPanitia = (cms && cms.kontak_panitia) 
-          ? (typeof cms.kontak_panitia === 'string' ? JSON.parse(cms.kontak_panitia) : cms.kontak_panitia) 
-          : [];
-      %>
-      
-      <% if (kontakPanitia.length > 0) { %>
-      <div class="contact-grid">
-        <% kontakPanitia.forEach((k, i) => { %>
-          <% if (k.tipe === 'whatsapp') { %>
-          <a href="https://wa.me/<%= k.value.replace(/^0/, '62').replace(/\D/g, '') %>" target="_blank" class="contact-item whatsapp">
-            <div class="contact-icon-wrap whatsapp">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.304-1.654a11.882 11.882 0 005.713 1.456h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-              </svg>
-            </div>
-            <div class="contact-info">
-              <div class="contact-label"><%= k.label || 'WhatsApp' %></div>
-              <div class="contact-value"><%= k.value %></div>
-            </div>
-            <svg class="contact-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-          </a>
-          <% } else if (k.tipe === 'email') { %>
-          <a href="mailto:<%= k.value %>" class="contact-item email">
-            <div class="contact-icon-wrap email">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
-              </svg>
-            </div>
-            <div class="contact-info">
-              <div class="contact-label"><%= k.label || 'Email' %></div>
-              <div class="contact-value"><%= k.value %></div>
-            </div>
-            <svg class="contact-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-          </a>
-          <% } else if (k.tipe === 'instagram') { %>
-          <a href="https://instagram.com/<%= k.value.replace('@', '') %>" target="_blank" class="contact-item instagram">
-            <div class="contact-icon-wrap instagram">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/>
-              </svg>
-            </div>
-            <div class="contact-info">
-              <div class="contact-label"><%= k.label || 'Instagram' %></div>
-              <div class="contact-value">@<%= k.value.replace('@', '') %></div>
-            </div>
-            <svg class="contact-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-          </a>
-          <% } else if (k.tipe === 'phone') { %>
-          <a href="tel:<%= k.value %>" class="contact-item phone">
-            <div class="contact-icon-wrap phone">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-              </svg>
-            </div>
-            <div class="contact-info">
-              <div class="contact-label"><%= k.label || 'Telepon' %></div>
-              <div class="contact-value"><%= k.value %></div>
-            </div>
-            <svg class="contact-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-          </a>
-          <% } %>
-        <% }); %>
-      </div>
-      <% } else { %>
-      <div class="empty-contact">
-        <p>Kontak belum diisi oleh panitia.</p>
-      </div>
-      <% } %>
     </div>
   </div>
 

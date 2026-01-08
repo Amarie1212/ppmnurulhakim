@@ -2,24 +2,24 @@
 /* 1. THEME & RESET (IDENTIK DENGAN DUTY)    */
 /* ========================================= */
 :root {
-  /* Master Palette - Emerald & Zinc (Premium Dark) */
-  --bg: #09090b;       /* Rich Black */
-  --bg-2: #18181b;     /* Card/Surface */
-  --bg-3: #27272a;     /* Hover/Active Surface */
-  --text: #f4f4f5;     /* Near White */
-  --muted: #94a3b8;    /* Slate 400 */
-  --accent: #10b981;   /* Emerald 500 */
-  --accent-hover: #059669; /* Emerald 600 */
+  /* Master Palette - Match Duty/Pengurus Theme */
+  --bg: #18181b;       /* Zinc 900 */
+  --bg-2: #27272a;     /* Zinc 800 */
+  --bg-3: #3f3f46;     /* Zinc 700 - Adjusted for new base */
+  --text: #f4f4f5;     /* Zinc 100 */
+  --muted: #a1a1aa;    /* Zinc 400 */
+  --accent: #22c55e;   /* Green 500 */
+  --accent-hover: #16a34a; /* Green 600 */
   --danger: #ef4444;   /* Red 500 */
-  --border: rgba(255, 255, 255, 0.1);
-  --input-bg: rgba(0, 0, 0, 0.3);
-  --input-border: rgba(255, 255, 255, 0.1);
+  --border: rgba(255, 255, 255, 0.08);
+  --input-bg: rgba(0, 0, 0, 0.2);
+  --input-border: rgba(255, 255, 255, 0.08);
   --nav-h: 72px;
   --dot-color: rgba(255, 255, 255, 0.03);
   
   /* Radii & Shadows */
   --radius-sm: 2px;
-  --radius-md: 4px;
+  --radius-md: 10px;
   --radius-lg: 6px;
   --radius-xl: 10px;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -201,7 +201,7 @@ a { color: inherit; text-decoration: none; }
 .cta-btn {
   display: inline-flex; align-items: center; gap: 6px;
   color: var(--accent); font-weight: 700;
-  padding: 8px 16px; border-radius: var(--radius-md);
+  padding: 8px 16px; border-radius: 50px;
   background: rgba(34, 197, 94, 0.1);
   border: 1px solid rgba(34, 197, 94, 0.2);
   transition: all 0.2s;
@@ -212,13 +212,35 @@ a { color: inherit; text-decoration: none; }
 /* Login Button / Admin Panel Button */
 .btn-nav {
   background: transparent; color: var(--text); font-weight: 700;
-  padding: 8px 16px; border-radius: var(--radius-md);
+  padding: 8px 16px; border-radius: 50px;
   border: 1px solid var(--border); cursor: pointer;
   display: inline-flex; align-items: center; gap: 8px;
   transition: .2s;
 }
 .btn-nav:hover { background: rgba(125,125,125,0.08); border-color: var(--muted); }
 .btn-nav svg { width: 18px; height: 18px; }
+
+/* Standard Back Button (Global) */
+.btn-back-inline {
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+  color: var(--text);
+  text-decoration: none;
+  transition: all .2s;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.btn-back-inline:hover {
+  border-color: var(--accent);
+  background: var(--bg-2);
+  transform: translateY(-2px);
+  color: var(--accent);
+}
+.btn-back-inline svg { width: 20px; height: 20px; stroke-width: 2; }
 
 /* ========================================= */
 /* 3. NAV TOGGLE / HAMBURGER                 */
@@ -360,7 +382,7 @@ a { color: inherit; text-decoration: none; }
 /* Logout Button (Outline Merah di Sidebar Desktop) */
 .logout-btn { 
   display: flex; align-items: center; justify-content: center; gap: 8px; 
-  width: 100%; padding: 12px; border-radius: var(--radius-md); 
+  width: 100%; padding: 12px; border-radius: 10px; 
   border: 1px solid var(--danger); color: var(--danger); 
   font-weight: 700; transition: .2s; background: transparent; 
   text-decoration: none; margin-top: 10px;

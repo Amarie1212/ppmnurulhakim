@@ -12,243 +12,221 @@
   
   <%- include('partials/notify') %>
   <style>
-    /* Premium Redesign Styles */
-    :root {
-      --card-blur: blur(10px);
-      --card-shadow: 0 4px 20px rgba(0,0,0,0.08);
-      --card-shadow-hover: 0 8px 30px rgba(0,0,0,0.12);
-    }
-
-    [data-theme="dark"] {
-      --card-shadow: 0 4px 25px rgba(0,0,0,0.3);
-      --card-shadow-hover: 0 10px 40px rgba(0,0,0,0.45);
-    }
-
     .main-content {
-      padding-top: 20px;
-      padding-bottom: 100px; /* Space for sticky actions */
+      padding-top: 100px;
+      padding-bottom: 40px;
     }
 
-    /* Modern Toolbar */
-    .toolbar-sticky {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: var(--bg);
-      margin: -20px -20px 32px;
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      backdrop-filter: var(--card-blur);
+    .page-header {
+      margin-bottom: 32px;
     }
-
-    .toolbar-info h1 {
-      font-size: 1.25rem;
+    .page-header h1 {
+      font-size: 1.5rem;
       font-weight: 800;
-      margin: 0;
+      margin: 0 0 8px 0;
       color: var(--text);
     }
-    
-    .toolbar-actions {
-      display: flex;
-      gap: 12px;
+    .page-header p {
+      color: var(--muted);
+      margin: 0;
+      font-size: 0.95rem;
     }
 
-    /* Enhanced Card */
-    .form-card {
+    .form-section {
       background: var(--bg-2);
       border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 32px;
-      margin-bottom: 24px;
-      box-shadow: var(--card-shadow);
-      transition: all 0.2s ease;
-      position: relative;
-      overflow: hidden;
+      border-radius: 2px;
+      padding: 24px;
+      margin-bottom: 20px;
     }
-    .form-card:hover {
-      box-shadow: var(--card-shadow-hover);
-    }
-    
-    .sec-title {
-      font-size: 1.1rem;
-      font-weight: 800;
-      margin: 0 0 24px 0;
-      color: var(--accent);
+
+    .section-header {
       display: flex;
       align-items: center;
       gap: 12px;
+      margin-bottom: 20px;
     }
-    .sec-title .icon-box {
-      width: 40px;
-      height: 40px;
+    .section-icon {
+      width: 44px;
+      height: 44px;
       background: rgba(34, 197, 94, 0.1);
-      border-radius: 3px;
+      border-radius: 2px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--accent);
     }
-    .sec-title svg { width: 22px; height: 22px; }
-    
-    .label {
-      display: block;
-      font-size: 0.9rem;
+    .section-icon svg { width: 22px; height: 22px; }
+    .section-title {
+      font-size: 1.1rem;
       font-weight: 700;
-      margin-bottom: 10px;
       color: var(--text);
-      opacity: 0.9;
+      margin: 0;
+    }
+    .section-subtitle {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin: 4px 0 0 0;
     }
 
-    /* Modern Inputs */
-    .input, .textarea-input {
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .form-input {
       width: 100%;
-      padding: 14px 18px;
-      border-radius: 3px;
-      border: 2px solid var(--border);
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
       background: var(--bg);
       color: var(--text);
       font-size: 1rem;
       font-family: inherit;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.2s;
     }
-    .input:focus, .textarea-input:focus {
+    .form-input:focus {
       outline: none;
       border-color: var(--accent);
-      background: var(--bg-2);
     }
-    .textarea-input { resize: vertical; min-height: 120px; line-height: 1.6; }
-    .hint { 
-      font-size: 0.85rem; 
-      color: var(--muted); 
-      margin-top: 10px; 
-      display: flex; 
-      align-items: center; 
-      gap: 6px; 
+    .form-textarea {
+      min-height: 120px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+    .form-hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 8px;
     }
 
-    /* Buttons */
-    .btn-base {
-      display: inline-flex;
+    /* Contact Row */
+    .contact-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .contact-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 1fr 44px;
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .contact-row select,
+    .contact-row input {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-2);
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    .btn-remove-contact {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      border: none;
+      background: #ef4444;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .btn-remove-contact:hover {
+      background: #dc2626;
+      color: #fff;
+    }
+    .btn-add-contact {
+      padding: 14px;
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--accent);
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
+      margin-top: 12px;
+    }
+    .btn-add-contact:hover {
+      border-color: var(--accent);
+      background: rgba(34, 197, 94, 0.05);
+    }
+
+    /* Action Buttons */
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+    .form-actions .btn {
+      flex: 1;
+      justify-content: center;
+      border-radius: 50px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       padding: 12px 24px;
-      border-radius: 3px;
-      font-weight: 700;
+      border-radius: 2px;
+      font-weight: 600;
       font-size: 0.95rem;
       cursor: pointer;
       transition: all 0.2s;
       border: none;
-    }
-
-    .btn-cancel {
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      color: var(--text);
       text-decoration: none;
     }
-    .btn-cancel:hover {
+    .btn-secondary {
       background: var(--bg);
-      border-color: var(--muted);
+      border: 1px solid var(--border);
+      color: var(--text);
     }
-
-    .btn-save {
+    .btn-secondary:hover {
+      background: var(--bg-2);
+    }
+    .btn-primary {
       background: var(--accent);
       color: #000;
-      min-width: 160px;
     }
-    .btn-save:hover {
+    .btn-primary:hover {
       filter: brightness(1.1);
       box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
     }
 
-    /* Contact Rows Redesign */
-    .kontak-container {
-      display: grid;
-      gap: 16px;
-    }
-    .item-row {
-      display: grid;
-      grid-template-columns: 140px 180px 1fr 44px;
-      gap: 12px;
-      align-items: center;
-      padding: 16px;
-      background: var(--bg);
-      border: 2px solid var(--border);
-      border-radius: 3px;
-      transition: all 0.2s;
-    }
-    .item-row:hover {
-      border-color: var(--accent);
-      background: var(--bg-2);
-    }
-    
-    .item-row select.input {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      background-size: 16px;
-      padding-right: 40px;
-      appearance: none;
-    }
-
-    .btn-add {
-      padding: 16px;
-      border-radius: 3px;
-      border: 2px dashed var(--border);
-      background: transparent;
-      color: var(--accent);
-      cursor: pointer;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: all 0.2s;
-      width: 100%;
-      margin-top: 20px;
-    }
-    .btn-add:hover { 
-      background: rgba(34, 197, 94, 0.08);
-      border-color: var(--accent); 
-    }
-
-    .btn-remove {
-      width: 44px;
-      height: 44px;
-      border-radius: 3px;
-      border: none;
-      background: rgba(239, 68, 68, 0.1);
-      color: #ef4444;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-    }
-    .btn-remove:hover { 
-      background: #ef4444;
-      color: #fff;
-    }
-
-    /* Mobile Responsive */
     @media (max-width: 768px) {
-      .toolbar-sticky {
-        margin: -20px -20px 24px;
-        padding: 12px 16px;
-      }
-      .toolbar-info h1 { font-size: 1.1rem; }
-      .form-card { padding: 24px 20px; }
-      .item-row { 
+      .contact-row {
         grid-template-columns: 1fr;
-        padding: 20px;
-        gap: 16px;
+        gap: 8px;
       }
-      .btn-remove { width: 100%; }
-      .input, .textarea-input { font-size: 0.95rem; }
+      .btn-remove-contact {
+        width: 100%;
+      }
+      .form-actions {
+        flex-direction: column-reverse;
+      }
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
     }
   </style>
 </head>
@@ -258,9 +236,9 @@
   <div class="container nav-inner">
     <div class="brand-wrap">
       <a href="/pengurus/home" class="btn-back-inline" title="Kembali ke Dashboard">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
       </a>
-      <div class="brand">Admin Panel</div>
+      <div class="brand">Kelola Pengumuman</div>
     </div>
     <div class="right-actions">
       <button id="navToggle" class="nav-toggle" style="display:flex !important;" aria-label="Menu">
@@ -273,69 +251,58 @@
 <%- include('partials/pengurus_sidebar', { currentPage: 'kelola-pengumuman', user: user, stat: null }) %>
 
 <main class="section main-content">
-  <div class="container" style="max-width: 1000px;">
-    
+  <div class="container" style="max-width: 800px;">
+
     <form id="pengumumanForm" action="/pengurus/kelola-pengumuman" method="POST">
       
-      <!-- Sticky Toolbar -->
-      <div class="toolbar-sticky">
-        <div class="toolbar-info desktop-only">
-          <h1>Kelola Pengumuman</h1>
-        </div>
-        <div class="toolbar-actions">
-          <a href="/pengurus/home" class="btn-base btn-cancel">Batal</a>
-          <button class="btn-base btn-save" type="submit">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            Simpan Semua
-          </button>
-        </div>
-      </div>
-
       <!-- Section: Jadwal Kedatangan -->
-      <div class="form-card">
-        <h3 class="sec-title">
-          <div class="icon-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <div class="form-section">
+        <div class="section-header">
+          <div class="section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           </div>
-          Jadwal Kedatangan
-        </h3>
-        <div>
-          <label class="label">Tanggal Kedatangan / Open House</label>
-          <div style="position: relative; max-width: 320px;">
-            <input type="date" class="input" name="tanggal_kedatangan" value="<%= info.tanggal_kedatangan ? new Date(info.tanggal_kedatangan).toISOString().split('T')[0] : '' %>">
+          <div>
+            <h3 class="section-title">Jadwal Kedatangan</h3>
+            <p class="section-subtitle">Tanggal open house / kedatangan santri</p>
           </div>
-          <p class="hint">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            Tanggal ini akan ditampilkan di dashboard santri sebagai jadwal kedatangan pondok.
-          </p>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tanggal Kedatangan</label>
+          <input type="date" class="form-input" name="tanggal_kedatangan" style="max-width: 300px;" value="<%= info.tanggal_kedatangan ? new Date(info.tanggal_kedatangan).toISOString().split('T')[0] : '' %>">
+          <p class="form-hint">Akan ditampilkan dengan countdown di halaman Info Santri</p>
         </div>
       </div>
 
       <!-- Section: Isi Pengumuman -->
-      <div class="form-card">
-        <h3 class="sec-title">
-          <div class="icon-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <div class="form-section">
+        <div class="section-header">
+          <div class="section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           </div>
-          Isi Pengumuman
-        </h3>
-        <div>
-          <label class="label">Pesan untuk Pendaftar</label>
-          <textarea class="textarea-input" name="pengumuman" placeholder="Tulis pengumuman resmi di sini..."><%= info.pengumuman || '' %></textarea>
-          <p class="hint">Informasi umum mengenai proses verifikasi, berkas, atau kabar terbaru.</p>
+          <div>
+            <h3 class="section-title">Pengumuman</h3>
+            <p class="section-subtitle">Pesan penting untuk para santri</p>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Isi Pengumuman</label>
+          <textarea class="form-input form-textarea" name="pengumuman" placeholder="Tulis pengumuman untuk santri..."><%= info.pengumuman || '' %></textarea>
         </div>
       </div>
 
       <!-- Section: Peraturan Santri -->
-      <div class="form-card">
-        <h3 class="sec-title">
-          <div class="icon-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <div class="form-section">
+        <div class="section-header">
+          <div class="section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
           </div>
-          Peraturan Santri
-        </h3>
-        <div>
-          <label class="label">Daftar Peraturan & Ketentuan</label>
+          <div>
+            <h3 class="section-title">Peraturan Santri</h3>
+            <p class="section-subtitle">Daftar peraturan yang wajib dipatuhi</p>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Daftar Peraturan (satu per baris)</label>
           <% 
             const defaultPeraturan = [
               'Wajib mengikuti seluruh kegiatan pondok (sholat berjamaah, kajian, piket).',
@@ -345,45 +312,57 @@
             ];
             const peraturanList = (Array.isArray(info.peraturan) && info.peraturan.length > 0) ? info.peraturan : defaultPeraturan;
           %>
-          <textarea class="textarea-input" name="peraturan" rows="8" placeholder="Tuliskan satu peraturan per baris..."><%= peraturanList.join('\n') %></textarea>
-          <p class="hint">Gunakan baris baru (Enter) untuk memisahkan setiap poin peraturan.</p>
+          <textarea class="form-input form-textarea" name="peraturan" rows="8" placeholder="Tuliskan peraturan..."><%= peraturanList.join('\n') %></textarea>
+          <p class="form-hint">Gunakan Enter untuk memisahkan setiap poin peraturan</p>
         </div>
       </div>
 
       <!-- Section: Kontak Panitia -->
-      <div class="form-card">
-        <h3 class="sec-title">
-          <div class="icon-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      <div class="form-section">
+        <div class="section-header">
+          <div class="section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
           </div>
-          Kontak Panitia
-        </h3>
-        <div id="kontak-list" class="kontak-container">
+          <div>
+            <h3 class="section-title">Kontak Panitia</h3>
+            <p class="section-subtitle">Kontak yang bisa dihubungi santri</p>
+          </div>
+        </div>
+        
+        <div id="kontak-list" class="contact-list">
           <% 
             var kontakPanitiaData = (info && info.kontak_panitia) ? (typeof info.kontak_panitia === 'string' ? JSON.parse(info.kontak_panitia) : info.kontak_panitia) : [];
-            var kontakLength = kontakPanitiaData.length;
           %>
           <% kontakPanitiaData.forEach((k, i) => { %>
-          <div class="item-row">
-            <select name="kontak_tipe[]" class="input">
+          <div class="contact-row">
+            <select name="kontak_tipe[]">
               <option value="whatsapp" <%= k.tipe === 'whatsapp' ? 'selected' : '' %>>WhatsApp</option>
               <option value="email" <%= k.tipe === 'email' ? 'selected' : '' %>>Email</option>
               <option value="instagram" <%= k.tipe === 'instagram' ? 'selected' : '' %>>Instagram</option>
               <option value="phone" <%= k.tipe === 'phone' ? 'selected' : '' %>>Telepon</option>
             </select>
-            <input type="text" name="kontak_label[]" class="input" placeholder="Label (e.g. Kang Admin)" value="<%= k.label || '' %>">
-            <input type="text" name="kontak_value[]" class="input" placeholder="ID / Nomor / Username" value="<%= k.value || '' %>">
-            <button type="button" class="btn-remove" title="Hapus Kontak" onclick="this.closest('.item-row').remove()">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <input type="text" name="kontak_label[]" placeholder="Nama/Label" value="<%= k.label || '' %>">
+            <input type="text" name="kontak_value[]" placeholder="Nomor/ID/Username" value="<%= k.value || '' %>">
+            <button type="button" class="btn-remove-contact" onclick="this.closest('.contact-row').remove()">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </div>
           <% }); %>
         </div>
-        <button type="button" class="btn-add" onclick="addKontakRow()">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Tambah Baris Kontak
+        
+        <button type="button" class="btn-add-contact" onclick="addKontakRow()">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Tambah Kontak
         </button>
-        <p class="hint">Tambahkan kontak panitia yang bisa dihubungi santri (WhatsApp, Email, Instagram, dll).</p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="form-actions">
+        <a href="/pengurus/home" class="btn btn-secondary">Batal</a>
+        <button type="submit" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Simpan Perubahan
+        </button>
       </div>
 
     </form>
@@ -396,29 +375,23 @@
 
 <script src="/toast.js"></script>
 
-<% 
-  // Calculate kontakLength for use in the script below
-  var scriptKontakLength = ((info && info.kontak_panitia) ? (typeof info.kontak_panitia === 'string' ? JSON.parse(info.kontak_panitia) : info.kontak_panitia) : []).length;
-%>
 <script>
   (function() {
-    let kontakIdx = <%= scriptKontakLength %>;
     window.addKontakRow = function() {
       const list = document.getElementById('kontak-list');
       const div = document.createElement('div');
-      div.className = 'item-row';
-      div.dataset.idx = kontakIdx++;
+      div.className = 'contact-row';
       div.innerHTML = `
-        <select name="kontak_tipe[]" class="input">
+        <select name="kontak_tipe[]">
           <option value="whatsapp">WhatsApp</option>
           <option value="email">Email</option>
           <option value="instagram">Instagram</option>
           <option value="phone">Telepon</option>
         </select>
-        <input type="text" name="kontak_label[]" class="input" placeholder="Label (e.g. Kang Admin)">
-        <input type="text" name="kontak_value[]" class="input" placeholder="ID / Nomor / Username">
-        <button type="button" class="btn-remove" title="Hapus Kontak" onclick="this.closest('.item-row').remove()">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <input type="text" name="kontak_label[]" placeholder="Nama/Label">
+        <input type="text" name="kontak_value[]" placeholder="Nomor/ID/Username">
+        <button type="button" class="btn-remove-contact" onclick="this.closest('.contact-row').remove()">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       `;
       list.appendChild(div);

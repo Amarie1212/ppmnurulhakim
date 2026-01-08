@@ -509,13 +509,13 @@
         <a href="/form" class="admin-dd-item biodata-warning">Isi Biodata (Wajib)</a>
       <% } else if (user.biodataRejected) { %>
         <!-- Rejection Accordion (Dropdown) -->
-        <div class="admin-dd-item danger" style="flex-direction:column; align-items:stretch; gap:0; padding:0; background:transparent; border:none; color:var(--danger);">
-          <div onclick="toggleReason(this)" style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; cursor:pointer;">
-             <span style="font-weight:600;">Biodata (Ditolak)</span>
+        <div style="border-bottom:1px solid var(--border);">
+          <div onclick="toggleReason(this)" class="admin-dd-item" style="color:#ef4444; cursor:pointer; justify-content:space-between;">
+             <span style="font-weight:600;">Edit Biodata (Ditolak)</span>
              <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"></polyline></svg>
           </div>
-          <div class="reason-box" style="display:none;">
-             <a href="/form" class="admin-dd-item" style="font-size:0.85rem; padding:10px 16px 10px 32px; color:#ef4444;">
+          <div class="reason-box" style="display:none; padding:8px 16px 12px 32px;">
+             <a href="/form" style="color:#ef4444; font-size:0.85rem; text-decoration:none;">
                Alasan: <%= user.biodataReason || 'Mohon perbaiki data Anda.' %>
              </a>
           </div>
@@ -580,7 +580,7 @@
         <% } else if (user.biodataRejected) { %>
           <div style="border-bottom:1px solid var(--border);">
             <div class="panel-link" onclick="toggleReason(this)" style="justify-content:space-between; color:#ef4444; cursor:pointer;">
-              <span>Biodata (Ditolak)</span>
+              <span>Edit Biodata (Ditolak)</span>
               <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
             <div class="reason-box" style="display:none;">
@@ -1537,22 +1537,18 @@
         // Update biodata link text in menu
         const updateBiodataLinks = (container) => {
           if (!container) return;
+          // Skip if biodata rejected - accordion is handled separately
+          if (status.biodataRejected) return;
+          
           const links = container.querySelectorAll('a[href="/form"]');
           links.forEach(link => {
             if (status.isBiodataEmpty) {
               link.textContent = 'Isi Biodata (Wajib)';
               link.className = link.className.replace(/biodata-\w+/g, '') + ' biodata-warning';
             } else if (!status.biodataVerified) {
-              if (status.biodataRejected) {
-                 let reasonText = status.biodataReason || 'Klik untuk perbaiki';
-                 link.innerHTML = 'Alasan: ' + reasonText;
-                 link.style.cssText = 'font-size:0.85rem; color:#ef4444; padding-left:36px;';
-                 link.className = 'panel-link';
-              } else {
-                 link.innerHTML = 'Biodata (Menunggu Verifikasi)';
-                 link.style.cssText = ''; 
-                 link.className = 'panel-link biodata-pending'; 
-              }
+              link.innerHTML = 'Biodata (Menunggu Verifikasi)';
+              link.style.cssText = ''; 
+              link.className = 'panel-link biodata-pending'; 
             } else {
               link.textContent = 'Edit Biodata Lengkap';
               link.className = link.className.replace(/biodata-\w+/g, '').replace('biodata-warning', '').replace('biodata-pending', '');

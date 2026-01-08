@@ -135,10 +135,13 @@ router.post('/login', async (req, res) => {
     //   return res.redirect('/?login=1&reason=rejected&msg=' + encodeURIComponent(s.alasan_tolak || 'Data tidak valid'));
     // }
 
-    // Cek Biodata
-    const bioCheck = await pool.query("SELECT id FROM tb_santri WHERE email=$1", [s.email]);
+    // Cek Biodata dan statusnya
+    const bioCheck = await pool.query("SELECT id, status_biodata, alasan_tolak FROM tb_santri WHERE email=$1", [s.email]);
     const isBiodataEmpty = bioCheck.rows.length === 0;
     const santriId = bioCheck.rows.length > 0 ? bioCheck.rows[0].id : null;
+    const biodataVerified = bioCheck.rows.length > 0 && bioCheck.rows[0].status_biodata === 'VERIFIED';
+    const biodataRejected = bioCheck.rows.length > 0 && bioCheck.rows[0].status_biodata === 'REJECTED';
+    const biodataReason = bioCheck.rows.length > 0 ? bioCheck.rows[0].alasan_tolak : null;
 
     req.session.regenerate(() => {
       req.session.user = { 
@@ -146,7 +149,10 @@ router.post('/login', async (req, res) => {
         kelompok: s.kelompok, desa: s.desa, daerah: s.daerah,
         status: s.status, isBiodataEmpty: isBiodataEmpty,
         santri_id: santriId,
-        alasan_tolak: s.alasan_tolak // [NEW] Simpan alasan tolak ke session
+        biodataVerified: biodataVerified,
+        biodataRejected: biodataRejected,
+        biodataReason: biodataReason,
+        alasan_tolak: s.alasan_tolak // Simpan alasan tolak AKUN ke session
       };
       res.redirect('/?toast=register_success'); 
     });
@@ -519,14 +525,15 @@ router.get('/info-santri', requireSantriAuth, refreshSantriSession, async (req, 
           cms.peraturan = [];
         }
       }
-      // Parse kontak_list if it's a JSON string
-      if (cms.kontak_list && typeof cms.kontak_list === 'string') {
+      // Parse kontak_panitia if it's a JSON string
+      if (cms.kontak_panitia && typeof cms.kontak_panitia === 'string') {
         try {
-          cms.kontak_list = JSON.parse(cms.kontak_list);
+          cms.kontak_panitia = JSON.parse(cms.kontak_panitia);
         } catch(e) {
-          cms.kontak_list = [];
+          cms.kontak_panitia = [];
         }
       }
+      console.log('[Info Santri] kontak_panitia:', cms.kontak_panitia);
     }
   } catch (e) {
     console.log('[Info Santri] CMS error:', e.message);

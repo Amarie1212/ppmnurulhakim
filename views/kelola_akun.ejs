@@ -20,7 +20,7 @@
       background: var(--accent);
       color: #000;
       border: none;
-      border-radius: 4px;
+      border-radius: 8px;
       font-weight: 700;
       cursor: pointer;
       transition: all .2s;
@@ -88,7 +88,7 @@
       background: rgba(59, 130, 246, 0.1);
       color: #3b82f6;
       border: 1px solid rgba(59, 130, 246, 0.2);
-      border-radius: 6px;
+      border-radius: 8px;
       font-weight: 600;
       font-size: 0.8rem;
       cursor: pointer;
@@ -154,7 +154,7 @@
   <div class="container nav-inner">
     <div class="brand-wrap">
       <a href="/pengurus/home" class="btn-back-inline" title="Kembali">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
       </a>
       <div class="brand">Kelola Akun Pengurus</div>
     </div>
@@ -170,18 +170,7 @@
 
 <main class="section">
   <div class="container">
-    <% if (typeof success !== 'undefined' && success) { %>
-      <div class="notify notify-success">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        <%= success %>
-      </div>
-    <% } %>
-    <% if (typeof error !== 'undefined' && error) { %>
-      <div class="notify notify-error">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-        <%= error %>
-      </div>
-    <% } %>
+
     
     <div style="margin-bottom: 20px;">
       <button class="btn-add" onclick="openAddModal()">
@@ -237,10 +226,7 @@
                   <div style="display: flex; gap: 8px; justify-content: flex-end;">
                     <button class="btn-edit-sm btn-edit" data-id="<%= p.id %>" data-nama="<%= p.nama %>" data-email="<%= p.email %>" data-role="<%= p.role %>">Edit</button>
                     <% if(p.id !== user.id) { %>
-                      <form action="/pengurus/kelola-akun/delete" method="POST" style="margin:0;" onsubmit="return confirm('Hapus akun ini?')">
-                        <input type="hidden" name="id" value="<%= p.id %>">
-                        <button type="submit" class="btn-delete-sm">Hapus</button>
-                      </form>
+                      <button type="button" class="btn-delete-sm" onclick="confirmDeleteAccount('<%= p.id %>', '<%= p.nama.replace(/'/g, "\\'") %>')">Hapus</button>
                     <% } %>
                   </div>
                 </td>
@@ -366,7 +352,77 @@
 </script>
 
 <%- include('partials/pengurus_nav_script') %>
+
+<script>
+  function confirmDeleteAccount(id, nama) {
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); z-index:9999; display:flex; justify-content:center; align-items:center; padding:20px;';
+    modal.innerHTML = `
+      <div style="background:var(--bg-2); border:1px solid var(--border); border-radius:16px; max-width:400px; width:100%; padding:24px; text-align:center; box-shadow:0 25px 50px rgba(0,0,0,0.5); animation:modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+        <div style="width:50px; height:50px; background:rgba(239,68,68,0.1); color:#ef4444; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </div>
+        <h3 style="margin:0 0 8px; font-size:1.1rem; font-weight:700; color:var(--text); line-height:1.4;">Hapus Akun Pengurus?</h3>
+        <p style="margin:0 0 20px; color:var(--muted); line-height:1.5; font-size:0.9rem;">
+          Anda akan menghapus akun <strong style="color:var(--text)">"${nama}"</strong>.<br>
+          Akses login akan dicabut permanen.
+        </p>
+        <div style="display:flex; gap:12px;">
+          <button id="cancelDelete" style="flex:1; background:transparent; border:1px solid var(--border); color:var(--text); padding:10px; border-radius:8px; font-weight:600; cursor:pointer; box-shadow:none;">Batal</button>
+          <button id="confirmDeleteBtn" style="flex:1; background:#ef4444; color:#fff; border:none; padding:10px; border-radius:8px; font-weight:600; cursor:pointer; box-shadow:none;">Ya, Hapus</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Add animation keyframes if not present
+    if (!document.getElementById('modalAnimStyle')) {
+       const style = document.createElement('style');
+       style.id = 'modalAnimStyle';
+       style.textContent = '@keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }';
+       document.head.appendChild(style);
+    }
+
+    document.getElementById('cancelDelete').onclick = () => {
+       modal.style.opacity = 0;
+       setTimeout(() => modal.remove(), 200);
+    };
+    
+    document.getElementById('confirmDeleteBtn').onclick = () => {
+       const form = document.createElement('form');
+       form.method = 'POST';
+       form.action = '/pengurus/kelola-akun/delete';
+       const input = document.createElement('input');
+       input.type = 'hidden';
+       input.name = 'id';
+       input.value = id;
+       form.appendChild(input);
+       document.body.appendChild(form);
+       form.submit();
+    };
+  }
+</script>
 <script src="/toast.js"></script>
+<% if (typeof success !== 'undefined' && success) { %>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+      showToast('success', 'Berhasil', '<%= success %>');
+      if (window.history.replaceState) {
+        const url = new URL(window.location);
+        url.searchParams.delete('success');
+        window.history.replaceState({}, document.title, url);
+      }
+  });
+</script>
+<% } %>
+
+<% if (typeof error !== 'undefined' && error) { %>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+      showToast('error', 'Gagal', '<%= error %>');
+  });
+</script>
+<% } %>
 
 </body>
 </html>

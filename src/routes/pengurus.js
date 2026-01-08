@@ -38,6 +38,21 @@ function requireAuth(req, res, next) {
   res.redirect('/panel-admin');
 }
 
+// --- Helper: Ambil Statistik Global (Badge Notifikasi) ---
+async function getAdminStats() {
+  try {
+    const res = await pool.query(`
+      SELECT 
+        (SELECT COUNT(*) FROM tb_akun_santri WHERE status='PENDING') AS pending,
+        (SELECT COUNT(*) FROM tb_pembayaran WHERE status='PENDING') AS pending_payment
+    `);
+    return res.rows[0] || { pending: 0, pending_payment: 0 };
+  } catch (e) {
+    console.error('[getAdminStats] Error:', e.message);
+    return { pending: 0, pending_payment: 0 };
+  }
+}
+
 // [DEBUG] Route sementara untuk cek data pembayaran di database
 router.get('/pengurus/debug-pembayaran', requireAuth, async (req, res) => {
   try {
@@ -53,20 +68,21 @@ router.get('/pengurus/debug-pembayaran', requireAuth, async (req, res) => {
    ============================================================ */
 router.get('/pengurus/home', requireAuth, async (req, res) => {
   try {
-    // Ambil data statistik untuk kartu dashboard
+    // Ambil data statistik lengkap untuk dashboard
     const stats = await pool.query(`
       SELECT 
         (SELECT COUNT(*) FROM tb_akun_santri WHERE status='PENDING') AS pending,
         (SELECT COUNT(*) FROM tb_santri WHERE status_biodata IS NULL OR status_biodata = 'PENDING') AS biodata_pending,
         (SELECT COUNT(*) FROM tb_santri) AS total_santri,
         (SELECT COUNT(*) FROM tb_santri WHERE jk='L') AS putra,
-        (SELECT COUNT(*) FROM tb_santri WHERE jk='P') AS putri
+        (SELECT COUNT(*) FROM tb_santri WHERE jk='P') AS putri,
+        (SELECT COUNT(*) FROM tb_pembayaran WHERE status='PENDING') AS pending_payment
     `);
 
     res.render('pengurus_home', {
       title: 'Beranda Pengurus',
       user: req.session.user,
-      stat: stats.rows[0] || { pending: 0, total_santri: 0, putra: 0, putri: 0 }
+      stat: stats.rows[0] || { pending: 0, biodata_pending: 0, total_santri: 0, putra: 0, putri: 0, pending_payment: 0 }
     });
   } catch (e) {
     console.error('[GET /pengurus/home] Error:', e.message);
@@ -79,6 +95,8 @@ router.get('/pengurus/home', requireAuth, async (req, res) => {
    ============================================================ */
 router.get('/pengurus', requireAuth, async (req, res) => {
   try {
+    const stat = await getAdminStats();
+
     // Menampilkan daftar santri yang sudah mengisi biodata lengkap
     // CATATAN: Menggunakan 'wa' sebagai 'phone' untuk menghindari error kolom 'telp'
     const { rows: santri } = await pool.query(`
@@ -102,7 +120,8 @@ router.get('/pengurus', requireAuth, async (req, res) => {
     res.render('pengurus', {
       title: 'Data Santri',
       user: req.session.user,
-      santri
+      santri,
+      stat
     });
   } catch (e) {
     console.error('[GET /pengurus] Error:', e.message);
@@ -133,7 +152,7 @@ router.post('/pengurus/santri/:id/delete', requireAuth, async (req, res) => {
       const filesToDelete = [s.foto_path, s.kk_path, s.ktp_path, s.sertifikat_path];
 
       // Ambil juga file bukti pembayaran
-      const payRes = await pool.query('SELECT bukti_path FROM tb_pembayaran WHERE email = $1', [email]);
+      const payRes = await pool.query('SELECT bukti_path FROM tb_pembayaran WHERE santri_id = $1', [id]);
       payRes.rows.forEach(p => {
          if(p.bukti_path) filesToDelete.push(p.bukti_path);
       });
@@ -150,14 +169,15 @@ router.post('/pengurus/santri/:id/delete', requireAuth, async (req, res) => {
           }
       });
       
+      // Delete child records first (respects foreign key constraints)
+      // Delete from tb_pembayaran first (has FK to tb_santri)
+      await pool.query('DELETE FROM tb_pembayaran WHERE santri_id = $1', [id]);
+      
       // Delete from tb_santri
       await pool.query('DELETE FROM tb_santri WHERE id = $1', [id]);
       
       // Also delete from tb_akun_santri if exists
       await pool.query('DELETE FROM tb_akun_santri WHERE email = $1', [email]);
-      
-      // Delete from tb_pembayaran if exists
-      await pool.query('DELETE FROM tb_pembayaran WHERE email = $1', [email]);
       
       console.log(`[DELETE SANTRI] Santri ID ${id} (${email}) and all files deleted by ${req.session.user.name}`);
     }
@@ -270,10 +290,13 @@ router.get('/pengurus/laporan-santri', requireAuth, async (req, res) => {
         s.nama ASC
     `);
     
+    const stat = await getAdminStats();
+    
     res.render('laporan_santri', {
       title: 'Laporan Data Santri',
       user: req.session.user,
-      santri: rows
+      santri: rows,
+      stat
     });
   } catch (e) {
     console.error('[GET /pengurus/laporan-santri] Error:', e.message);
@@ -418,12 +441,15 @@ router.get('/pengurus/verifikasi', requireAuth, async (req, res) => {
       console.log('[Verifikasi] Biodata query skipped:', bioErr.message);
     }
     
+    const stat = await getAdminStats();
+
     res.render('verifikasi', { 
       title: 'Verifikasi', 
       user: req.session.user, 
       akun: akunResult.rows,
       biodata: biodataRows,
-      activeTab: req.query.tab || 'akun'
+      activeTab: req.query.tab || 'akun',
+      stat
     });
   } catch (e) {
     console.error('[GET /verifikasi] Error:', e.message);
@@ -574,11 +600,14 @@ router.get('/pengurus/verifikasi-pembayaran', requireAuth, async (req, res) => {
     console.log('[Verifikasi Pembayaran] Error:', e.message);
   }
 
+  const stat = await getAdminStats();
+
   res.render('verifikasi_pembayaran', {
     title: 'Verifikasi Pembayaran',
     user: req.session.user,
     pembayaran,
-    riwayat
+    riwayat,
+    stat
   });
 });
 
@@ -756,6 +785,8 @@ router.get('/pengurus/laporan-pembayaran', requireAuth, async (req, res) => {
     console.log('[Laporan Pembayaran] Error:', e.message);
   }
 
+  const stat = await getAdminStats();
+
   res.render('laporan_pembayaran', {
     title: 'Laporan Pembayaran',
     user: req.session.user,
@@ -763,7 +794,8 @@ router.get('/pengurus/laporan-pembayaran', requireAuth, async (req, res) => {
     belumBayar,
     riwayat,
     success: req.query.success === '1',
-    error: req.query.error || null
+    error: req.query.error || null,
+    stat
   });
 });
 
@@ -874,10 +906,13 @@ router.get('/pengurus/laporan-masuk', requireAuth, async (req, res) => {
       ORDER BY p.created_at DESC
     `);
 
+    const stat = await getAdminStats();
+
     res.render('laporan_masuk', {
       title: 'Laporan Pembayaran Masuk',
       user: req.session.user,
-      pembayaran
+      pembayaran,
+      stat
     });
   } catch (e) {
     console.error('[GET /pengurus/laporan-masuk] Error:', e.message);
@@ -1182,6 +1217,14 @@ router.get('/pengurus/kelola-pengumuman', requireAuth, async (req, res) => {
   try {
     const { rows } = await pool.query(`SELECT * FROM tb_info_ppm ORDER BY id LIMIT 1`);
     info = rows[0] || {};
+    
+    // Parse JSON fields
+    if (info.peraturan && typeof info.peraturan === 'string') {
+      try { info.peraturan = JSON.parse(info.peraturan); } catch(e) { info.peraturan = []; }
+    }
+    if (info.kontak_panitia && typeof info.kontak_panitia === 'string') {
+      try { info.kontak_panitia = JSON.parse(info.kontak_panitia); } catch(e) { info.kontak_panitia = []; }
+    }
   } catch (e) {
     console.log('[Kelola Pengumuman] Tabel belum ada:', e.message);
   }
@@ -1203,15 +1246,22 @@ router.post('/pengurus/kelola-pengumuman', requireAuth, async (req, res) => {
   const { pengumuman, tanggal_kedatangan, peraturan } = req.body;
   const peraturanJSON = peraturan ? JSON.stringify(peraturan.split('\n').filter(x => x.trim())) : '[]';
   
+  // Debug: log form body to see what's coming in
+  console.log('[Kelola Pengumuman] req.body keys:', Object.keys(req.body));
+  
   // Build kontak_panitia array from form arrays
-  const kontakTipe = req.body['kontak_tipe[]'] || [];
-  const kontakLabel = req.body['kontak_label[]'] || [];
-  const kontakValue = req.body['kontak_value[]'] || [];
+  // Check both possible property names
+  const kontakTipe = req.body['kontak_tipe[]'] || req.body['kontak_tipe'] || [];
+  const kontakLabel = req.body['kontak_label[]'] || req.body['kontak_label'] || [];
+  const kontakValue = req.body['kontak_value[]'] || req.body['kontak_value'] || [];
+  
+  console.log('[Kelola Pengumuman] kontakTipe:', kontakTipe);
+  console.log('[Kelola Pengumuman] kontakValue:', kontakValue);
   
   const kontakPanitia = [];
-  const tipeArr = Array.isArray(kontakTipe) ? kontakTipe : [kontakTipe];
-  const labelArr = Array.isArray(kontakLabel) ? kontakLabel : [kontakLabel];
-  const valueArr = Array.isArray(kontakValue) ? kontakValue : [kontakValue];
+  const tipeArr = Array.isArray(kontakTipe) ? kontakTipe : (kontakTipe ? [kontakTipe] : []);
+  const labelArr = Array.isArray(kontakLabel) ? kontakLabel : (kontakLabel ? [kontakLabel] : []);
+  const valueArr = Array.isArray(kontakValue) ? kontakValue : (kontakValue ? [kontakValue] : []);
   
   for (let i = 0; i < tipeArr.length; i++) {
     if (valueArr[i] && valueArr[i].trim()) {
@@ -1222,6 +1272,7 @@ router.post('/pengurus/kelola-pengumuman', requireAuth, async (req, res) => {
       });
     }
   }
+  console.log('[Kelola Pengumuman] kontakPanitia to save:', kontakPanitia);
   const kontakPanitiaJSON = JSON.stringify(kontakPanitia);
   
   try {

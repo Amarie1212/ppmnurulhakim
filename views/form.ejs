@@ -12,21 +12,7 @@
     /* Styling khusus tombol di halaman form agar sama dengan halaman lain */
     .brand-wrap { display: flex; align-items: center; gap: 12px; }
     
-    .btn-back-inline {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 40px; height: 40px; border-radius: 4px; /* Sudut tajam */
-      border: 1px solid var(--border);
-      background: var(--bg); /* Solid */
-      color: var(--text);
-      cursor: pointer;
-      transition: all .2s ease;
-      text-decoration: none;
-    }
-    .btn-back-inline:hover { 
-      background: var(--bg-2); 
-      border-color: var(--accent);
-    }
-    .btn-back-inline .icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
 
     /* Layout Form Responsif */
     .form-wrap {
@@ -43,8 +29,7 @@
     @media (max-width: 640px) {
       .actions { flex-direction: column-reverse; }
       .actions .btn-ghost, .actions .btn-nav { width: 100%; justify-content: center; padding: 14px; }
-      .btn-back-inline { width: 36px; height: 36px; border-radius: 4px; }
-      .btn-back-inline .icon { width: 18px; height: 18px; }
+
       .form-title { font-size: 1.5rem; }
     }
   </style>
@@ -55,9 +40,7 @@
   <div class="container nav-inner">
     <div class="brand-wrap">
       <a href="/" class="btn-back-inline" aria-label="Kembali ke Beranda" title="Kembali ke Beranda">
-        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
       </a>
       <div class="brand">PPM Nurul Hakim</div>
     </div>
@@ -65,236 +48,237 @@
 </header>
 
 <main class="form-wrap">
-  <h2 class="form-title">Formulir Biodata Santri</h2>
-  
-  <p class="lead" style="text-align:center; margin-bottom:30px; font-size:0.95rem; line-height:1.6; color:var(--muted);">
-    Halo, <strong style="color:var(--text)"><%= user.name %></strong>!<br>
-    <% if(data && data.status_biodata === 'REJECTED') { %>
-      <!-- Notification removed by user request -->
-    <% } else if(data && data.id) { %>
-      <span style="color:var(--accent); font-weight:600; display:inline-flex; align-items:center; gap:6px; margin-top:4px;">
-        <svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        Data Anda tersimpan. Silakan edit jika ada perubahan.
-      </span>
-    <% } else { %>
-      <span>Silakan lengkapi data diri Anda di bawah ini dengan benar.</span>
-    <% } %>
-  </p>
-
-  <% if (typeof error !== 'undefined' && error) { %>
-    <div style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#ef4444; padding:14px; border-radius:12px; margin-bottom:24px; text-align:center; font-weight:600;">
-      ⚠️ <%= error %>
-    </div>
-  <% } %>
-
-  <form class="form-card" action="/form" method="POST" enctype="multipart/form-data">
+  <div class="form-card">
+    <h2 class="form-title">Formulir Biodata Santri</h2>
     
+    <p class="lead" style="text-align:center; margin-bottom:30px; font-size:0.95rem; line-height:1.6; color:var(--muted);">
+      Halo, <strong style="color:var(--text)"><%= user.name %></strong>!<br>
+      <% if(data && data.status_biodata === 'REJECTED') { %>
+        <!-- Notification removed by user request -->
+      <% } else if(data && data.id) { %>
+        <span style="color:var(--accent); font-weight:600; display:inline-flex; align-items:center; gap:6px; margin-top:4px;">
+          <svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Data Anda tersimpan. Silakan edit jika ada perubahan.
+        </span>
+      <% } else { %>
+        <span>Silakan lengkapi data diri Anda di bawah ini dengan benar.</span>
+      <% } %>
+    </p>
 
-    <input type="hidden" name="old_foto" value="<%= (data && data.foto_path) ? data.foto_path : '' %>">
-    <input type="hidden" name="wa" value="<%= (data && data.wa) ? data.wa : (user.wa || '') %>">
-
-    <div class="grid-12">
-
-      <div class="col-12"><h3 class="sec-title">Data Akun</h3></div>
-
-      <% const isEditable = (data && data.id) ? '' : 'readonly'; %>
-
-      <div class="col-12">
-        <label class="label">Nama Lengkap <span style="color:var(--danger)">*</span></label>
-        <input class="input" name="nama" value="<%= user.name %>" <%= isEditable %> required style="font-weight:600;">
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#ef4444; padding:14px; border-radius:12px; margin-bottom:24px; text-align:center; font-weight:600;">
+        ⚠️ <%= error %>
       </div>
+    <% } %>
 
-      <div class="col-6">
-        <label class="label">Email</label>
-        <input type="email" class="input" value="<%= user.email %>" readonly style="opacity:0.7; cursor:default;">
-      </div>
+    <form action="/form" method="POST" enctype="multipart/form-data">
+      
+      <input type="hidden" name="old_foto" value="<%= (data && data.foto_path) ? data.foto_path : '' %>">
+      <input type="hidden" name="wa" value="<%= (data && data.wa) ? data.wa : (user.wa || '') %>">
 
-      <div class="col-6">
-        <label class="label">Password</label>
-        <input type="password" class="input" name="password" <%= isEditable %>>
-      </div>
+      <div class="grid-12">
 
-      <div class="col-12"><div class="divider"></div></div>
+        <div class="col-12"><h3 class="sec-title">Data Akun</h3></div>
 
-      <div class="col-12"><h3 class="sec-title">Data Diri</h3></div>
+        <% const isEditable = (data && data.id) ? '' : 'readonly'; %>
 
-      <div class="col-6">
-        <label class="label">Jenis Kelamin <span style="color:var(--danger)">*</span></label>
-        <select class="select" name="jk" required>
-          <option value="">— Pilih —</option>
-          <option value="L" <%= (data && data.jk === 'L') ? 'selected' : '' %>>Laki-laki</option>
-          <option value="P" <%= (data && data.jk === 'P') ? 'selected' : '' %>>Perempuan</option>
-        </select>
-      </div>
-
-      <div class="col-6">
-        <label class="label">No WhatsApp</label>
-        <div style="background:var(--input-bg); padding:11px 12px; border-radius:4px; border:1px solid var(--input-border); font-weight:600; color:var(--text); display:flex; align-items:center; justify-content:space-between;">
-          <span><%= (data && data.wa) ? data.wa : (user.wa || '-') %></span>
-          <span style="font-size:0.75rem; color:var(--muted); font-weight:400;">(Terverifikasi)</span>
+        <div class="col-12">
+          <label class="label">Nama Lengkap <span style="color:var(--danger)">*</span></label>
+          <input class="input" name="nama" value="<%= user.name %>" <%= isEditable %> required style="font-weight:600;">
         </div>
-      </div>
 
-      <div class="col-6">
-        <label class="label">Pernah Mondok? <span style="color:var(--danger)">*</span></label>
-        <select class="select" name="pernah_mondok" required>
-          <option value="">— Pilih —</option>
-          <option value="true" <%= (data && String(data.pernah_mondok) === 'true') ? 'selected' : '' %>>Ya</option>
-          <option value="false" <%= (data && String(data.pernah_mondok) === 'false') ? 'selected' : '' %>>Tidak</option>
-        </select>
-      </div>
+        <div class="col-6">
+          <label class="label">Email</label>
+          <input type="email" class="input" value="<%= user.email %>" readonly style="opacity:0.7; cursor:default;">
+        </div>
 
-      <div class="col-6">
-        <label class="label">Mempunyai Sertifikat Penyampai? <span style="color:var(--danger)">*</span></label>
-        <select class="select" name="lulus_muballigh" id="sertifikatSelect" required onchange="toggleSertifikatUpload()">
-          <option value="">— Pilih —</option>
-          <option value="true" <%= (data && String(data.lulus_muballigh) === 'true') ? 'selected' : '' %>>Ya</option>
-          <option value="false" <%= (data && String(data.lulus_muballigh) === 'false') ? 'selected' : '' %>>Tidak</option>
-        </select>
-        
-        <!-- Conditional Upload Sertifikat -->
-        <div id="sertifikatUpload" style="display:none; margin-top:12px; background:var(--bg); border:1px solid var(--border); padding:12px; border-radius:4px;">
-           <label class="label" style="font-size:0.85rem; margin-bottom:8px;">Upload Sertifikat/Bukti (JPG/PNG/PDF)</label>
-           <% if (data && data.sertifikat_path) { %>
-              <div style="margin-bottom:8px; display:flex; align-items:center; gap:8px; font-size:0.8rem;">
-                 <span style="color:var(--accent);">✅ File tersimpan</span>
-                 <a href="<%= data.sertifikat_path %>" target="_blank" style="color:var(--text); text-decoration:underline;">Lihat</a>
+        <div class="col-6">
+          <label class="label">Password</label>
+          <input type="password" class="input" name="password" <%= isEditable %>>
+        </div>
+
+        <div class="col-12"><div class="divider"></div></div>
+
+        <div class="col-12"><h3 class="sec-title">Data Diri</h3></div>
+
+        <div class="col-6">
+          <label class="label">Jenis Kelamin <span style="color:var(--danger)">*</span></label>
+          <select class="select" name="jk" required>
+            <option value="">— Pilih —</option>
+            <option value="L" <%= (data && data.jk === 'L') ? 'selected' : '' %>>Laki-laki</option>
+            <option value="P" <%= (data && data.jk === 'P') ? 'selected' : '' %>>Perempuan</option>
+          </select>
+        </div>
+
+        <div class="col-6">
+          <label class="label">No WhatsApp</label>
+          <div style="background:var(--input-bg); padding:11px 12px; border-radius:4px; border:1px solid var(--input-border); font-weight:600; color:var(--text); display:flex; align-items:center; justify-content:space-between;">
+            <span><%= (data && data.wa) ? data.wa : (user.wa || '-') %></span>
+            <span style="font-size:0.75rem; color:var(--muted); font-weight:400;">(Terverifikasi)</span>
+          </div>
+        </div>
+
+        <div class="col-6">
+          <label class="label">Pernah Mondok? <span style="color:var(--danger)">*</span></label>
+          <select class="select" name="pernah_mondok" required>
+            <option value="">— Pilih —</option>
+            <option value="true" <%= (data && String(data.pernah_mondok) === 'true') ? 'selected' : '' %>>Ya</option>
+            <option value="false" <%= (data && String(data.pernah_mondok) === 'false') ? 'selected' : '' %>>Tidak</option>
+          </select>
+        </div>
+
+        <div class="col-6">
+          <label class="label">Mempunyai Sertifikat Penyampai? <span style="color:var(--danger)">*</span></label>
+          <select class="select" name="lulus_muballigh" id="sertifikatSelect" required onchange="toggleSertifikatUpload()">
+            <option value="">— Pilih —</option>
+            <option value="true" <%= (data && String(data.lulus_muballigh) === 'true') ? 'selected' : '' %>>Ya</option>
+            <option value="false" <%= (data && String(data.lulus_muballigh) === 'false') ? 'selected' : '' %>>Tidak</option>
+          </select>
+          
+          <!-- Conditional Upload Sertifikat -->
+          <div id="sertifikatUpload" style="display:none; margin-top:12px; background:var(--bg); border:1px solid var(--border); padding:12px; border-radius:4px;">
+             <label class="label" style="font-size:0.85rem; margin-bottom:8px;">Upload Sertifikat/Bukti (JPG/PNG/PDF)</label>
+             <% if (data && data.sertifikat_path) { %>
+                <div style="margin-bottom:8px; display:flex; align-items:center; gap:8px; font-size:0.8rem;">
+                   <span style="color:var(--accent);">✅ File tersimpan</span>
+                   <a href="<%= data.sertifikat_path %>" target="_blank" style="color:var(--text); text-decoration:underline;">Lihat</a>
+                </div>
+             <% } %>
+             <input type="file" class="file id-doc" name="sertifikat" accept=".jpg,.jpeg,.png,.pdf">
+             <input type="hidden" name="old_sertifikat" value="<%= (data && data.sertifikat_path) ? data.sertifikat_path : '' %>">
+          </div>
+        </div>
+
+        <div class="col-12"><div class="divider"></div></div>
+
+        <div class="col-12"><h3 class="sec-title">Alamat Domisili</h3></div>
+        <div class="col-6"><label class="label">Kelurahan <span style="color:var(--danger)">*</span></label><input class="input" name="kelurahan" value="<%= (data && data.kelurahan) || '' %>" required></div>
+        <div class="col-6"><label class="label">Kecamatan <span style="color:var(--danger)">*</span></label><input class="input" name="kecamatan" value="<%= (data && data.kecamatan) || '' %>" required></div>
+        <div class="col-6"><label class="label">Kota/Kabupaten <span style="color:var(--danger)">*</span></label><input class="input" name="kota_kab" value="<%= (data && data.kota_kab) || '' %>" required></div>
+        <div class="col-6"><label class="label">Provinsi <span style="color:var(--danger)">*</span></label><input class="input" name="provinsi" value="<%= (data && data.provinsi) || '' %>" required></div>
+
+        <div class="col-12"><div class="divider"></div></div>
+
+        <div class="col-12"><h3 class="sec-title">Asal Majlis Taklim</h3></div>
+
+        <div class="col-4">
+          <label class="label">Kelompok <span style="color:var(--danger)">*</span></label>
+          <input class="input" name="kelompok" value="<%= (data && data.kelompok) ? data.kelompok : user.kelompok %>" required>
+        </div>
+
+        <div class="col-4">
+          <label class="label">Desa <span style="color:var(--danger)">*</span></label>
+          <input class="input" name="desa" value="<%= (data && data.desa) ? data.desa : user.desa %>" required>
+        </div>
+
+        <div class="col-4">
+          <label class="label">Daerah <span style="color:var(--danger)">*</span></label>
+          <input class="input" name="daerah" value="<%= (data && data.daerah) ? data.daerah : user.daerah %>" required>
+        </div>
+
+        <div class="col-12">
+          <label class="label">Nomor Kyai Kelompok</label>
+          <input class="input" name="no_ki" value="<%= (data && data.no_ki) || '' %>" pattern="^08[0-9]{7,13}$">
+        </div>
+
+        <div class="col-12"><div class="divider"></div></div>
+
+        <div class="col-12"><h3 class="sec-title">Informasi Akademik</h3></div>
+        <div class="col-6"><label class="label">Kampus <span style="color:var(--danger)">*</span></label><input class="input" name="kampus" value="<%= (data && data.kampus) || '' %>" required></div>
+        <div class="col-6"><label class="label">Prodi / Jurusan <span style="color:var(--danger)">*</span></label><input class="input" name="prodi" value="<%= (data && data.prodi) || '' %>" required></div>
+        <div class="col-6">
+          <label class="label">Jenjang <span style="color:var(--danger)">*</span></label>
+          <select class="select" name="jenjang" required>
+            <option value="">— Pilih —</option>
+            <% ['S1','D4','D3','S2'].forEach(opt => { %>
+              <option value="<%= opt %>" <%= (data && data.jenjang === opt) ? 'selected' : '' %>><%= opt %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="col-6"><label class="label">Angkatan Kuliah <span style="color:var(--danger)">*</span></label><input class="input" name="angkatan" value="<%= (data && data.angkatan) || '' %>" pattern="^[0-9]{4}$" placeholder="Contoh: 2025" required></div>
+
+        <div class="col-12"><div class="divider"></div></div>
+
+        <div class="col-12"><h3 class="sec-title">Data Orang Tua</h3></div>
+
+        <div class="col-6 smooth-box">
+          <div class="sub" style="color:var(--accent); margin-bottom:10px;">Data Ayah</div>
+          <label class="label">Nama Lengkap <span style="color:var(--danger)">*</span></label><input class="input" name="ayah_nama" value="<%= (data && data.ayah_nama) || '' %>" required onblur="toTitle(this)">
+          <label class="label mt">Nomor HP</label><input class="input" name="ayah_hp" value="<%= (data && data.ayah_hp) || '' %>" pattern="^08[0-9]{7,13}$">
+        </div>
+
+        <div class="col-6 smooth-box">
+          <div class="sub" style="color:var(--accent); margin-bottom:10px;">Data Ibu</div>
+          <label class="label">Nama Lengkap <span style="color:var(--danger)">*</span></label><input class="input" name="ibu_nama" value="<%= (data && data.ibu_nama) || '' %>" required onblur="toTitle(this)">
+          <label class="label mt">Nomor HP</label><input class="input" name="ibu_hp" value="<%= (data && data.ibu_hp) || '' %>" pattern="^08[0-9]{7,13}$">
+        </div>
+
+        <div class="col-12"><div class="divider"></div></div>
+
+        <div class="col-12"><h3 class="sec-title">Dokumen Pendukung</h3></div>
+        <div class="col-12" style="margin-bottom:12px;">
+           <div style="background:var(--bg); border:1px dashed var(--border); padding:12px; border-radius:4px; font-size:0.9rem; color:var(--text); display:flex; gap:10px; align-items:center;">
+               <svg style="width:20px;height:20px;color:var(--accent);" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+               <span>Wajib upload <strong>salah satu</strong>: Kartu Keluarga (KK) <u>ATAU</u> KTP.</span>
+           </div>
+        </div>
+
+        <div class="col-6">
+          <label class="label">Kartu Keluarga (KK)</label>
+          <% if (data && data.kk_path) { %>
+            <div style="margin-bottom:10px; padding:12px; background:var(--input-bg); border:1px solid var(--input-border); border-radius:4px;">
+              <div style="display:flex; align-items:center; gap:8px; font-size:0.85rem;">
+                <svg style="width:16px;height:16px; color:var(--accent);" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span style="color:var(--text);">KK sudah diupload</span>
+                <a href="<%= data.kk_path %>" target="_blank" style="color:var(--accent); margin-left:auto;">Lihat</a>
               </div>
-           <% } %>
-           <input type="file" class="file id-doc" name="sertifikat" accept=".jpg,.jpeg,.png,.pdf">
-           <input type="hidden" name="old_sertifikat" value="<%= (data && data.sertifikat_path) ? data.sertifikat_path : '' %>">
+            </div>
+          <% } %>
+          <input type="file" class="file id-doc" name="kk" accept=".jpg,.jpeg,.png">
+          <input type="hidden" name="old_kk" value="<%= (data && data.kk_path) ? data.kk_path : '' %>">
+        </div>
+
+        <div class="col-6">
+          <label class="label">KTP</label>
+          <% if (data && data.ktp_path) { %>
+            <div style="margin-bottom:10px; padding:12px; background:var(--input-bg); border:1px solid var(--input-border); border-radius:4px;">
+              <div style="display:flex; align-items:center; gap:8px; font-size:0.85rem;">
+                <svg style="width:16px;height:16px; color:var(--accent);" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span style="color:var(--text);">KTP sudah diupload</span>
+                <a href="<%= data.ktp_path %>" target="_blank" style="color:var(--accent); margin-left:auto;">Lihat</a>
+              </div>
+            </div>
+          <% } %>
+          <input type="file" class="file id-doc" name="ktp" accept=".jpg,.jpeg,.png">
+          <input type="hidden" name="old_ktp" value="<%= (data && data.ktp_path) ? data.ktp_path : '' %>">
+        </div>
+
+        <div class="col-12"><div class="divider"></div></div>
+
+        <div class="col-12"><h3 class="sec-title">Upload Foto</h3></div>
+        <div class="col-12">
+          <label class="label">Foto Formal (Maks 5MB) <span style="color:var(--danger)">*</span></label>
+          <% if(data && data.foto_path) { %>
+            <div style="margin-bottom:12px; padding:12px; background:var(--input-bg); border-radius:4px; display:flex; align-items:center; gap:14px; border:1px solid var(--input-border);">
+              <img src="<%= data.foto_path %>" style="width:56px; height:68px; object-fit:cover; border-radius:3px; background:#fff; border:1px solid var(--input-border);">
+              <div>
+                <span style="font-weight:700; font-size:0.9rem; display:block; color:var(--text)">Foto Tersimpan</span>
+                <span style="font-size:0.85rem; color:var(--muted)">Biarkan kosong jika tidak ingin mengganti.</span>
+              </div>
+            </div>
+          <% } %>
+          <input type="file" class="file" name="foto" accept=".jpg,.jpeg,.png" <%= (data && data.foto_path) ? '' : 'required' %>>
+        </div>
+
+        <div class="col-12 actions">
+          <a href="/" class="btn-ghost" style="text-decoration:none;">Batal</a>
+          <button class="btn-nav" type="submit" style="padding:12px 24px; font-size:1rem;">
+            <%= (data && data.id) ? 'Simpan Perubahan' : 'Kirim Biodata' %>
+          </button>
         </div>
       </div>
-
-      <div class="col-12"><div class="divider"></div></div>
-
-      <div class="col-12"><h3 class="sec-title">Alamat Domisili</h3></div>
-      <div class="col-6"><label class="label">Kelurahan <span style="color:var(--danger)">*</span></label><input class="input" name="kelurahan" value="<%= (data && data.kelurahan) || '' %>" required></div>
-      <div class="col-6"><label class="label">Kecamatan <span style="color:var(--danger)">*</span></label><input class="input" name="kecamatan" value="<%= (data && data.kecamatan) || '' %>" required></div>
-      <div class="col-6"><label class="label">Kota/Kabupaten <span style="color:var(--danger)">*</span></label><input class="input" name="kota_kab" value="<%= (data && data.kota_kab) || '' %>" required></div>
-      <div class="col-6"><label class="label">Provinsi <span style="color:var(--danger)">*</span></label><input class="input" name="provinsi" value="<%= (data && data.provinsi) || '' %>" required></div>
-
-      <div class="col-12"><div class="divider"></div></div>
-
-      <div class="col-12"><h3 class="sec-title">Asal Majlis Taklim</h3></div>
-
-      <div class="col-4">
-        <label class="label">Kelompok <span style="color:var(--danger)">*</span></label>
-        <input class="input" name="kelompok" value="<%= (data && data.kelompok) ? data.kelompok : user.kelompok %>" required>
-      </div>
-
-      <div class="col-4">
-        <label class="label">Desa <span style="color:var(--danger)">*</span></label>
-        <input class="input" name="desa" value="<%= (data && data.desa) ? data.desa : user.desa %>" required>
-      </div>
-
-      <div class="col-4">
-        <label class="label">Daerah <span style="color:var(--danger)">*</span></label>
-        <input class="input" name="daerah" value="<%= (data && data.daerah) ? data.daerah : user.daerah %>" required>
-      </div>
-
-      <div class="col-12">
-        <label class="label">Nomor Kyai Kelompok</label>
-        <input class="input" name="no_ki" value="<%= (data && data.no_ki) || '' %>" pattern="^08[0-9]{7,13}$">
-      </div>
-
-      <div class="col-12"><div class="divider"></div></div>
-
-      <div class="col-12"><h3 class="sec-title">Informasi Akademik</h3></div>
-      <div class="col-6"><label class="label">Kampus <span style="color:var(--danger)">*</span></label><input class="input" name="kampus" value="<%= (data && data.kampus) || '' %>" required></div>
-      <div class="col-6"><label class="label">Prodi / Jurusan <span style="color:var(--danger)">*</span></label><input class="input" name="prodi" value="<%= (data && data.prodi) || '' %>" required></div>
-      <div class="col-6">
-        <label class="label">Jenjang <span style="color:var(--danger)">*</span></label>
-        <select class="select" name="jenjang" required>
-          <option value="">— Pilih —</option>
-          <% ['S1','D4','D3','S2'].forEach(opt => { %>
-            <option value="<%= opt %>" <%= (data && data.jenjang === opt) ? 'selected' : '' %>><%= opt %></option>
-          <% }) %>
-        </select>
-      </div>
-      <div class="col-6"><label class="label">Angkatan Kuliah <span style="color:var(--danger)">*</span></label><input class="input" name="angkatan" value="<%= (data && data.angkatan) || '' %>" pattern="^[0-9]{4}$" placeholder="Contoh: 2025" required></div>
-
-      <div class="col-12"><div class="divider"></div></div>
-
-      <div class="col-12"><h3 class="sec-title">Data Orang Tua</h3></div>
-
-      <div class="col-6 smooth-box">
-        <div class="sub" style="color:var(--accent); margin-bottom:10px;">Data Ayah</div>
-        <label class="label">Nama Lengkap <span style="color:var(--danger)">*</span></label><input class="input" name="ayah_nama" value="<%= (data && data.ayah_nama) || '' %>" required onblur="toTitle(this)">
-        <label class="label mt">Nomor HP</label><input class="input" name="ayah_hp" value="<%= (data && data.ayah_hp) || '' %>" pattern="^08[0-9]{7,13}$">
-      </div>
-
-      <div class="col-6 smooth-box">
-        <div class="sub" style="color:var(--accent); margin-bottom:10px;">Data Ibu</div>
-        <label class="label">Nama Lengkap <span style="color:var(--danger)">*</span></label><input class="input" name="ibu_nama" value="<%= (data && data.ibu_nama) || '' %>" required onblur="toTitle(this)">
-        <label class="label mt">Nomor HP</label><input class="input" name="ibu_hp" value="<%= (data && data.ibu_hp) || '' %>" pattern="^08[0-9]{7,13}$">
-      </div>
-
-      <div class="col-12"><div class="divider"></div></div>
-
-      <div class="col-12"><h3 class="sec-title">Dokumen Pendukung</h3></div>
-      <div class="col-12" style="margin-bottom:12px;">
-         <div style="background:var(--bg); border:1px dashed var(--border); padding:12px; border-radius:4px; font-size:0.9rem; color:var(--text); display:flex; gap:10px; align-items:center;">
-             <svg style="width:20px;height:20px;color:var(--accent);" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-             <span>Wajib upload <strong>salah satu</strong>: Kartu Keluarga (KK) <u>ATAU</u> KTP.</span>
-         </div>
-      </div>
-
-      <div class="col-6">
-        <label class="label">Kartu Keluarga (KK)</label>
-        <% if (data && data.kk_path) { %>
-          <div style="margin-bottom:10px; padding:12px; background:var(--input-bg); border:1px solid var(--input-border); border-radius:4px;">
-            <div style="display:flex; align-items:center; gap:8px; font-size:0.85rem;">
-              <svg style="width:16px;height:16px; color:var(--accent);" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              <span style="color:var(--text);">KK sudah diupload</span>
-              <a href="<%= data.kk_path %>" target="_blank" style="color:var(--accent); margin-left:auto;">Lihat</a>
-            </div>
-          </div>
-        <% } %>
-        <input type="file" class="file id-doc" name="kk" accept=".jpg,.jpeg,.png">
-        <input type="hidden" name="old_kk" value="<%= (data && data.kk_path) ? data.kk_path : '' %>">
-      </div>
-
-      <div class="col-6">
-        <label class="label">KTP</label>
-        <% if (data && data.ktp_path) { %>
-          <div style="margin-bottom:10px; padding:12px; background:var(--input-bg); border:1px solid var(--input-border); border-radius:4px;">
-            <div style="display:flex; align-items:center; gap:8px; font-size:0.85rem;">
-              <svg style="width:16px;height:16px; color:var(--accent);" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              <span style="color:var(--text);">KTP sudah diupload</span>
-              <a href="<%= data.ktp_path %>" target="_blank" style="color:var(--accent); margin-left:auto;">Lihat</a>
-            </div>
-          </div>
-        <% } %>
-        <input type="file" class="file id-doc" name="ktp" accept=".jpg,.jpeg,.png">
-        <input type="hidden" name="old_ktp" value="<%= (data && data.ktp_path) ? data.ktp_path : '' %>">
-      </div>
-
-      <div class="col-12"><div class="divider"></div></div>
-
-      <div class="col-12"><h3 class="sec-title">Upload Foto</h3></div>
-      <div class="col-12">
-        <label class="label">Foto Formal (Maks 5MB) <span style="color:var(--danger)">*</span></label>
-        <% if(data && data.foto_path) { %>
-          <div style="margin-bottom:12px; padding:12px; background:var(--input-bg); border-radius:4px; display:flex; align-items:center; gap:14px; border:1px solid var(--input-border);">
-            <img src="<%= data.foto_path %>" style="width:56px; height:68px; object-fit:cover; border-radius:3px; background:#fff; border:1px solid var(--input-border);">
-            <div>
-              <span style="font-weight:700; font-size:0.9rem; display:block; color:var(--text)">Foto Tersimpan</span>
-              <span style="font-size:0.85rem; color:var(--muted)">Biarkan kosong jika tidak ingin mengganti.</span>
-            </div>
-          </div>
-        <% } %>
-        <input type="file" class="file" name="foto" accept=".jpg,.jpeg,.png" <%= (data && data.foto_path) ? '' : 'required' %>>
-      </div>
-
-      <div class="col-12 actions">
-        <a href="/" class="btn-ghost" style="text-decoration:none;">Batal</a>
-        <button class="btn-nav" type="submit" style="padding:12px 24px; font-size:1rem;">
-          <%= (data && data.id) ? 'Simpan Perubahan' : 'Kirim Biodata' %>
-        </button>
-      </div>
-    </div>
-  </form>
+    </form>
+  </div>
 </main>
 
 <button id="themeFab" class="theme-fab" aria-label="Ganti tema" title="Ganti tema"></button>

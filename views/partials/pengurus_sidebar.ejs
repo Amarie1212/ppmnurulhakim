@@ -53,10 +53,20 @@
     <a class="admin-dd-item <%= currentPage === 'santri' ? 'active' : '' %>" href="/pengurus">Data Santri</a>
   <% } %>
   <% if (user.role === 'admin' || user.role === 'panitia') { %>
-    <a class="admin-dd-item <%= currentPage === 'verifikasi' ? 'active' : '' %>" href="/pengurus/verifikasi">Verifikasi Pendaftaran</a>
+    <a class="admin-dd-item <%= currentPage === 'verifikasi' ? 'active' : '' %>" href="/pengurus/verifikasi" style="display:flex; justify-content:space-between; align-items:center;">
+      Verifikasi Pendaftaran
+      <% if(stat && stat.pending > 0){ %>
+        <span style="background:var(--danger); color:white; padding:2px 8px; border-radius:10px; font-size:0.7em;"><%= stat.pending %></span>
+      <% } %>
+    </a>
   <% } %>
   <% if (user.role === 'admin' || user.role === 'keuangan') { %>
-    <a class="admin-dd-item <%= currentPage === 'verif-bayar' ? 'active' : '' %>" href="/pengurus/verifikasi-pembayaran">Verifikasi Pembayaran</a>
+    <a class="admin-dd-item <%= currentPage === 'verif-bayar' ? 'active' : '' %>" href="/pengurus/verifikasi-pembayaran" style="display:flex; justify-content:space-between; align-items:center;">
+      Verifikasi Pembayaran
+      <% if(stat && stat.pending_payment > 0){ %>
+        <span style="background:var(--danger); color:white; padding:2px 8px; border-radius:10px; font-size:0.7em;"><%= stat.pending_payment %></span>
+      <% } %>
+    </a>
   <% } %>
   <% if (user.role === 'admin' || user.role === 'keuangan') { %>
     <a class="admin-dd-item <%= currentPage === 'laporan-bayar' ? 'active' : '' %>" href="/pengurus/laporan-pembayaran">Laporan Pembayaran</a>
@@ -102,7 +112,12 @@
       </a>
     <% } %>
     <% if (user.role === 'admin' || user.role === 'keuangan') { %>
-        <a href="/pengurus/verifikasi-pembayaran" class="panel-link <%= currentPage === 'verif-bayar' ? 'active' : '' %>">Verifikasi Pembayaran</a>
+        <a href="/pengurus/verifikasi-pembayaran" class="panel-link <%= currentPage === 'verif-bayar' ? 'active' : '' %>">
+          Verifikasi Pembayaran
+          <% if(stat && stat.pending_payment > 0){ %>
+            <span style="background:var(--danger); color:white; padding:2px 8px; border-radius:10px; font-size:0.7em; margin-left:auto"><%= stat.pending_payment %></span>
+          <% } %>
+        </a>
     <% } %>
     <% if (user.role === 'admin' || user.role === 'keuangan') { %>
         <a href="/pengurus/laporan-pembayaran" class="panel-link <%= currentPage === 'laporan-bayar' ? 'active' : '' %>">Laporan Pembayaran</a>

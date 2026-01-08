@@ -36,32 +36,27 @@
 </head>
 <body class="form-page layout-form">
 
-<header class="navbar">
-  <div class="container nav-inner">
-    <div class="brand-wrap">
-      <a href="/" class="btn-back-inline" aria-label="Kembali ke Beranda" title="Kembali ke Beranda">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-      </a>
-      <div class="brand">PPM Nurul Hakim</div>
-    </div>
-  </div>
-</header>
+<%- include('partials/santri_navbar', { title: 'Formulir Biodata', backLink: '/' }) %>
 
 <main class="form-wrap">
   <div class="form-card">
-    <h2 class="form-title">Formulir Biodata Santri</h2>
-    
-    <p class="lead" style="text-align:center; margin-bottom:30px; font-size:0.95rem; line-height:1.6; color:var(--muted);">
-      Halo, <strong style="color:var(--text)"><%= user.name %></strong>!<br>
       <% if(data && data.status_biodata === 'REJECTED') { %>
-        <!-- Notification removed by user request -->
+        <div style="text-align:center; margin-bottom:24px;">
+           <span style="display:inline-block; color:#ef4444; font-weight:600; font-size:1rem; padding:8px 16px; border-radius:100px; background:rgba(239,68,68,0.08);">
+              Perbaiki: "<%= data.alasan_tolak || 'Data belum valid' %>"
+           </span>
+        </div>
       <% } else if(data && data.id) { %>
-        <span style="color:var(--accent); font-weight:600; display:inline-flex; align-items:center; gap:6px; margin-top:4px;">
-          <svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Data Anda tersimpan. Silakan edit jika ada perubahan.
-        </span>
+        <div style="text-align:center; margin-bottom:24px;">
+          <span style="color:var(--accent); font-weight:600; font-size:0.85rem; display:inline-flex; align-items:center; gap:6px; background:rgba(34,197,94,0.08); padding:6px 14px; border-radius:100px; border:1px solid rgba(34,197,94,0.15);">
+            <svg style="width:14px;height:14px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            Data Anda tersimpan. Silakan edit jika ada perubahan.
+          </span>
+        </div>
       <% } else { %>
-        <span>Silakan lengkapi data diri Anda di bawah ini dengan benar.</span>
+        <div style="text-align:center; margin-bottom:24px; color:var(--muted); font-size:0.85rem;">
+          Silakan lengkapi data diri Anda di bawah ini dengan benar.
+        </div>
       <% } %>
     </p>
 

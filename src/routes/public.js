@@ -55,6 +55,17 @@ async function refreshSantriSession(req, res, next) {
     const email = req.session.user.email;
     if (!email) return next();
     
+    // [FIX] Get fresh ACCOUNT status from tb_akun_santri
+    const akunCheck = await pool.query(
+      `SELECT status, alasan_tolak FROM tb_akun_santri WHERE email = $1 LIMIT 1`,
+      [email]
+    );
+    
+    if (akunCheck.rows.length > 0) {
+      req.session.user.status = akunCheck.rows[0].status;
+      req.session.user.alasan_tolak = akunCheck.rows[0].alasan_tolak;
+    }
+    
     // Get fresh biodata status
     const santriCheck = await pool.query(
       `SELECT id, status_biodata, alasan_tolak FROM tb_santri WHERE email = $1 LIMIT 1`,
@@ -85,10 +96,16 @@ async function refreshSantriSession(req, res, next) {
         
         if (!req.session.user.paymentPending) {
            const rejectedCheck = await pool.query(
-             `SELECT id FROM tb_pembayaran WHERE santri_id = $1 AND status = 'REJECTED' LIMIT 1`,
+             `SELECT id, alasan_tolak FROM tb_pembayaran WHERE santri_id = $1 AND status = 'REJECTED' ORDER BY created_at DESC LIMIT 1`,
              [santriId]
            );
-           req.session.user.paymentRejected = rejectedCheck.rows.length > 0;
+           if (rejectedCheck.rows.length > 0) {
+              req.session.user.paymentRejected = true;
+              req.session.user.paymentReason = rejectedCheck.rows[0].alasan_tolak;
+           } else {
+              req.session.user.paymentRejected = false;
+              req.session.user.paymentReason = null;
+           }
         }
       } else {
         req.session.user.paymentPending = false;
@@ -560,8 +577,23 @@ router.get('/api/santri-status', async (req, res) => {
       isBiodataEmpty: true,
       biodataVerified: false,
       hasPaid: false,
-      paymentPending: false
+      paymentPending: false,
+      accountStatus: 'PENDING', // [FIX] Add account status
+      accountRejectedReason: null
     };
+    
+    // [FIX] Get fresh ACCOUNT status from tb_akun_santri
+    const akunCheck = await pool.query(
+      `SELECT status, alasan_tolak FROM tb_akun_santri WHERE email = $1 LIMIT 1`,
+      [email]
+    );
+    
+    if (akunCheck.rows.length > 0) {
+      status.accountStatus = akunCheck.rows[0].status;
+      status.accountRejectedReason = akunCheck.rows[0].alasan_tolak;
+      req.session.user.status = akunCheck.rows[0].status;
+      req.session.user.alasan_tolak = akunCheck.rows[0].alasan_tolak;
+    }
     
     // Get fresh biodata status
     const santriCheck = await pool.query(
@@ -609,9 +641,81 @@ router.get('/api/santri-status', async (req, res) => {
 });
 
 /* ============================================================
+   EDIT AKUN (Untuk santri yang ditolak)
+   ============================================================ */
+// GET - Form edit data akun
+router.get('/edit-akun', requireSantriAuth, async (req, res) => {
+  // Hanya untuk akun yang REJECTED
+  const email = req.session.user.email;
+  
+  try {
+    const { rows } = await pool.query('SELECT * FROM tb_akun_santri WHERE email = $1', [email]);
+    if (rows.length === 0) {
+      return res.redirect('/');
+    }
+    
+    const akun = rows[0];
+    
+    res.render('edit_akun', {
+      title: 'Edit Data Akun',
+      user: req.session.user,
+      akun,
+      error: null,
+      success: req.query.success === '1'
+    });
+  } catch (e) {
+    console.error('[GET /edit-akun] Error:', e.message);
+    res.redirect('/');
+  }
+});
+
+// POST - Simpan perubahan dan set status ke PENDING
+router.post('/edit-akun', requireSantriAuth, async (req, res) => {
+  const email = req.session.user.email;
+  const { nama, wa, kelompok, desa, daerah } = req.body;
+  
+  try {
+    // Update data akun dan reset status ke PENDING
+    await pool.query(`
+      UPDATE tb_akun_santri 
+      SET nama = $1, wa = $2, kelompok = $3, desa = $4, daerah = $5, 
+          status = 'PENDING', alasan_tolak = NULL
+      WHERE email = $6
+    `, [toTitleCase(nama), normPhone(wa), kelompok, desa, daerah, email]);
+    
+    // Update session
+    req.session.user.name = toTitleCase(nama);
+    req.session.user.wa = normPhone(wa);
+    req.session.user.kelompok = kelompok;
+    req.session.user.desa = desa;
+    req.session.user.daerah = daerah;
+    req.session.user.status = 'PENDING';
+    req.session.user.alasan_tolak = null;
+    
+    console.log(`[Edit Akun] Akun ${email} diupdate dan status direset ke PENDING`);
+    
+    res.redirect('/?toast=akun_updated');
+  } catch (e) {
+    console.error('[POST /edit-akun] Error:', e.message);
+    res.render('edit_akun', {
+      title: 'Edit Data Akun',
+      user: req.session.user,
+      akun: req.body,
+      error: 'Gagal menyimpan perubahan. Silakan coba lagi.',
+      success: false
+    });
+  }
+});
+
+/* ============================================================
    LOGOUT
    ============================================================ */
-router.get('/logout', (req, res) => req.session.destroy(() => res.redirect('/')));
-router.post('/logout', (req, res) => req.session.destroy(() => res.redirect('/')));
+router.get('/logout', (req, res) => {
+  req.session.destroy(() => res.redirect('/'));
+});
+
+router.post('/logout', (req, res) => {
+  req.session.destroy(() => res.redirect('/'));
+});
 
 module.exports = router;

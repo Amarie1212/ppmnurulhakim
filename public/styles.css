@@ -14,7 +14,7 @@
   --border: rgba(255, 255, 255, 0.08);
   --input-bg: rgba(0, 0, 0, 0.2);
   --input-border: rgba(255, 255, 255, 0.08);
-  --nav-h: 72px;
+  --nav-h: 64px;
   --dot-color: rgba(255, 255, 255, 0.03);
   
   /* Radii & Shadows */
@@ -51,6 +51,15 @@ html, body {
   max-width: 100vw; 
   /* Ensure vertical scrollbar is always accounted for or visible */
   overflow-y: auto;
+  
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 /* --- Reveal Animations (Intersection Observer compatible) --- */
@@ -164,32 +173,82 @@ a { color: inherit; text-decoration: none; }
 }
 :root[data-theme="light"] .navbar { background: var(--bg-2); }
 
+
 .nav-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-between;  /* Kembali ke space-between */
   width: 100%; height: 100%; padding: 0 24px;
+  gap: 8px; 
 }
 @media (max-width: 768px) { 
   .nav-inner { 
-    padding: 0 16px; 
+    padding: 0 12px;
+    gap: 6px;
   } 
 }
 
-.brand-wrap { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-.brand { font-weight: 800; letter-spacing: -0.02em; font-size: 1.15rem; }
+.brand-wrap { 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+  flex-shrink: 0;
+  min-width: fit-content;
+}
+.brand-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  object-fit: contain;
+  background: white;
+  padding: 2px;
+}
+.brand { 
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 700; 
+  font-size: 1rem;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+@media (max-width: 768px) {
+  .brand-wrap {
+    gap: 8px;
+  }
+  .brand-logo {
+    width: 28px;
+    height: 28px;
+  }
+  .brand {
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+}
 
 .menu {
-  display: flex; align-items: center; gap: 32px;
-  margin-left: auto; /* Push menu to the right */
-  margin-right: 32px; /* Gap before buttons */
+  display: flex; 
+  align-items: center; 
+  gap: 24px;
+  margin-left: auto;  /* Menu rapat ke kanan */
+  margin-right: 16px;
 }
 .menu a {
-  font-weight: 600; color: var(--muted); font-size: 0.95rem; transition: 0.2s; white-space: nowrap;
+  font-weight: 600; 
+  color: var(--muted); 
+  font-size: 0.9rem; 
+  transition: 0.2s; 
+  white-space: nowrap;
 }
-.menu a:hover, .menu a.active { color: var(--accent); }
 
-.right-actions { display: flex; align-items: center; gap: 12px; justify-content: flex-end; }
+.menu a:hover, .menu a.active { 
+  color: var(--accent); 
+}
+
+.right-actions { 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+  justify-content: flex-end;
+}
 
 
 /* Tombol Khusus Mobile (Hidden di Desktop) */
@@ -199,26 +258,50 @@ a { color: inherit; text-decoration: none; }
 
 /* CTA Button (Daftar) */
 .cta-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  color: var(--accent); font-weight: 700;
-  padding: 8px 16px; border-radius: 50px;
-  background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.2);
+  display: inline-flex; 
+  align-items: center; 
+  gap: 6px;
+  color: #000; 
+  font-weight: 700;
+  padding: 10px 20px; 
+  border-radius: 8px;
+  background: var(--accent);
+  border: 1px solid var(--accent);
   transition: all 0.2s;
 }
-.cta-btn:hover { background: var(--accent); color: #fff; }
-.cta-btn svg { width: 18px; height: 18px; stroke-width: 2.5; }
+.cta-btn:hover { 
+  background: var(--accent-hover); 
+  border-color: var(--accent-hover);
+  filter: brightness(0.95);
+}
+.cta-btn svg { 
+  width: 16px; 
+  height: 16px; 
+  stroke-width: 2.5; 
+}
 
-/* Login Button / Admin Panel Button */
+/* Login Button / Auth Button */
 .btn-nav {
-  background: transparent; color: var(--text); font-weight: 700;
-  padding: 8px 16px; border-radius: 50px;
-  border: 1px solid var(--border); cursor: pointer;
-  display: inline-flex; align-items: center; gap: 8px;
+  background: transparent; 
+  color: var(--accent); 
+  font-weight: 700;
+  padding: 10px 20px; 
+  border-radius: 8px;
+  border: 1px solid var(--accent); 
+  cursor: pointer;
+  display: inline-flex; 
+  align-items: center; 
+  gap: 8px;
   transition: .2s;
 }
-.btn-nav:hover { background: rgba(125,125,125,0.08); border-color: var(--muted); }
-.btn-nav svg { width: 18px; height: 18px; }
+.btn-nav:hover { 
+  background: rgba(34, 197, 94, 0.1);
+  border-color: var(--accent); 
+}
+.btn-nav svg { 
+  width: 16px; 
+  height: 16px; 
+}
 
 /* Standard Back Button (Global) */
 .btn-back-inline {
@@ -246,24 +329,50 @@ a { color: inherit; text-decoration: none; }
 /* 3. NAV TOGGLE / HAMBURGER                 */
 /* ========================================= */
 .nav-toggle {
-  display: flex; /* Visible for logged-in panel toggles */
-  flex-direction: column; justify-content: center; align-items: center; gap: 5px;
-  width: 42px; height: 42px;
+  display: none;
+  flex-direction: column; 
+  justify-content: center; 
+  align-items: center; 
+  gap: 5px;
+  width: 40px; 
+  height: 40px;
   background: transparent;
   border: 1px solid var(--border);
-  border-radius: 50%;
-  cursor: pointer; padding: 0;
+  border-radius: 8px;
+  cursor: pointer; 
+  padding: 0;
   color: var(--text);
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-@media (min-width: 769px) {
-  /* Guest experience: no hamburger on desktop if not logged in */
-  .navbar:not(.logged-in) .nav-toggle { display: none; }
+
+/* Mobile only - selalu tampil di mobile */
+.nav-toggle.mobile-only {
+  display: flex !important;
 }
-.nav-toggle:hover { background: rgba(125,125,125,0.08); transform: scale(1.05); }
+
+/* Logged-in user buttons (santri, pengurus) - always visible */
+#santriToggle,
+#pengurusToggle {
+  display: flex !important;
+}
+
+@media (min-width: 769px) {
+  /* Desktop: hamburger button hidden jika tidak logged in */
+  .navbar:not(.logged-in) .nav-toggle.mobile-only { 
+    display: none !important; 
+  }
+}
+
+.nav-toggle:hover { 
+  background: rgba(125,125,125,0.08); 
+  transform: scale(1.05); 
+}
 
 .nav-toggle .bar {
-  width: 18px; height: 2px; background-color: currentColor; border-radius: 2px;
+  width: 18px; 
+  height: 2px; 
+  background-color: currentColor; 
+  border-radius: 2px;
   transition: transform 0.3s, opacity 0.3s;
 }
 
@@ -274,9 +383,17 @@ a { color: inherit; text-decoration: none; }
   color: var(--accent);
   transform: rotate(90deg);
 }
-.nav-toggle.active .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); width: 20px; }
-.nav-toggle.active .bar:nth-child(2) { opacity: 0; }
-.nav-toggle.active .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); width: 20px; }
+.nav-toggle.active .bar:nth-child(1) { 
+  transform: translateY(7px) rotate(45deg); 
+  width: 20px; 
+}
+.nav-toggle.active .bar:nth-child(2) { 
+  opacity: 0; 
+}
+.nav-toggle.active .bar:nth-child(3) { 
+  transform: translateY(-7px) rotate(-45deg); 
+  width: 20px; 
+}
 
 /* Dot Button (Admin Mobile) */
 .icon-btn.dots {
@@ -464,84 +581,101 @@ a { color: inherit; text-decoration: none; }
 /* ========================================= */
 @media (max-width: 768px) {
   :root { --nav-h: 64px; }
-  .nav-inner { padding: 0 16px; }
+  .nav-inner { 
+    padding: 0 12px;
+    gap: 8px !important;
+  }
   
   /* 1. SEMBUNYIKAN MENU TENGAH (Beranda, Profil, dll) */
-  .menu { display: none; }
+  .menu { 
+    display: none !important; 
+    margin: 0 !important;
+  }
 
   /* 2. SEMBUNYIKAN TOMBOL LOGIN/DAFTAR DI HEADER */
-  /* Agar header bersih, tombol ini pindah ke dalam menu hamburger */
-  .right-actions .cta-btn, 
-  .right-actions .btn-nav {
+  .right-actions .desktop-only {
     display: none !important; 
   }
   
-  /* 3. MUNCULKAN HAMBURGER MENU */
-  .nav-toggle { display: flex !important; } 
-  .nav-toggle.desktop-only { display: none !important; }
+  /* 3. MUNCULKAN HAMBURGER MENU MOBILE */
+  .nav-toggle.mobile-only { 
+    display: flex !important; 
+  }
   
-  /* --- STYLING MOBILE MENU (DRAWER) --- */
-  .mobile-menu {
-    display: flex !important; flex-direction: column;
-    position: fixed; top: var(--nav-h); left: 0; right: 0;
-    background: var(--bg-2); /* Solid Background */
+  /* --- MOBILE DROPDOWN (FULL WIDTH) --- */
+  .header-dropdown {
+    position: fixed;
+    top: var(--nav-h);
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: calc(100vh - var(--nav-h));
+    border-radius: 0;
+    background: var(--bg-2);
     border-bottom: 1px solid var(--border);
-    padding: 16px 20px; gap: 8px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    z-index: 999;
+    overflow-y: auto;
+    z-index: 1000;
     
-    transform: translateY(-20px);
-    opacity: 0; visibility: hidden;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: top center;
+    transform: scale(0.97) translateY(-8px);
+    opacity: 0;
+    transition: transform .2s ease-out, opacity .15s ease;
   }
-  .mobile-menu.open { 
-    transform: translateY(0); 
-    opacity: 1; visibility: visible;
+  .header-dropdown.open {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    animation: dropdownPop .2s ease-out;
+  }
+  @keyframes dropdownPop {
+    0% { transform: scale(0.97) translateY(-8px); opacity: 0; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
   }
 
-  /* Link Menu Biasa di Mobile */
-  .mobile-menu a:not(.mobile-btn) {
-    padding: 12px 0;
+  .header-dd-header { 
+    background: var(--bg-2); 
+    padding: 12px 20px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
     border-bottom: 1px solid var(--border);
-    color: var(--text);
-    font-weight: 600;
-    text-decoration: none;
-  }
-
-  /* --- PERBAIKAN TOMBOL MASUK & DAFTAR DI DALAM MENU MOBILE --- */
-  .mobile-auth-buttons {
-    display: grid; 
-    grid-template-columns: 1fr 1fr; /* Sebelahan 50:50 */
-    gap: 12px;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-  }
-
-  /* Tombol Masuk (Outline) */
-  .mobile-btn-login {
-    display: flex; align-items: center; justify-content: center;
-    padding: 12px; border-radius: var(--radius-md);
-    border: 1px solid var(--border);
-    background: transparent; color: var(--text);
-    font-weight: 700; text-decoration: none;
   }
   
-  /* Tombol Daftar (Solid Hijau) */
-  .mobile-btn-register {
-    display: flex; align-items: center; justify-content: center;
-    padding: 12px; border-radius: var(--radius-md);
-    background: var(--accent); color: #08110a; /* Teks Gelap biar kontras */
-    font-weight: 800; text-decoration: none;
-    border: none;
+  .header-dd-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-2);
+    transition: background 0.2s;
+  }
+  .header-dd-item:hover { background: var(--bg-3); }
+  .header-dd-item.danger { color: #ef4444; }
+  
+  .header-dd-divider { height: 1px; background: var(--border); margin: 0; }
+
+  .header-dd-scrim {
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+  .header-dd-scrim.open {
+    opacity: 1;
+    visibility: visible;
   }
 
   /* Panel Desktop Hilang */
   .panel-pengurus { display: none !important; } 
   .desk-pengurus-toggle { display: none !important; }
-  .admin-toggle-mobile { display: inline-flex !important; }
   
-  .admin-dd { display: block; } 
+  .admin-dd { display: none !important; } 
   .hero { height: 60vh; }
   
   /* Responsive sizes for mobile */
@@ -572,12 +706,75 @@ a { color: inherit; text-decoration: none; }
 @media (min-width: 769px) {
   .mobile-menu, .nav-toggle[id="btnMobileMenu"] { display: none !important; }
   .admin-toggle-mobile { display: none !important; }
+  .mobile-popup { display: none !important; }
   
   /* Di Desktop: Tombol Header Muncul */
   .right-actions .cta-btn, 
   .right-actions .btn-nav { display: inline-flex !important; }
+  
+  /* Desktop: Logged-in user buttons HARUS visible */
+  #santriToggle,
+  #pengurusToggle { display: flex !important; }
 
   .admin-dd { display: none !important; } 
   .admin-dd-scrim { display: none !important; }
   .panel-pengurus { display: flex !important; }
+}
+
+/* --- Pengurus Mobile Dropdown (Unified) --- */
+#mobileDropdown {
+  display: none;
+  position: fixed; 
+  top: 70px; /* Fixed height fallback */
+  top: calc(var(--nav-h, 70px) + 10px); 
+  right: 16px; 
+  z-index: 9999 !important; /* Force on top */
+  width: 280px;
+  background: var(--bg-2);
+  border: 1px solid var(--border); 
+  border-radius: 16px; 
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  transform-origin: top right; 
+  transform: scale(0.9) translateY(-10px); 
+  opacity: 0;
+  transition: transform .2s cubic-bezier(0.16, 1, 0.3, 1), opacity .2s;
+}
+
+#mobileDropdown.open {
+  display: block !important;
+  transform: scale(1) translateY(0); 
+  opacity: 1;
+  animation: dropdownPopIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes dropdownPopIn {
+  0% { transform: scale(0.85) translateY(-10px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+#mobileScrim {
+  display: none;
+  position: fixed; 
+  inset: 0; 
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9998 !important;
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+#mobileScrim.open {
+  display: block !important;
+  opacity: 1;
+}
+
+/* Nav Toggle Active State (X Animation) */
+.nav-toggle.active .bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.nav-toggle.active .bar:nth-child(2) {
+  opacity: 0;
+}
+.nav-toggle.active .bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
 }

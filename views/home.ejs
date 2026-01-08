@@ -22,16 +22,8 @@
 
   <style>
     /* ========================================= */
-    /* 0. BRAND LOGO IN NAVBAR                   */
+    /* 0. HOME PAGE SPECIFIC STYLES              */
     /* ========================================= */
-    .brand-logo {
-      width: 36px;
-      height: 36px;
-      border-radius: 4px;
-      object-fit: contain;
-      background: white;
-      padding: 2px;
-    }
     
     /* Agenda Tab active state mapping */
     .agenda-tab.active {
@@ -266,6 +258,51 @@
       .brand-arrow { display: none; }
       .brand-dropdown { display: none; }
     }
+    /* Header Dropdown - Full Width attached to header */
+    .header-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      z-index: 1000;
+      max-height: calc(100vh - var(--nav-h));
+      overflow-y: auto;
+      
+      transform-origin: top;
+      transform: translateY(-10px);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .header-dropdown.open {
+      transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
+    }
+    .header-dd-header { background: var(--bg-2); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .header-dd-item {
+      display: flex;
+      align-items: center;
+      padding: 14px 20px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+    .header-dd-item:hover { background: var(--bg-2); }
+    .header-dd-item.danger { color: #ef4444; }
+    .header-dd-divider { height: 1px; background: var(--border); margin: 0; }
+    
+    .header-dd-scrim { position: fixed; inset: 0; background: rgba(0,0,0,0.2); z-index: 999; }
+    
+    /* Animation for Brand Arrow */
+    #brandToggle.active .brand-arrow { transform: rotate(180deg); }
+    .brand-arrow { transition: transform 0.2s; }
   </style>
 </head>
 <body>
@@ -281,18 +318,20 @@
       </svg>
     </div>
     
-    <!-- Mobile Brand Dropdown -->
-    <nav id="brandDropdown" class="brand-dropdown">
-      <a href="#beranda">Beranda</a>
-      <a href="#profil">Profil</a>
-      <a href="#target-santri">Target Santri</a>
-      <a href="#agenda">Agenda Rutin</a>
-      <a href="#fasilitas">Fasilitas</a>
-      <a href="#galeri">Galeri</a>
-      <a href="#lokasi">Lokasi</a>
-      <a href="#about">Alur Pendaftaran</a>
-      <a href="#biaya">Manajemen Administrasi</a>
-      <a href="#kontak">Kontak</a>
+    <!-- Mobile Brand Dropdown (Full Width Dropdown) -->
+    <nav id="brandDropdown" class="header-dropdown" hidden>
+      <div class="header-dropdown-content">
+        <a href="#beranda" class="header-dd-item">Beranda</a>
+        <a href="#profil" class="header-dd-item">Profil</a>
+        <a href="#target-santri" class="header-dd-item">Target Santri</a>
+        <a href="#agenda" class="header-dd-item">Agenda Rutin</a>
+        <a href="#fasilitas" class="header-dd-item">Fasilitas</a>
+        <a href="#galeri" class="header-dd-item">Galeri</a>
+        <a href="#lokasi" class="header-dd-item">Lokasi</a>
+        <a href="#about" class="header-dd-item">Alur Pendaftaran</a>
+        <a href="#biaya" class="header-dd-item">Manajemen Administrasi</a>
+        <a href="#kontak" class="header-dd-item">Kontak</a>
+      </div>
     </nav>
 
     <nav class="menu">
@@ -318,22 +357,15 @@
       <a href="#kontak">Kontak</a>
     </nav>
 
-    <div class="right-actions">
       
       <% if (!user) { %>
-        <!-- Desktop: Auth Buttons -->
-        <div class="desktop-only" style="display: flex; gap: 8px; align-items: center;">
-          <button onclick="openLogin()" class="btn-nav">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-            Masuk
-          </button>
-          <a href="/register" class="cta-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-            Daftar
-          </a>
+        <!-- Desktop: Login & Register Buttons -->
+        <div class="desktop-only" style="display: flex; gap: 12px; align-items: center;">
+          <button onclick="openLogin()" class="btn-nav">Masuk</button>
+          <a href="/register" class="cta-btn">Daftar</a>
         </div>
         
-        <!-- Mobile: Hamburger Menu (Restored) -->
+        <!-- Mobile: Hamburger Menu Button -->
         <button class="nav-toggle mobile-only" id="btnMobileMenu">
           <div class="bar"></div><div class="bar"></div><div class="bar"></div>
         </button>
@@ -468,86 +500,289 @@
   </style>
 <% } %>
 
-<!-- Guest Mobile Menu (Restored & Fixed) -->
-<nav id="mobile-menu" class="admin-dd" hidden>
-  <% if (!user) { %>
-    <div class="admin-dd-head">
-      <div class="admin-dd-title">Selamat Datang</div>
-      <div class="admin-dd-sub">Silakan masuk atau daftar</div>
-    </div>
-    
-    <button onclick="openLogin()" class="admin-dd-item" style="width:100%; justify-content: flex-start; gap: 12px; cursor: pointer; background: transparent; border: none; border-bottom: 1px solid var(--border); text-align: left;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-      Masuk
-    </button>
-    
-    <a href="/register" class="admin-dd-item" style="justify-content: flex-start; gap: 12px; color: var(--accent); font-weight: 700; border-bottom: none;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+<!-- Guest Mobile Popup (Login & Register Only) -->
+<% if (!user) { %>
+<style>
+  /* Guest Mobile Popup - Small top-right */
+  #guestMobileMenu {
+    display: none;
+    position: fixed;
+    top: calc(var(--nav-h) + 10px);
+    right: 16px;
+    z-index: 2005;
+    width: 280px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    transform-origin: top right;
+    transform: scale(0.85);
+    opacity: 0;
+    transition: transform .25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity .2s;
+  }
+  #guestMobileMenu.open {
+    display: block;
+    transform: scale(1);
+    opacity: 1;
+    animation: guestPopIn .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes guestPopIn {
+    0% { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  /* Tighter padding for guest popup */
+  #guestMobileMenu .admin-dd-head {
+    padding: 14px 16px;
+  }
+  #guestMobileScrim {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2004;
+    opacity: 0;
+    transition: opacity .2s;
+  }
+  #guestMobileScrim.open {
+    display: block;
+    opacity: 1;
+  }
+</style>
+
+<div id="guestMobileMenu">
+  <div class="admin-dd-head">
+    <div class="admin-dd-title">Selamat Datang</div>
+  </div>
+  
+  <div style="padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+    <a href="/register" class="btn btn-primary" style="justify-content: center; font-weight:500;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="8.5" cy="7" r="4"/>
+        <line x1="20" y1="8" x2="20" y2="14"/>
+        <line x1="23" y1="11" x2="17" y2="11"/>
+      </svg>
       Daftar Sekarang
     </a>
-  <% } %>
-</nav>
-<div class="admin-dd-scrim" id="mobileScrim" hidden></div>
-
-<% if (user && user.role === 'santri') { %>
-  <div id="santriDropdownMobile" class="admin-dd" hidden>
-    <div class="admin-dd-head"><div class="admin-dd-title">Menu Santri</div><div class="admin-dd-sub">Halo, <%= user.name %></div></div>
-    <div class="admin-dd-item" style="cursor: default;">
-      <span>Status Akun</span>
-      <% if(user.status === 'PENDING') { %>
-        <span style="color:#eab308; font-weight:800; font-size:0.75rem; background:rgba(234,179,8,0.1); padding:2px 8px; border-radius:3px;">Menunggu Verifikasi</span>
-      <% } else if(user.status === 'REJECTED') { %>
-        <span style="color:#ef4444; font-weight:800; font-size:0.75rem; background:rgba(239,68,68,0.1); padding:2px 8px; border-radius:3px;">Ditolak</span>
-      <% } else { %>
-        <span style="color:#22c55e; font-weight:800; font-size:0.75rem; background:rgba(34,197,94,0.1); padding:2px 8px; border-radius:3px;">Terverifikasi</span>
-      <% } %>
-    </div>
     
-    <% if(user.status !== 'PENDING' && user.status !== 'REJECTED') { %>
-      <a href="/info-santri" class="admin-dd-item">Pengumuman & Info</a>
-      <% if (user.isBiodataEmpty) { %>
-        <a href="/form" class="admin-dd-item biodata-warning">Isi Biodata (Wajib)</a>
-      <% } else if (user.biodataRejected) { %>
-        <!-- Rejection Accordion (Dropdown) -->
-        <div style="border-bottom:1px solid var(--border);">
-          <div onclick="toggleReason(this)" class="admin-dd-item" style="color:#ef4444; cursor:pointer; justify-content:space-between;">
-             <span style="font-weight:600;">Edit Biodata (Ditolak)</span>
-             <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"></polyline></svg>
-          </div>
-          <div class="reason-box" style="display:none; padding:8px 16px 12px 32px;">
-             <a href="/form" style="color:#ef4444; font-size:0.85rem; text-decoration:none;">
-               Alasan: <%= user.biodataReason || 'Mohon perbaiki data Anda.' %>
-             </a>
-          </div>
-        </div>
-      <% } else if (!user.biodataVerified) { %>
-        <a href="/form" class="admin-dd-item biodata-pending">Biodata (Sedang Diverifikasi)</a>
-      <% } else { %>
-        <a href="/form" class="admin-dd-item">Edit Biodata</a>
-      <% } %>
-    <% } %>
-
-    <% if (!user.isBiodataEmpty && user.status !== 'PENDING' && user.status !== 'REJECTED') { %>
-        <% 
-          let paymentClass = '';
-          let paymentText = 'Shodaqoh Operasional';
-          if (user.hasPaid) {
-            // Verified - no class, normal text
-          } else if (user.paymentPending) {
-            paymentClass = ' payment-pending'; // Orange
-            paymentText = 'Shodaqoh Operasional (Menunggu Verifikasi)';
-          } else {
-            paymentClass = ' payment-warning'; // Red
-            paymentText = 'Shodaqoh Operasional (Wajib)';
-          }
-        %>
-        <a href="/pembayaran" class="admin-dd-item<%= paymentClass %>"><%= paymentText %></a>
-    <% } %>
-
-    <a class="admin-dd-item danger" href="/logout">Logout</a>
+    <button onclick="openLogin(); closeGuestMenu();" class="btn btn-outline" style="justify-content: center; font-weight:500;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18">
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+        <polyline points="10 17 15 12 10 7"/>
+        <line x1="15" y1="12" x2="3" y2="12"/>
+      </svg>
+      Masuk
+    </button>
   </div>
-  <div id="santriDdScrim" class="admin-dd-scrim"></div>
+</div>
+<div id="guestMobileScrim"></div>
+<% } %>
 
+
+
+  <% if (user && user.role === 'santri') { %>
+    <style>
+      /* Santri Mobile Popup */
+      #santriMobileMenu {
+        display: none;
+        position: fixed;
+        top: calc(var(--nav-h) + 10px);
+        right: 16px;
+        z-index: 2005;
+        width: 280px;
+        background: var(--bg-2);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        transform-origin: top right;
+        transform: scale(0.85);
+        opacity: 0;
+        transition: transform .25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity .2s;
+      }
+      #santriMobileMenu.open {
+        display: block;
+        transform: scale(1);
+        opacity: 1;
+        animation: popIn .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      @keyframes popIn {
+        0% { transform: scale(0.85); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+      #santriMobileScrim {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 2004;
+        opacity: 0;
+        transition: opacity .2s;
+      }
+      #santriMobileScrim.open {
+        display: block;
+        opacity: 1;
+      }
+      /* Status badges for popup */
+      #santriMobileMenu .popup-badge {
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 6px;
+      }
+      #santriMobileMenu .popup-badge.verified {
+        color: #22c55e;
+        background: rgba(34, 197, 94, 0.15);
+      }
+      #santriMobileMenu .popup-badge.pending {
+        color: #eab308;
+        background: rgba(234, 179, 8, 0.15);
+      }
+      #santriMobileMenu .popup-badge.rejected {
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.15);
+      }
+      /* Tighter item padding */
+      #santriMobileMenu .admin-dd-item {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+      }
+      #santriMobileMenu .admin-dd-head {
+        padding: 14px 16px;
+      }
+    </style>
+
+    <div id="santriMobileMenu">
+      <div class="admin-dd-head">
+        <div class="admin-dd-title">Menu Santri</div>
+        <div class="admin-dd-sub">Halo, <%= user.name %></div>
+      </div>
+      
+      <div class="admin-dd-item" style="cursor: default; justify-content:space-between;">
+        <span>Status Akun</span>
+        <% if(user.status === 'PENDING') { %>
+          <span class="popup-badge pending">Menunggu..</span>
+        <% } else if(user.status === 'REJECTED') { %>
+          <span class="popup-badge rejected">Ditolak</span>
+        <% } else { %>
+          <span class="popup-badge verified">Terverifikasi</span>
+        <% } %>
+      </div>
+      
+      <!-- Shared CSS for Accordion -->
+      <style>
+         /* Use theme variables/rgba for background to support dark mode */
+         .reason-drawer { 
+            display: grid; 
+            grid-template-rows: 0fr; 
+            transition: grid-template-rows 0.3s ease-out; 
+            background: rgba(239, 68, 68, 0.08); 
+         }
+         .reason-drawer.open { grid-template-rows: 1fr; }
+         .reason-inner { overflow: hidden; }
+         .reason-icon { transition: transform 0.3s; }
+         .reason-trigger.open .reason-icon { transform: rotate(180deg); }
+         /* Theme aware trigger background */
+         .reason-trigger.open { background: rgba(239, 68, 68, 0.08) !important; }
+      </style>
+
+      <% if (user.status === 'REJECTED') { %>
+
+               <svg class="reason-icon" style="width:18px; height:18px; color:#ef4444;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+         </div>
+
+      <% } %>
+      
+      <% if (user.status !== 'PENDING' && user.status !== 'REJECTED') { %>
+        
+        <% if (user.biodataRejected) { %>
+           <!-- 2. BIODATA DITOLAK (Accordion) -->
+           <div onclick="this.classList.toggle('open'); this.nextElementSibling.classList.toggle('open'); event.stopPropagation();" class="admin-dd-item reason-trigger" style="cursor:pointer; justify-content:space-between; align-items:center; transition:background 0.2s;">
+              <span>Edit Biodata Lengkap</span>
+              <div style="display:flex; align-items:center; gap:8px;">
+                 <span class="popup-badge rejected">Ditolak</span>
+                 <svg class="reason-icon" style="width:18px; height:18px; color:#ef4444;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </div>
+           </div>
+           
+           <!-- Konten Alasan -->
+           <div class="reason-drawer">
+              <div class="reason-inner">
+                 <a href="/form" style="display:block; padding:16px; text-decoration:none; border-bottom:1px solid #fee2e2; transition:background .2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.1)'" onmouseout="this.style.background='transparent'">
+                    <div style="font-size:0.85rem; color:#ef4444; font-weight:600; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px;">Alasan Penolakan:</div>
+                    <div style="font-size:0.95rem; color:var(--text); line-height:1.5; font-weight:400;">"<%= user.biodataReason || 'Mohon perbaiki data.' %>"</div>
+                    <div style="margin-top:8px; font-size:0.8rem; color:#ef4444; font-weight:500; display:flex; align-items:center; gap:4px;">Klik untuk perbaiki <svg style="width:14px; height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></div>
+                 </a>
+              </div>
+           </div>
+
+        <% } else if (!user.isBiodataEmpty && !user.biodataVerified) { %>
+           <!-- 3. BIODATA PENDING -->
+           <div class="admin-dd-item" style="cursor:default; justify-content:space-between;">
+              <span>Edit Biodata Lengkap</span>
+              <span class="popup-badge pending">Menunggu..</span>
+           </div>
+
+        <% } else { %>
+          <!-- 4. MENU UTAMA -->
+          <a href="/info-santri" class="admin-dd-item">Pengumuman & Info</a>
+          
+          <% if (user.isBiodataEmpty) { %>
+            <a href="/form" class="admin-dd-item" style="color:#ef4444; font-weight:700;">Isi Biodata (Wajib)</a>
+          <% } else { %>
+            <a href="/form" class="admin-dd-item">Edit Biodata Lengkap</a>
+          <% } %>
+
+          <!-- Logic Menu Pembayaran -->
+          <% if (!user.isBiodataEmpty) { %>
+             <% if (user.paymentRejected) { %>
+                <!-- PEMBAYARAN DITOLAK (Accordion) -->
+                <div onclick="this.classList.toggle('open'); this.nextElementSibling.classList.toggle('open'); event.stopPropagation();" class="admin-dd-item reason-trigger" style="cursor:pointer; justify-content:space-between; align-items:center; transition:background 0.2s;">
+                   <span>Shodaqoh Operasional</span>
+                   <div style="display:flex; align-items:center; gap:8px;">
+                      <span class="popup-badge rejected">Ditolak</span>
+                      <svg class="reason-icon" style="width:18px; height:18px; color:#ef4444;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                   </div>
+                </div>
+                <div class="reason-drawer">
+                   <div class="reason-inner">
+                      <a href="/pembayaran" style="display:block; padding:16px; text-decoration:none; border-bottom:1px solid #fee2e2; transition:background .2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.1)'" onmouseout="this.style.background='transparent'">
+                         <div style="font-size:0.85rem; color:#ef4444; font-weight:600; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px;">Alasan Penolakan:</div>
+                         <div style="font-size:0.95rem; color:var(--text); line-height:1.5; font-weight:400;">"<%= user.paymentReason || 'Bukti pembayaran tidak valid.' %>"</div>
+                         <div style="margin-top:8px; font-size:0.8rem; color:#ef4444; font-weight:500; display:flex; align-items:center; gap:4px;">Upload ulang <svg style="width:14px; height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></div>
+                      </a>
+                   </div>
+                </div>
+
+             <% } else if (user.paymentPending) { %>
+                <!-- PEMBAYARAN PENDING -->
+                <div class="admin-dd-item" style="cursor:default; justify-content:space-between;">
+                   <span>Shodaqoh Operasional</span>
+                   <span class="popup-badge pending">Menunggu..</span>
+                </div>
+                
+             <% } else if (user.hasPaid) { %>
+                <!-- PEMBAYARAN VERIFIED (Biasa) -->
+                <a href="/pembayaran" class="admin-dd-item">Shodaqoh Operasional</a>
+                
+             <% } else { %>
+                <!-- BELUM BAYAR (Wajib Merah) -->
+                <a href="/pembayaran" class="admin-dd-item" style="color:#ef4444; font-weight:700;">Shodaqoh Operasional (Wajib)</a>
+             <% } %>
+          <% } %>
+
+        <% } %>
+      <% } %>
+
+      <div class="header-dd-divider"></div>
+      <a class="admin-dd-item danger" href="/logout">Logout</a>
+    </div>
+    <div id="santriMobileScrim"></div>
+  <% } %>
+
+  <% if (user && user.role === 'santri') { %>
   <aside id="panelSantri" class="panel-pengurus" hidden>
     <div class="panel-head"><div><div class="panel-title">Menu Santri</div><div class="panel-sub">Halo, <%= user.name %></div></div><button class="panel-close" id="closePanelSantri">×</button></div>
     <nav class="panel-body">
@@ -565,10 +800,16 @@
         </div>
 
         <% if(user.status === 'REJECTED') { %>
-          <div style="display:block; text-align:center; padding:16px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.4); border-radius:4px; margin-top:12px;">
-            <strong style="display:block; color:#ef4444; font-size:0.95rem; margin-bottom:6px;">Akun Ditolak</strong>
-            <span style="display:block; font-size:0.85rem; color:#ef4444; opacity:0.9; line-height:1.4;"><%= user.alasan_tolak || "Hubungi pengurus untuk info lebih lanjut." %></span>
-            <div style="margin-top:8px; font-size:0.75rem; color:#ef4444; text-decoration:underline;">Harap Hubungi Admin</div>
+          <div style="border-bottom:1px solid var(--border);">
+            <div class="panel-link" onclick="toggleReason(this)" style="justify-content:space-between; color:#ef4444; cursor:pointer;">
+              <span>Edit Data Akun (Ditolak)</span>
+              <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div class="reason-box" style="display:none;">
+               <a href="/edit-akun" class="panel-link" style="font-size:0.85rem; color:#ef4444; padding-left:36px;">
+                  Alasan: <%= user.alasan_tolak || 'Mohon perbaiki data Anda.' %>
+               </a>
+            </div>
           </div>
         <% } %>
       </div>
@@ -621,45 +862,109 @@
 
 
 <% if (user && ['admin', 'keuangan', 'ketua', 'panitia'].includes(user.role)) { %>
-  
-  <div id="adminDropdownMobile" class="admin-dd" hidden>
-    <div class="admin-dd-head"><div class="admin-dd-title"><%= user.role.toUpperCase() %></div><div class="admin-dd-sub">Halo, <%= user.name %></div></div>
+  <style>
+    /* Pengurus Mobile Popup */
+    #pengurusMobileMenu {
+      display: none;
+      position: fixed;
+      top: calc(var(--nav-h) + 10px);
+      right: 16px;
+      z-index: 2005;
+      width: 280px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      max-height: calc(100vh - var(--nav-h) - 30px);
+      overflow-y: auto;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      transform-origin: top right;
+      transform: scale(0.85);
+      opacity: 0;
+      transition: transform .25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity .2s;
+    }
+    #pengurusMobileMenu.open {
+      display: block;
+      transform: scale(1);
+      opacity: 1;
+      animation: popInPengurus .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes popInPengurus {
+      0% { transform: scale(0.85); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    #pengurusMobileScrim {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2004;
+      opacity: 0;
+      transition: opacity .2s;
+    }
+    #pengurusMobileScrim.open {
+      display: block;
+      opacity: 1;
+    }
+    /* Tighter item padding */
+    #pengurusMobileMenu .admin-dd-item {
+      padding: 10px 16px;
+      font-size: 0.9rem;
+    }
+    #pengurusMobileMenu .admin-dd-head {
+      padding: 14px 16px;
+    }
+  </style>
+
+  <div id="pengurusMobileMenu">
+    <div class="admin-dd-head">
+      <div class="admin-dd-title">Menu Pengurus</div>
+      <div class="admin-dd-sub">Halo, <%= user.name %> (<%= user.role.toUpperCase() %>)</div>
+    </div>
     
-    <a class="admin-dd-item" href="/pengurus/home">Beranda Admin</a>
-    <a class="admin-dd-item" href="/">Halaman Utama</a>
-    <div style="height:1px; background:var(--border); margin:4px 0;"></div>
+    <a href="/pengurus/home" class="admin-dd-item">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Beranda Admin
+      </div>
+    </a>
+    <a href="/" class="admin-dd-item">
+       <div style="display:flex; align-items:center; gap:10px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Lihat Website
+       </div>
+       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="opacity:0.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+    </a>
     
+    <% if (user.role !== 'keuangan') { %>
+      <a href="/pengurus" class="admin-dd-item">Data Santri</a>
+    <% } %>
+    
+    <% if (user.role === 'admin' || user.role === 'panitia') { %>
+      <a href="/pengurus/verifikasi" class="admin-dd-item">Verifikasi Pendaftaran</a>
+    <% } %>
+    
+    <% if (user.role === 'admin' || user.role === 'keuangan') { %>
+      <a href="/pengurus/verifikasi-pembayaran" class="admin-dd-item">Verifikasi Pembayaran</a>
+      <a href="/pengurus/laporan-pembayaran" class="admin-dd-item">Laporan Pembayaran</a>
+    <% } %>
+    
+    <% if (user.role === 'admin' || user.role === 'ketua') { %>
+      <a href="/pengurus/laporan-masuk" class="admin-dd-item">Laporan Pembayaran Masuk</a>
+    <% } %>
+
     <% if (user.role === 'admin') { %>
-        <a class="admin-dd-item" href="/pengurus">Data Santri</a>
-        <a class="admin-dd-item" href="/pengurus/verifikasi">Verifikasi Pendaftaran</a>
-        <a class="admin-dd-item" href="/pengurus/verifikasi-pembayaran">Verifikasi Pembayaran</a>
-        <a class="admin-dd-item" href="/pengurus/laporan-pembayaran">Laporan Pembayaran</a>
-        <a class="admin-dd-item" href="/pengurus/laporan-masuk">Laporan Pembayaran Masuk</a>
-
-        <a class="admin-dd-item" href="/pengurus/kelola-akun">Kelola Akun Pengurus</a>
-        <a class="admin-dd-item" href="/pengurus/kelola-pengumuman">Kelola Pengumuman</a>
+      <a href="/pengurus/kelola-akun" class="admin-dd-item">Kelola Akun Pengurus</a>
     <% } %>
-
-    <% if (user.role === 'panitia') { %>
-        <a class="admin-dd-item" href="/pengurus">Data Santri</a>
-        <a class="admin-dd-item" href="/pengurus/verifikasi">Verifikasi Pendaftaran</a>
-        <a class="admin-dd-item" href="/pengurus/kelola-pengumuman">Kelola Pengumuman</a>
+    
+    <% if (user.role === 'admin' || user.role === 'panitia') { %>
+      <a href="/pengurus/kelola-pengumuman" class="admin-dd-item">Kelola Pengumuman</a>
     <% } %>
-
-    <% if (user.role === 'keuangan') { %>
-        <a class="admin-dd-item" href="/pengurus/verifikasi-pembayaran">Verifikasi Pembayaran</a>
-        <a class="admin-dd-item" href="/pengurus/laporan-pembayaran">Laporan Pembayaran</a>
-    <% } %>
-
-    <% if (user.role === 'ketua') { %>
-        <a class="admin-dd-item" href="/pengurus">Data Santri</a>
-        <a class="admin-dd-item" href="/pengurus/laporan-masuk">Laporan Pembayaran Masuk</a>
-
-    <% } %>
-
+    
+    <div class="header-dd-divider"></div>
     <a class="admin-dd-item danger" href="/logout">Logout</a>
   </div>
-  <div id="adminDdScrim" class="admin-dd-scrim" hidden></div>
+  <div id="pengurusMobileScrim"></div>
 
   <aside id="panelPengurus" class="panel-pengurus" hidden>
     <div class="panel-head"><div><div class="panel-title"><%= user.role.toUpperCase() %></div><div class="panel-sub">Halo, <%= user.name %></div></div><button class="panel-close" id="closePanelPengurus">×</button></div>
@@ -1410,7 +1715,7 @@
   if(loginModal) loginModal.addEventListener('click', e => { if(e.target === loginModal) closeLogin(); });
 
   /* --- 2. LOGIC MOBILE MENU (GUEST) --- */
-  setupUnifiedMenu('btnMobileMenu', 'mobile-menu', 'mobileScrim', null, null, null);
+  // Dipanggil setelah function definition di bawah
 
   /* --- 3. Logic Unified Menu (Santri & Pengurus) --- */
   function setupUnifiedMenu(btnId, popupId, popupScrimId, sidebarId, sidebarScrimId, sidebarCloseId) {
@@ -1423,17 +1728,10 @@
 
     if(!btn) return;
 
-    let scrollPosition = 0;
-
     function openAll() {
-      // Simple scroll lock - just hide overflow
       document.body.style.overflow = 'hidden';
-      
       btn.classList.add('active'); 
       btn.setAttribute('aria-expanded', 'true');
-      // Ensure button is above scrim
-      btn.style.zIndex = '1200';
-      btn.style.position = 'relative';
 
       if(popup) { 
         popup.hidden = false; 
@@ -1456,7 +1754,6 @@
     function closeAll() {
       btn.classList.remove('active'); 
       btn.setAttribute('aria-expanded', 'false');
-      btn.style.zIndex = ''; // Reset z-index
 
       if(popup) { 
         popup.classList.remove('open'); 
@@ -1469,7 +1766,6 @@
         setTimeout(() => { sidebar.hidden = true; sidebarScrim.hidden = true; }, 300); 
       }
       
-      // Simple scroll unlock
       setTimeout(() => {
         document.body.style.overflow = '';
       }, 300);
@@ -1486,7 +1782,6 @@
     if(sidebarScrim) sidebarScrim.addEventListener('click', closeAll);
     if(sidebarClose) sidebarClose.addEventListener('click', closeAll);
     
-    // Auto-close when clicking any link/button inside the popup (IMPORTANT FOR USER EXPERIENCE)
     if(popup) {
         popup.querySelectorAll('a, button').forEach(el => {
             el.addEventListener('click', closeAll);
@@ -1494,8 +1789,194 @@
     }
   }
 
-  setupUnifiedMenu('santriToggle', 'santriDropdownMobile', 'santriDdScrim', 'panelSantri', 'panelSantriScrim', 'closePanelSantri');
-  setupUnifiedMenu('pengurusToggle', 'adminDropdownMobile', 'adminDdScrim', 'panelPengurus', 'panelPengurusScrim', 'closePanelPengurus');
+  // Guest Mobile Menu Toggle (Simple approach like pengurus_sidebar.ejs)
+  const guestMenuBtn = document.getElementById('btnMobileMenu');
+  const guestMenu = document.getElementById('guestMobileMenu');
+  const guestScrim = document.getElementById('guestMobileScrim');
+  
+  if (guestMenuBtn && guestMenu && guestScrim) {
+    function toggleGuestMenu() {
+      const isOpen = guestMenu.classList.contains('open');
+      if (isOpen) {
+        // Close
+        guestMenuBtn.classList.remove('active');
+        guestMenu.classList.remove('open');
+        guestScrim.classList.remove('open');
+      } else {
+        // Open
+        guestMenuBtn.classList.add('active');
+        guestMenu.classList.add('open');
+        guestScrim.classList.add('open');
+      }
+    }
+    
+    window.closeGuestMenu = function() {
+      guestMenuBtn.classList.remove('active');
+      guestMenu.classList.remove('open');
+      guestScrim.classList.remove('open');
+    };
+    
+    guestMenuBtn.addEventListener('click', toggleGuestMenu);
+    guestScrim.addEventListener('click', closeGuestMenu);
+    guestMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', closeGuestMenu);
+    });
+  }
+  
+  // Santri Toggle - Mobile: Popup, Desktop: Sidebar
+  const santriMenuBtn = document.getElementById('santriToggle');
+  const santriMenu = document.getElementById('santriMobileMenu');
+  const santriScrim = document.getElementById('santriMobileScrim');
+  const santriSidebar = document.getElementById('panelSantri');
+  const santriSidebarScrim = document.getElementById('panelSantriScrim');
+  const santriSidebarClose = document.getElementById('closePanelSantri');
+  
+  if (santriMenuBtn) {
+    function closeSantriPopup() {
+      santriMenuBtn.classList.remove('active');
+      if (santriMenu) santriMenu.classList.remove('open');
+      if (santriScrim) santriScrim.classList.remove('open');
+    }
+    
+    function closeSantriSidebar() {
+      santriMenuBtn.classList.remove('active');
+      if (santriSidebar) {
+        santriSidebar.classList.remove('open');
+        santriSidebarScrim.classList.remove('open');
+        setTimeout(() => { santriSidebar.hidden = true; santriSidebarScrim.hidden = true; }, 300);
+      }
+    }
+    
+    function toggleSantri() {
+      const isMobile = window.innerWidth <= 768;
+      const isOpen = santriMenuBtn.classList.contains('active');
+      
+      if (isOpen) {
+        isMobile ? closeSantriPopup() : closeSantriSidebar();
+      } else {
+        santriMenuBtn.classList.add('active');
+        if (isMobile && santriMenu) {
+          santriMenu.classList.add('open');
+          if (santriScrim) santriScrim.classList.add('open');
+        } else if (santriSidebar) {
+          santriSidebar.hidden = false;
+          santriSidebarScrim.hidden = false;
+          setTimeout(() => { santriSidebar.classList.add('open'); santriSidebarScrim.classList.add('open'); }, 10);
+        }
+      }
+    }
+    
+    window.closeSantriMenu = function() { closeSantriPopup(); closeSantriSidebar(); };
+    santriMenuBtn.addEventListener('click', toggleSantri);
+    if (santriScrim) santriScrim.addEventListener('click', closeSantriPopup);
+    if (santriSidebarScrim) santriSidebarScrim.addEventListener('click', closeSantriSidebar);
+    if (santriSidebarClose) santriSidebarClose.addEventListener('click', closeSantriSidebar);
+    if (santriMenu) santriMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', closeSantriPopup));
+  }
+  
+  // Pengurus Toggle - Mobile: Popup, Desktop: Sidebar
+  const pengurusMenuBtn = document.getElementById('pengurusToggle');
+  const pengurusMenu = document.getElementById('pengurusMobileMenu');
+  const pengurusScrim = document.getElementById('pengurusMobileScrim');
+  const pengurusSidebar = document.getElementById('panelPengurus');
+  const pengurusSidebarScrim = document.getElementById('panelPengurusScrim');
+  const pengurusSidebarClose = document.getElementById('closePanelPengurus');
+  
+  if (pengurusMenuBtn) {
+    function closePengurusPopup() {
+      pengurusMenuBtn.classList.remove('active');
+      if (pengurusMenu) pengurusMenu.classList.remove('open');
+      if (pengurusScrim) pengurusScrim.classList.remove('open');
+    }
+    
+    function closePengurusSidebar() {
+      pengurusMenuBtn.classList.remove('active');
+      if (pengurusSidebar) {
+        pengurusSidebar.classList.remove('open');
+        pengurusSidebarScrim.classList.remove('open');
+        setTimeout(() => { pengurusSidebar.hidden = true; pengurusSidebarScrim.hidden = true; }, 300);
+      }
+    }
+    
+    function togglePengurus() {
+      const isMobile = window.innerWidth <= 768;
+      const isOpen = pengurusMenuBtn.classList.contains('active');
+      
+      if (isOpen) {
+        isMobile ? closePengurusPopup() : closePengurusSidebar();
+      } else {
+        pengurusMenuBtn.classList.add('active');
+        if (isMobile && pengurusMenu) {
+          pengurusMenu.classList.add('open');
+          if (pengurusScrim) pengurusScrim.classList.add('open');
+        } else if (pengurusSidebar) {
+          pengurusSidebar.hidden = false;
+          pengurusSidebarScrim.hidden = false;
+          setTimeout(() => { pengurusSidebar.classList.add('open'); pengurusSidebarScrim.classList.add('open'); }, 10);
+        }
+      }
+    }
+    
+    window.closePengurusMenu = function() { closePengurusPopup(); closePengurusSidebar(); };
+    pengurusMenuBtn.addEventListener('click', togglePengurus);
+    if (pengurusScrim) pengurusScrim.addEventListener('click', closePengurusPopup);
+    if (pengurusSidebarScrim) pengurusSidebarScrim.addEventListener('click', closePengurusSidebar);
+    if (pengurusSidebarClose) pengurusSidebarClose.addEventListener('click', closePengurusSidebar);
+    if (pengurusMenu) pengurusMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', closePengurusPopup));
+  }
+  
+  // Brand dropdown toggle (no scrim overlay)
+  const brandToggle = document.getElementById('brandToggle');
+  const brandDropdown = document.getElementById('brandDropdown');
+  
+  if (brandToggle && brandDropdown) {
+    // Remove hidden initially and use CSS to hide
+    brandDropdown.hidden = false;
+    brandDropdown.style.display = 'none';
+    
+    function openDropdown() {
+      brandToggle.classList.add('open');
+      brandDropdown.style.display = 'block';
+      // Trigger reflow for animation
+      brandDropdown.offsetHeight;
+      brandDropdown.classList.add('open');
+    }
+    
+    function closeDropdown() {
+      brandToggle.classList.remove('open');
+      brandDropdown.classList.remove('open');
+      // Wait for animation then hide
+      setTimeout(() => {
+        if (!brandDropdown.classList.contains('open')) {
+          brandDropdown.style.display = 'none';
+        }
+      }, 250);
+    }
+    
+    function toggleBrand(e) {
+      e.stopPropagation();
+      const isOpen = brandDropdown.classList.contains('open');
+      if (isOpen) {
+        closeDropdown();
+      } else {
+        openDropdown();
+      }
+    }
+    
+    brandToggle.addEventListener('click', toggleBrand);
+    
+    // Close on click outside
+    document.addEventListener('click', (e) => {
+      if (!brandToggle.contains(e.target) && !brandDropdown.contains(e.target)) {
+        closeDropdown();
+      }
+    });
+    
+    // Close when clicking links
+    brandDropdown.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', closeDropdown);
+    });
+  }
   
   /* --- Real-time Santri Status Refresh --- */
   <% if (user && user.role === 'santri') { %>
@@ -1587,43 +2068,40 @@
   <% } %>
   
   // Auth Dropdown (Desktop Only - Guest)
-  // (setupUnifiedMenu removed to prevent scroll lock on desktop. Using IIFE below.)
+  // Handled by separate IIFE below
 
-  /* --- Brand Dropdown (Mobile - Click Logo) --- */
-  (() => {
-    const brandToggle = document.getElementById('brandToggle');
-    const brandDropdown = document.getElementById('brandDropdown');
-    
-    if (!brandToggle || !brandDropdown) return;
-    
-    // Only for mobile
-    function isMobile() { return window.innerWidth <= 768; }
-    
-    brandToggle.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (!isMobile()) return;
-      brandToggle.classList.toggle('open');
-      brandDropdown.classList.toggle('open');
+  /* --- Agenda Tabs Logic --- */
+  window.showAgendaTab = function(tabName) {
+    // 1. Hide all contents
+    ['harian', 'mingguan', 'bulanan', 'tahunan'].forEach(t => {
+      const el = document.getElementById('agenda-' + t);
+      if (el) el.style.display = 'none';
+      
+      // Update buttons
+      // We need to find the button that calls this function with this tabName
+      // But simpler way: loop through all buttons in agenda-tabs
     });
-    
-    // Close when clicking links
-    brandDropdown.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        brandToggle.classList.remove('open');
-        brandDropdown.classList.remove('open');
-      });
-    });
-    
-    // Close when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!isMobile()) return;
-      if (!brandToggle.contains(e.target) && !brandDropdown.contains(e.target)) {
-        brandToggle.classList.remove('open');
-        brandDropdown.classList.remove('open');
+
+    // 2. Show active content
+    const target = document.getElementById('agenda-' + tabName);
+    if (target) {
+      target.style.display = 'block';
+      // Reset animation
+      target.style.animation = 'none';
+      target.offsetHeight; /* trigger reflow */
+      target.style.animation = 'fadeInUp 0.4s ease-out';
+    }
+
+    // 3. Update active state on buttons
+    const buttons = document.querySelectorAll('.agenda-tab');
+    buttons.forEach(btn => {
+      if (btn.getAttribute('onclick').includes("'" + tabName + "'")) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
       }
     });
-  })();
+  };
 
   /* --- 4. Alert & Theme --- */
   (function(){

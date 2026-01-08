@@ -270,6 +270,15 @@
 
     <!-- TAB 1: VERIFIKASI AKUN -->
     <div id="tab-akun" class="tab-content <%= activeTab === 'akun' ? 'active' : '' %>">
+      <% if(akun.length === 0){ %>
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <h3>Tidak ada pendaftar baru</h3>
+          <p>Semua pendaftar sudah diverifikasi.</p>
+        </div>
+      <% } else { %>
       <div class="table-card">
         <table class="table">
           <thead>
@@ -282,9 +291,6 @@
             </tr>
           </thead>
           <tbody>
-            <% if(akun.length === 0){ %>
-              <tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted)">Tidak ada pendaftar baru yang perlu diverifikasi.</td></tr>
-            <% } %>
             <% akun.forEach((a, index) => { %>
               <tr>
                 <td style="text-align:center; color:var(--muted); font-size:0.9rem"><%= index + 1 %></td>
@@ -312,11 +318,21 @@
           </tbody>
         </table>
       </div>
+      <% } %>
     </div>
 
     <!-- TAB 2: CEK BIODATA -->
     <div id="tab-biodata" class="tab-content <%= activeTab === 'biodata' ? 'active' : '' %>">
-      <div class="card table-card">
+      <% if(biodata.length === 0){ %>
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <h3>Semua biodata sudah dicek</h3>
+          <p>Tidak ada biodata yang menunggu verifikasi.</p>
+        </div>
+      <% } else { %>
+      <div class="table-card">
         <table class="table">
           <thead>
             <tr>
@@ -328,9 +344,6 @@
             </tr>
           </thead>
           <tbody>
-            <% if(biodata.length === 0){ %>
-              <tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted)">Semua biodata sudah dicek ✓</td></tr>
-            <% } %>
             <% biodata.forEach((b, index) => { %>
               <tr>
                 <td style="text-align:center; color:var(--muted); font-size:0.9rem"><%= index + 1 %></td>
@@ -375,6 +388,7 @@
           </tbody>
         </table>
       </div>
+      <% } %>
     </div>
   </div>
 </main>

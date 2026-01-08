@@ -50,24 +50,10 @@
 </head>
 <body class="form-page layout-form">
 
-<header class="navbar">
-  <div class="container nav-inner">
-    <div class="brand-wrap">
-      <a href="/" class="btn-back-inline" aria-label="Kembali" title="Kembali">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-      </a>
-      <div class="brand">PPM Nurul Hakim</div>
-    </div>
-  </div>
-</header>
+<%- include('partials/santri_navbar', { title: 'Pengumuman dan Info', backLink: '/' }) %>
 
 <main class="form-wrap">
   <div class="form-card">
-    <h2 class="form-title">Informasi Penting</h2>
-    <p style="text-align:center; margin-bottom:24px; font-size:0.95rem; color:var(--muted);">
-      Assalamu'alaikum, <strong style="color:var(--text)"><%= user.name %></strong>!
-    </p>
-
     <div class="grid-12">
       
       <!-- Countdown Section -->

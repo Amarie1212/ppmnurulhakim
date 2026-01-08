@@ -35,7 +35,7 @@
       align-items: center;
       gap: 20px;
       padding: 24px;
-      background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, transparent 100%);
+      padding: 24px;
       border-bottom: 1px solid var(--border);
     }
     .profile-foto {
@@ -241,6 +241,27 @@
       .info-label { font-size: 0.75rem; }
       .info-val { text-align: left; max-width: 100%; font-size: 0.8rem; }
     }
+    
+    /* Fix Button Style */
+    .btn-back-inline {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+    .btn-back-inline:hover {
+      background: var(--bg-2);
+      color: var(--text);
+    }
+    .btn-back-inline svg {
+      width: 20px;
+      height: 20px;
+    }
   </style>
 </head>
 <body>
@@ -249,7 +270,7 @@
   <div class="container nav-inner">
     <div class="brand-wrap">
       <a href="/pengurus" class="btn-back-inline" title="Kembali">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
       </a>
       <div class="brand">Detail Santri</div>
     </div>
@@ -267,9 +288,6 @@
   <div class="container">
     <div class="page-header">
       <h2 class="page-title">Data Lengkap Santri</h2>
-      <a href="/pengurus" class="btn-back-inline" title="Kembali">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-      </a>
     </div>
 
     <div class="profile-card">
@@ -472,12 +490,83 @@
 
 <script>
   // Image Zoom Modal
+  // Image Zoom Styled (Boxed)
   function openZoom(src) {
     const modal = document.createElement('div');
-    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:9999;cursor:zoom-out;padding:20px;';
-    modal.innerHTML = '<img src="' + src + '" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;">';
-    modal.onclick = () => modal.remove();
+    modal.style.cssText = `
+      position: fixed; inset: 0; z-index: 10000;
+      background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      opacity: 0; transition: opacity 0.3s ease;
+    `;
+    
+    const box = document.createElement('div');
+    box.style.cssText = `
+      background: var(--bg-2, #27272a);
+      border: 1px solid var(--border, rgba(255,255,255,0.1));
+      border-radius: 12px;
+      overflow: hidden;
+      max-width: 100%; width: auto;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      display: flex; flex-direction: column;
+      transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    `;
+    
+    const header = document.createElement('div');
+    header.style.cssText = `
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border, rgba(255,255,255,0.1));
+      background: var(--bg-2, #27272a);
+    `;
+    
+    const title = document.createElement('span');
+    title.textContent = 'Bukti / Dokumen';
+    title.style.cssText = 'font-weight: 700; font-size: 0.95rem; color: var(--text, #fff);';
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '×';
+    closeBtn.style.cssText = `
+      background: transparent; border: 1px solid var(--border, rgba(255,255,255,0.1));
+      color: var(--text, #fff); width: 28px; height: 28px;
+      border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1.2rem; line-height: 1; padding-bottom: 2px;
+    `;
+    closeBtn.onmouseover = () => closeBtn.style.background = 'rgba(255,255,255,0.05)';
+    closeBtn.onmouseout = () => closeBtn.style.background = 'transparent';
+    
+    header.appendChild(title);
+    header.appendChild(closeBtn);
+    
+    const body = document.createElement('div');
+    body.style.cssText = 'padding: 0; background: #000; display: flex; justify-content: center; position: relative;';
+    
+    const img = document.createElement('img');
+    img.src = src;
+    img.style.cssText = 'max-width: 100%; max-height: 80vh; object-fit: contain; display: block;';
+    
+    body.appendChild(img);
+    box.appendChild(header);
+    box.appendChild(body);
+    modal.appendChild(box);
     document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+    
+    requestAnimationFrame(() => {
+      modal.style.opacity = '1';
+      box.style.transform = 'scale(1)';
+    });
+    
+    const close = () => {
+      modal.style.opacity = '0';
+      box.style.transform = 'scale(0.95)';
+      document.body.style.overflow = '';
+      setTimeout(() => modal.remove(), 300);
+    };
+    
+    modal.onclick = (e) => { if (e.target === modal) close(); };
+    closeBtn.onclick = close;
   }
 </script>
 

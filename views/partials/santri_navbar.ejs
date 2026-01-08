@@ -1,0 +1,282 @@
+<% 
+  const navTitle = typeof title !== 'undefined' ? title : 'PPM Nurul Hakim';
+  const navBack = typeof backLink !== 'undefined' ? backLink : '/';
+%>
+
+<header class="navbar logged-in">
+  <div class="container nav-inner">
+    <div class="brand-wrap">
+      <a href="<%= navBack %>" class="btn-back-inline" title="Kembali">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </a>
+      <div class="brand"><%= navTitle %></div>
+    </div>
+
+    <div class="right-actions">
+      <% if (user && user.role === 'santri') { %>
+        <button id="santriToggle" class="nav-toggle">
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        </button>
+      <% } %>
+    </div>
+  </div>
+</header>
+
+<% if (user && user.role === 'santri') { %>
+  <style>
+    /* Santri Mobile Popup (Sama dengan Home) */
+    .brand-wrap {
+      margin-left: -8px;
+    }
+    .brand {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+    }
+    @media (max-width: 768px) {
+      .brand { font-size: 0.95rem; }
+    }
+    
+    #santriMobileMenu {
+      display: none;
+      position: fixed;
+      top: calc(var(--nav-h) + 10px);
+      right: 16px;
+      z-index: 2005;
+      width: 280px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      transform-origin: top right;
+      transform: scale(0.97) translateY(-8px);
+      opacity: 0;
+      transition: transform .2s ease-out, opacity .15s ease;
+    }
+    #santriMobileMenu.open {
+      display: block;
+      transform: scale(1) translateY(0);
+      opacity: 1;
+      animation: santriPopIn .25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes santriPopIn {
+      0% { transform: scale(0.97) translateY(-8px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    #santriMobileScrim {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2004;
+      opacity: 0;
+      transition: opacity .2s;
+    }
+    #santriMobileScrim.open {
+      display: block;
+      opacity: 1;
+    }
+    
+    #santriMobileMenu .admin-dd-item {
+      padding: 10px 16px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+    #santriMobileMenu .admin-dd-item:hover { background: var(--bg-3); }
+    #santriMobileMenu .admin-dd-item.danger { color: #ef4444; }
+    
+    #santriMobileMenu .admin-dd-head {
+      padding: 14px 16px;
+      background: var(--bg-2);
+      border-bottom: 1px solid var(--border);
+    }
+    .admin-dd-title { font-weight: 700; font-size: 0.95rem; }
+    .admin-dd-sub { font-size: 0.8rem; color: var(--muted); }
+
+    #santriMobileMenu .popup-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    #santriMobileMenu .popup-badge.verified { color: #22c55e; background: rgba(34, 197, 94, 0.15); }
+    #santriMobileMenu .popup-badge.pending { color: #eab308; background: rgba(234, 179, 8, 0.15); }
+    #santriMobileMenu .popup-badge.rejected { color: #ef4444; background: rgba(239, 68, 68, 0.15); }
+    
+    .header-dd-divider { height: 1px; background: var(--border); }
+  </style>
+
+  <div id="santriMobileMenu">
+    <div class="admin-dd-head">
+      <div class="admin-dd-title">Menu Santri</div>
+      <div class="admin-dd-sub">Halo, <%= user.name %></div>
+    </div>
+    
+    <div class="admin-dd-item" style="cursor: default; justify-content:space-between;">
+      <span>Status Akun</span>
+      <% if(user.status === 'PENDING') { %>
+        <span class="popup-badge pending">Menunggu..</span>
+      <% } else if(user.status === 'REJECTED') { %>
+        <span class="popup-badge rejected">Ditolak</span>
+      <% } else { %>
+        <span class="popup-badge verified">Terverifikasi</span>
+      <% } %>
+    </div>
+    
+      <!-- Shared CSS for Accordion -->
+      <style>
+         /* Use theme variables/rgba for background to support dark mode */
+         .reason-drawer { 
+            display: grid; 
+            grid-template-rows: 0fr; 
+            transition: grid-template-rows 0.3s ease-out; 
+            background: rgba(239, 68, 68, 0.08); /* Transparent red tint */
+         }
+         .reason-drawer.open { grid-template-rows: 1fr; }
+         .reason-inner { overflow: hidden; }
+         .reason-icon { transition: transform 0.3s; }
+         .reason-trigger.open .reason-icon { transform: rotate(180deg); }
+         /* Theme aware trigger background */
+         .reason-trigger.open { background: rgba(239, 68, 68, 0.08) !important; }
+      </style>
+
+      <% if (user.status === 'REJECTED') { %>
+
+               <svg class="reason-icon" style="width:18px; height:18px; color:#ef4444;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+         </div>
+         <div class="reason-drawer">
+            <div class="reason-inner">
+               <a href="/edit-akun" style="display:block; padding:16px; text-decoration:none; border-bottom:1px solid rgba(239, 68, 68, 0.2); transition:background .2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.1)'" onmouseout="this.style.background='transparent'">
+                  <div style="font-size:0.85rem; color:#ef4444; font-weight:600; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px;">Alasan Penolakan:</div>
+                  <div style="font-size:0.95rem; color:var(--text); line-height:1.5; font-weight:400;">"<%= user.alasan_tolak || 'Data akun tidak valid.' %>"</div>
+                  <div style="margin-top:8px; font-size:0.8rem; color:#ef4444; font-weight:500; display:flex; align-items:center; gap:4px;">Klik untuk perbaiki <svg style="width:14px; height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></div>
+               </a>
+            </div>
+         </div>
+      <% } %>
+    
+    <% if (user.status !== 'PENDING' && user.status !== 'REJECTED') { %>
+      
+      <% if (user.biodataRejected) { %>
+         <!-- 2. BIODATA DITOLAK (Accordion) -->
+         <div onclick="this.classList.toggle('open'); this.nextElementSibling.classList.toggle('open'); event.stopPropagation();" class="admin-dd-item reason-trigger" style="cursor:pointer; justify-content:space-between; align-items:center; transition:background 0.2s;">
+            <span>Edit Biodata Lengkap</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+               <span class="popup-badge rejected">Ditolak</span>
+               <svg class="reason-icon" style="width:18px; height:18px; color:#ef4444;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+         </div>
+         <div class="reason-drawer">
+            <div class="reason-inner">
+               <a href="/form" style="display:block; padding:16px; text-decoration:none; border-bottom:1px solid rgba(239, 68, 68, 0.2); transition:background .2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.1)'" onmouseout="this.style.background='transparent'">
+                  <div style="font-size:0.85rem; color:#ef4444; font-weight:600; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px;">Alasan Penolakan:</div>
+                  <div style="font-size:0.95rem; color:var(--text); line-height:1.5; font-weight:400;">"<%= user.biodataReason || 'Mohon perbaiki data.' %>"</div>
+                  <div style="margin-top:8px; font-size:0.8rem; color:#ef4444; font-weight:500; display:flex; align-items:center; gap:4px;">Klik untuk perbaiki <svg style="width:14px; height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></div>
+               </a>
+            </div>
+         </div>
+
+
+      <% } else if (!user.isBiodataEmpty && !user.biodataVerified) { %>
+         <!-- 3. BIODATA PENDING -->
+         <div class="admin-dd-item" style="cursor:default; justify-content:space-between;">
+            <span>Edit Biodata Lengkap</span>
+            <span class="popup-badge pending">Menunggu..</span>
+         </div>
+
+      <% } else { %>
+        <!-- 4. MENU UTAMA (Verified Biodata) -->
+        <a href="/info-santri" class="admin-dd-item">Pengumuman & Info</a>
+        <a href="/form" class="admin-dd-item"><%= user.isBiodataEmpty ? 'Isi Biodata (Wajib)' : 'Edit Biodata Lengkap' %></a>
+        
+        <!-- Logic Menu Pembayaran -->
+        <% if (!user.isBiodataEmpty) { %>
+           <% if (user.paymentRejected) { %>
+              <!-- PEMBAYARAN DITOLAK (Accordion) -->
+              <div onclick="this.classList.toggle('open'); this.nextElementSibling.classList.toggle('open'); event.stopPropagation();" class="admin-dd-item reason-trigger" style="cursor:pointer; justify-content:space-between; align-items:center; transition:background 0.2s;">
+                 <span>Shodaqoh Operasional</span>
+                 <div style="display:flex; align-items:center; gap:8px;">
+                    <span class="popup-badge rejected">Ditolak</span>
+                    <svg class="reason-icon" style="width:18px; height:18px; color:#ef4444;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                 </div>
+              </div>
+              <div class="reason-drawer">
+                 <div class="reason-inner">
+                    <a href="/pembayaran" style="display:block; padding:16px; text-decoration:none; border-bottom:1px solid #fee2e2; transition:background .2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.1)'" onmouseout="this.style.background='transparent'">
+                       <div style="font-size:0.85rem; color:#ef4444; font-weight:600; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px;">Alasan Penolakan:</div>
+                       <div style="font-size:0.95rem; color:var(--text); line-height:1.5; font-weight:400;">"<%= user.paymentReason || 'Bukti pembayaran tidak valid.' %>"</div>
+                       <div style="margin-top:8px; font-size:0.8rem; color:#ef4444; font-weight:500; display:flex; align-items:center; gap:4px;">Upload ulang <svg style="width:14px; height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></div>
+                    </a>
+                 </div>
+              </div>
+
+           <% } else if (user.paymentPending) { %>
+              <!-- PEMBAYARAN PENDING -->
+              <div class="admin-dd-item" style="cursor:default; justify-content:space-between;">
+                 <span>Shodaqoh Operasional</span>
+                 <span class="popup-badge pending">Menunggu..</span>
+              </div>
+              
+           <% } else if (user.hasPaid) { %>
+              <!-- PEMBAYARAN VERIFIED (Biasa) -->
+              <a href="/pembayaran" class="admin-dd-item">Shodaqoh Operasional</a>
+              
+           <% } else { %>
+              <!-- BELUM BAYAR (Wajib Merah) -->
+              <a href="/pembayaran" class="admin-dd-item" style="color:#ef4444; font-weight:700;">Shodaqoh Operasional (Wajib)</a>
+           <% } %>
+        <% } %>
+
+      <% } %>
+    <% } %>
+
+    <div class="header-dd-divider"></div>
+    <a class="admin-dd-item danger" href="/logout">Logout</a>
+  </div>
+  <div id="santriMobileScrim"></div>
+
+  <script>
+    (function(){
+      const btn = document.getElementById('santriToggle');
+      const menu = document.getElementById('santriMobileMenu');
+      const scrim = document.getElementById('santriMobileScrim');
+
+      if(!btn || !menu) return;
+
+      function openMenu() {
+        btn.classList.add('active');
+        menu.style.display = 'block';
+        menu.offsetHeight;
+        menu.classList.add('open');
+        scrim.classList.add('open');
+      }
+
+      function closeMenu() {
+        btn.classList.remove('active');
+        menu.classList.remove('open');
+        scrim.classList.remove('open');
+        setTimeout(() => {
+          if(!menu.classList.contains('open')) menu.style.display = 'none';
+        }, 200);
+      }
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.classList.contains('open') ? closeMenu() : openMenu();
+      });
+
+      scrim.addEventListener('click', closeMenu);
+      menu.querySelectorAll('a').forEach(l => l.addEventListener('click', closeMenu));
+    })();
+  </script>
+<% } %>

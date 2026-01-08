@@ -376,32 +376,29 @@ a {
   border-radius: 4px;
 }
 
-/* Table */
-/* Table - Improved Design from Data Santri */
+/* Table - Improved Design (Copied from kelola_akun.ejs) */
 .table-card {
   padding: 0;
   overflow: hidden;
-  border-radius: 12px;
   background: var(--bg-2);
   border: 1px solid var(--border);
+  border-radius: 8px;
 }
-
+.table-responsive {
+  overflow-x: auto;
+}
 .table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--bg-2);
 }
-
 .table thead {
   background: var(--bg-3);
 }
-
 :root[data-theme="light"] .table thead {
   background: #f8fafc;
 }
-
 .table th {
-  padding: 16px 20px;
+  padding: 18px 20px;
   text-align: left;
   font-size: 0.75rem;
   font-weight: 700;
@@ -410,66 +407,187 @@ a {
   color: var(--muted);
   border-bottom: 2px solid var(--border);
 }
-
 .table td {
   padding: 16px 20px;
   vertical-align: middle;
   border-bottom: 1px solid var(--border);
   color: var(--text);
   font-size: 0.95rem;
+  line-height: 1.5;
 }
+.table tr:last-child td { border-bottom: none; }
+.table tr:hover td { background: rgba(0,0,0,0.015); }
+:root[data-theme="dark"] .table tr:hover td { background: rgba(255,255,255,0.015); }
 
-.table tr:last-child td {
-  border-bottom: none;
-}
-
-.table tr:hover td {
-  background: rgba(0, 0, 0, 0.015);
-}
-
-:root[data-theme="dark"] .table tr:hover td {
-  background: rgba(255, 255, 255, 0.015);
-}
+.cell-no { width: 60px; text-align: center; color: var(--muted); }
+.cell-nama { font-weight: 700; }
+.cell-email { color: var(--muted); }
 
 /* Mobile responsive for table */
 @media (max-width: 768px) {
-  .table-card {
-    overflow-x: auto;
-    border-radius: 8px; /* Slightly smaller radius on mobile */
-    margin: 0 -10px; /* Slight breakout */
+  .table-responsive {
+    margin: 0 -16px;
+    padding: 0 16px;
   }
+  .table { min-width: 600px; }
+  .table th, .table td { padding: 12px 14px; }
+  
+  /* Fix Nama Santri agar tidak sempit/wrap */
+  .table .cell-nama {
+    white-space: nowrap;
+    min-width: 150px;
+  }
+}
 
-  .table {
-    min-width: 600px; /* Force horizontal scroll */
-  }
+/* Global cell-nama style (desktop & mobile) */
+.cell-nama { font-weight: 700; color: var(--text); }
 
-  .table th,
-  .table td {
-    font-size: 0.85rem !important;
-    padding: 14px 12px !important;
-  }
+.avatar-initial {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: inline-grid; place-items: center;
+  font-weight: 700; font-size: 0.85rem;
+  color: #fff;
+  flex-shrink: 0;
+  text-transform: uppercase;
 }
 
 /* Hover disabled */
 
+/* ========================================= */
+/* GLOBAL BUTTON STYLES (Consistent Design) */
+/* ========================================= */
+
+/* Base Action Button */
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-family: inherit;
+}
+
+/* Accept/Confirm Button - Solid Green */
+.btn-accept,
+.btn-save,
+.btn-confirm {
+  background: var(--accent);
+  color: #000;
+  border: none;
+}
+.btn-accept:hover,
+.btn-save:hover,
+.btn-confirm:hover {
+  background: var(--accent-hover);
+  filter: brightness(1.1);
+}
+
+/* Reject/Delete Button - Solid Red */
+.btn-reject,
+.btn-delete,
+.btn-danger {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+}
+.btn-reject:hover,
+.btn-delete:hover,
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+/* Cancel Button - Neutral/Transparent */
+.btn-cancel,
+.btn-secondary {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-cancel:hover,
+.btn-secondary:hover {
+  background: var(--bg-2);
+  border-color: var(--muted);
+}
+
+/* Outline Variants */
+.btn-accept-outline {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+.btn-accept-outline:hover {
+  background: var(--accent);
+  color: #000;
+}
+
+.btn-reject-outline {
+  background: transparent;
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.btn-reject-outline:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+}
+
 /* Badge & Buttons */
-.status-badge {
+.status-badge,
+.popup-badge {
   display: inline-block;
   padding: 4px 10px;
   border-radius: 6px;
   font-size: 0.75rem;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
 }
-.status-badge.pending {
+
+/* Pending - Yellow/Orange */
+.status-badge.pending,
+.popup-badge.pending {
   background: rgba(245, 158, 11, 0.15);
   color: #fbbf24;
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
-:root[data-theme="light"] .status-badge.pending {
+:root[data-theme="light"] .status-badge.pending,
+:root[data-theme="light"] .popup-badge.pending {
   background: #fffbeb;
   color: #b45309;
   border-color: #fcd34d;
+}
+
+/* Verified - Green */
+.status-badge.verified,
+.popup-badge.verified {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+:root[data-theme="light"] .status-badge.verified,
+:root[data-theme="light"] .popup-badge.verified {
+  background: #dcfce7;
+  color: #16a34a;
+  border-color: #86efac;
+}
+
+/* Rejected - Red */
+.status-badge.rejected,
+.popup-badge.rejected {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+:root[data-theme="light"] .status-badge.rejected,
+:root[data-theme="light"] .popup-badge.rejected {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
 }
 
 .btn-small {

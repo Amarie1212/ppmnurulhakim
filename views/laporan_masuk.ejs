@@ -87,40 +87,6 @@
     }
     .empty-state svg { width: 80px; height: 80px; opacity: 0.3; margin-bottom: 16px; }
     
-    /* Improved Table Styling */
-    .table-card {
-      padding: 0;
-      overflow: hidden;
-    }
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-      background: var(--bg-2);
-    }
-    .table thead {
-      background: var(--bg-3);
-    }
-    :root[data-theme="light"] .table thead {
-      background: #f8fafc;
-    }
-    .table th {
-      padding: 16px 20px;
-      text-align: left;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--muted);
-      border-bottom: 2px solid var(--border);
-    }
-    .table td {
-      padding: 16px 20px;
-      vertical-align: middle;
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-    }
-    .table tr:last-child td { border-bottom: none; }
-    
     /* Mobile responsive */
     @media (max-width: 768px) {
       .page-header { 
@@ -129,26 +95,20 @@
         gap: 16px; 
         margin-bottom: 20px !important;
       }
-      .page-title { font-size: 1.3rem !important; }
+      .page-title { font-size: 1.3rem !important; margin: 0 !important; }
       .page-sub { font-size: 0.85rem; }
       .btn-export { width: 100%; justify-content: center; }
       
-      .stats-row { gap: 10px; }
-      .stat-card { padding: 14px; min-width: 100px; }
-      .stat-card .value { font-size: 1.5rem; }
-      .stat-card .label { font-size: 0.7rem; }
+      /* Stat cards smaller */
+      .stats-row { gap: 10px !important; flex-wrap: wrap; }
+      .stat-card { 
+        padding: 12px 16px !important; 
+        min-width: 100px; 
+        flex: 1;
+      }
+      .stat-card .value { font-size: 1.4rem !important; }
+      .stat-card .label { font-size: 0.7rem !important; }
       
-      .table-card { 
-        overflow-x: auto;
-        border-radius: var(--radius-md);
-      }
-      .table {
-        min-width: 600px;
-      }
-      .table th, .table td {
-        font-size: 0.85rem !important;
-        padding: 14px 12px !important;
-      }
       
       .bukti-thumb {
         width: 45px !important;
@@ -195,7 +155,7 @@
         <p>Belum ada pembayaran yang diverifikasi</p>
       </div>
     <% } else { %>
-      <div class="card table-card">
+      <div class="table-card">
         <table class="table">
           <thead>
             <tr>
@@ -209,11 +169,14 @@
             <% pembayaran.forEach((p, i) => { %>
               <tr>
                 <td style="text-align:center; color:var(--muted); font-size:0.9rem"><%= i + 1 %></td>
-                <td style="font-weight:700"><%= p.nama_santri %></td>
+                <td class="cell-nama"><%= p.nama_santri %></td>
                 <td style="color:var(--muted); font-size:0.85rem"><%= p.tanggal_upload %></td>
                 <td style="text-align:center">
-                  <div style="width:50px; height:50px; border-radius:8px; overflow:hidden; border:1px solid var(--border); background:var(--bg); margin:0 auto;">
-                    <img src="<%= p.bukti_path %>" alt="Bukti" style="width:100%; height:100%; object-fit:cover; cursor:pointer;" onclick="openZoom('<%= p.bukti_path %>')">
+                  <div style="display:flex; justify-content:center;">
+                    <button type="button" onclick="openZoom('<%= p.bukti_path %>')" style="background:var(--bg-2); border:1px solid var(--border); border-radius:6px; padding:4px 8px; display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; color:var(--text); transition:all .2s;">
+                      <img src="<%= p.bukti_path %>" style="width:24px; height:24px; object-fit:cover; border-radius:4px;">
+                      Lihat
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -229,15 +192,83 @@
 
 <script>
   // Image Zoom
+  // Image Zoom Styled (Boxed)
   function openZoom(src) {
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const bgColor = isDark ? 'rgba(0,0,0,0.95)' : 'rgba(0,0,0,0.9)';
-    
     const modal = document.createElement('div');
-    modal.style.cssText = 'position:fixed;inset:0;background:' + bgColor + ';display:flex;align-items:center;justify-content:center;z-index:9999;cursor:zoom-out;';
-    modal.innerHTML = '<img src="' + src + '" style="max-width:90%;max-height:90%;object-fit:contain;border-radius:8px;box-shadow:0 10px 50px rgba(0,0,0,0.5);">';
-    modal.onclick = () => modal.remove();
+    modal.style.cssText = `
+      position: fixed; inset: 0; z-index: 10000;
+      background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      opacity: 0; transition: opacity 0.3s ease;
+    `;
+    
+    const box = document.createElement('div');
+    box.style.cssText = `
+      background: var(--bg-2, #27272a);
+      border: 1px solid var(--border, rgba(255,255,255,0.1));
+      border-radius: 12px;
+      overflow: hidden;
+      max-width: 100%; width: auto;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      display: flex; flex-direction: column;
+      transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    `;
+    
+    const header = document.createElement('div');
+    header.style.cssText = `
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border, rgba(255,255,255,0.1));
+      background: var(--bg-2, #27272a);
+    `;
+    
+    const title = document.createElement('span');
+    title.textContent = 'Bukti Pembayaran';
+    title.style.cssText = 'font-weight: 700; font-size: 0.95rem; color: var(--text, #fff);';
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '×';
+    closeBtn.style.cssText = `
+      background: transparent; border: 1px solid var(--border, rgba(255,255,255,0.1));
+      color: var(--text, #fff); width: 28px; height: 28px;
+      border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1.2rem; line-height: 1; padding-bottom: 2px;
+    `;
+    closeBtn.onmouseover = () => closeBtn.style.background = 'rgba(255,255,255,0.05)';
+    closeBtn.onmouseout = () => closeBtn.style.background = 'transparent';
+    
+    header.appendChild(title);
+    header.appendChild(closeBtn);
+    
+    const body = document.createElement('div');
+    body.style.cssText = 'padding: 0; background: #000; display: flex; justify-content: center; position: relative;';
+    
+    const img = document.createElement('img');
+    img.src = src;
+    img.style.cssText = 'max-width: 100%; max-height: 80vh; object-fit: contain; display: block;';
+    
+    body.appendChild(img);
+    box.appendChild(header);
+    box.appendChild(body);
+    modal.appendChild(box);
     document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+    
+    requestAnimationFrame(() => {
+      modal.style.opacity = '1';
+      box.style.transform = 'scale(1)';
+    });
+    
+    const close = () => {
+      modal.style.opacity = '0';
+      box.style.transform = 'scale(0.95)';
+      document.body.style.overflow = '';
+      setTimeout(() => modal.remove(), 300);
+    };
+    
+    modal.onclick = (e) => { if (e.target === modal) close(); };
+    closeBtn.onclick = close;
   }
 </script>
 

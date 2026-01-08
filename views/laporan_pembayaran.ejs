@@ -9,6 +9,87 @@
   <link rel="stylesheet" href="/styles.css" />
   <link rel="stylesheet" href="/duty.css" />
   
+  <script>
+    // Image Zoom Styled (Boxed)
+  function openZoom(src) {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position: fixed; inset: 0; z-index: 10000;
+      background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      opacity: 0; transition: opacity 0.3s ease;
+    `;
+    
+    const box = document.createElement('div');
+    box.style.cssText = `
+      background: var(--bg-2, #27272a);
+      border: 1px solid var(--border, rgba(255,255,255,0.1));
+      border-radius: 12px;
+      overflow: hidden;
+      max-width: 100%; width: auto;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      display: flex; flex-direction: column;
+      transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    `;
+    
+    const header = document.createElement('div');
+    header.style.cssText = `
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border, rgba(255,255,255,0.1));
+      background: var(--bg-2, #27272a);
+    `;
+    
+    const title = document.createElement('span');
+    title.textContent = 'Bukti Pembayaran';
+    title.style.cssText = 'font-weight: 700; font-size: 0.95rem; color: var(--text, #fff);';
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '×';
+    closeBtn.style.cssText = `
+      background: transparent; border: 1px solid var(--border, rgba(255,255,255,0.1));
+      color: var(--text, #fff); width: 28px; height: 28px;
+      border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1.2rem; line-height: 1; padding-bottom: 2px;
+    `;
+    closeBtn.onmouseover = () => closeBtn.style.background = 'rgba(255,255,255,0.05)';
+    closeBtn.onmouseout = () => closeBtn.style.background = 'transparent';
+    
+    header.appendChild(title);
+    header.appendChild(closeBtn);
+    
+    const body = document.createElement('div');
+    body.style.cssText = 'padding: 0; background: #000; display: flex; justify-content: center; position: relative;';
+    
+    const img = document.createElement('img');
+    img.src = src;
+    img.style.cssText = 'max-width: 100%; max-height: 80vh; object-fit: contain; display: block;';
+    
+    body.appendChild(img);
+    box.appendChild(header);
+    box.appendChild(body);
+    modal.appendChild(box);
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+    
+    requestAnimationFrame(() => {
+      modal.style.opacity = '1';
+      box.style.transform = 'scale(1)';
+    });
+    
+    const close = () => {
+      modal.style.opacity = '0';
+      box.style.transform = 'scale(0.95)';
+      document.body.style.overflow = '';
+      setTimeout(() => modal.remove(), 300);
+    };
+    
+    modal.onclick = (e) => { if (e.target === modal) close(); };
+    closeBtn.onclick = close;
+  }
+  </script>
+  
   <style>
     /* Tab Styling */
     .tab-container {
@@ -57,40 +138,7 @@
       display: block;
     }
     
-    /* Improved Table Styling */
-    .table-card {
-      padding: 0;
-      overflow: hidden;
-    }
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-      background: var(--bg-2);
-    }
-    .table thead {
-      background: var(--bg-3);
-    }
-    :root[data-theme="light"] .table thead {
-      background: #f8fafc;
-    }
-    .table th {
-      padding: 16px 20px;
-      text-align: left;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--muted);
-      border-bottom: 2px solid var(--border);
-    }
-    .table td {
-      padding: 16px 20px;
-      vertical-align: middle;
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-    }
-    .table tr:last-child td { border-bottom: none; }
-    
+
     /* Mobile responsive */
     @media (max-width: 768px) {
       .page-header { 
@@ -120,28 +168,6 @@
         gap: 4px;
       }
       .tab-btn svg { width: 14px; height: 14px; }
-      
-      .table-card { 
-        overflow-x: auto;
-        border-radius: var(--radius-md);
-      }
-      .table {
-        min-width: 600px;
-      }
-      .table th, .table td {
-        font-size: 0.85rem !important;
-        padding: 14px 12px !important;
-      }
-      
-      .bukti-thumb {
-        width: 45px !important;
-        height: 45px !important;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .table { min-width: 500px; }
-      .table th, .table td { font-size: 0.8rem !important; padding: 12px 10px !important; }
     }
   </style>
 </head>
@@ -167,21 +193,6 @@
 
 <main class="section">
   <div class="container">
-    
-    <!-- Header Row: Stats + Export Button -->
-    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; margin-bottom: 20px;">
-      <div class="stat-card" style="flex: 1; min-width: 120px;">
-        <div class="value"><%= pembayaran.length %></div>
-        <div class="label">Sudah Bayar</div>
-      </div>
-      <% if (user.role !== 'ketua' && belumBayar) { %>
-      <div class="stat-card" style="flex: 1; min-width: 120px; border-color: #ef4444;">
-        <div class="value" style="color: #ef4444;"><%= belumBayar.length %></div>
-        <div class="label">Belum Bayar</div>
-      </div>
-      <% } %>
-
-    </div>
     
     <!-- TAB SWITCHER -->
     <div class="tab-container">
@@ -220,12 +231,12 @@
           <p>Verifikasi pembayaran dulu di menu Verifikasi Pembayaran</p>
         </div>
       <% } else { %>
-        <div class="card table-card">
+        <div class="table-card">
           <table class="table">
             <thead>
               <tr>
                 <th style="text-align:center" width="60">No</th>
-                <th width="80">Bukti</th>
+                <th width="100" style="text-align:center">Bukti</th>
                 <th>Nama Santri</th>
                 <th>Tanggal Upload</th>
               </tr>
@@ -235,11 +246,14 @@
                 <tr>
                   <td style="text-align:center; color:var(--muted); font-size:0.9rem"><%= i + 1 %></td>
                   <td>
-                    <div style="width:50px; height:50px; border-radius:8px; overflow:hidden; border:1px solid var(--border); background:var(--bg);">
-                      <img src="<%= p.bukti_path %>" alt="Bukti" style="width:100%; height:100%; object-fit:cover; cursor:pointer;" onclick="openZoom('<%= p.bukti_path %>')">
+                    <div style="display:flex; justify-content:center;">
+                      <button type="button" onclick="openZoom('<%= p.bukti_path %>')" style="background:transparent; border:1px solid var(--border); border-radius:50px; padding:4px 12px 4px 4px; display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.8rem; font-weight:600; width:auto; color:var(--text); transition:all .2s;">
+                        <img src="<%= p.bukti_path %>" style="width:24px; height:24px; object-fit:cover; border-radius:50%;">
+                        Lihat
+                      </button>
                     </div>
                   </td>
-                  <td style="font-weight:700"><%= p.nama_santri %></td>
+                  <td class="cell-nama"><%= p.nama_santri %></td>
                   <td style="color:var(--muted); font-size:0.85rem"><%= p.tanggal_upload %></td>
                 </tr>
               <% }) %>
@@ -261,23 +275,26 @@
           <p>Tidak ada santri yang belum membayar.</p>
         </div>
       <% } else { %>
-        <div class="card table-card">
+        <div class="table-card">
           <table class="table">
             <thead>
               <tr>
                 <th style="text-align:center" width="60">No</th>
-                <th>Nama Lengkap</th>
-                <th>Informasi Kontak (WA)</th>
+                <th>Nama Santri</th>
+                <th>Kontak</th>
               </tr>
             </thead>
             <tbody>
               <% belumBayar.forEach((s, i) => { %>
                 <tr>
                   <td style="text-align:center; color:var(--muted); font-size:0.9rem"><%= i + 1 %></td>
-                  <td style="font-weight:700"><%= s.nama %></td>
+                  <td class="cell-nama"><%= s.nama %></td>
                   <td>
                     <% if (s.wa) { %>
-                      <a href="https://wa.me/<%= s.wa.replace(/\D/g,'') %>" target="_blank" style="color: var(--accent); text-decoration: none; font-weight: 500;">
+                      <a href="https://wa.me/<%= s.wa.replace(/^0/, '62').replace(/\D/g, '') %>" target="_blank" class="btn-accent-outline" style="padding: 6px 12px; font-size: 0.85rem;">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.304-1.654a11.882 11.882 0 005.713 1.456h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                        </svg>
                         <%= s.wa %>
                       </a>
                     <% } else { %>
@@ -295,11 +312,6 @@
   </div>
 </main>
 
-<!-- Modal Zoom -->
-<div id="zoomModal" class="modal-overlay" onclick="closeZoom()">
-  <button class="modal-close" onclick="closeZoom()">×</button>
-  <img id="zoomImg" src="" alt="Bukti Pembayaran" class="modal-img">
-</div>
 
 <button id="themeFab" class="theme-fab"></button>
 
@@ -317,16 +329,6 @@
       document.querySelectorAll('.tab-btn')[1].classList.add('active');
       document.getElementById('tab-belum').classList.add('active');
     }
-  }
-  
-  function openZoom(src) {
-    document.getElementById('zoomImg').src = src;
-    document.getElementById('zoomModal').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeZoom() {
-    document.getElementById('zoomModal').classList.remove('open');
-    document.body.style.overflow = '';
   }
 </script>
 

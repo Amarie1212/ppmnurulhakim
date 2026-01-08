@@ -130,6 +130,20 @@ router.get('/pengurus', requireAuth, async (req, res) => {
 });
 
 /* ============================================================
+   1b. EDIT SANTRI (Quick Edit)
+   ============================================================ */
+router.post('/pengurus/santri/update', requireAuth, async (req, res) => {
+  try {
+    const { id, nama, wa } = req.body;
+    await pool.query('UPDATE tb_santri SET nama = $1, wa = $2 WHERE id = $3', [nama, wa, id]);
+    res.redirect('/pengurus');
+  } catch (e) {
+    console.error('[POST /pengurus/santri/update] Error:', e.message);
+    res.redirect('/pengurus?error=update_failed');
+  }
+});
+
+/* ============================================================
    2a. DELETE SANTRI (Admin & Panitia Only)
    ============================================================ */
 router.post('/pengurus/santri/:id/delete', requireAuth, async (req, res) => {
@@ -750,7 +764,7 @@ router.get('/pengurus/laporan-pembayaran', requireAuth, async (req, res) => {
     `);
     pembayaran = pembayaranResult.rows;
     
-    // Data santri yang BELUM bayar (akun VERIFIED tapi tidak ada record di tb_pembayaran)
+    // Data santri yang BELUM bayar (tidak ada pembayaran VERIFIED)
     const belumBayarResult = await pool.query(`
       SELECT 
         s.id,
@@ -760,7 +774,7 @@ router.get('/pengurus/laporan-pembayaran', requireAuth, async (req, res) => {
       JOIN tb_akun_santri a ON s.email = a.email
       WHERE a.status = 'VERIFIED'
         AND NOT EXISTS (
-          SELECT 1 FROM tb_pembayaran p WHERE p.santri_id = s.id
+          SELECT 1 FROM tb_pembayaran p WHERE p.santri_id = s.id AND p.status = 'VERIFIED'
         )
       ORDER BY s.nama ASC
     `);

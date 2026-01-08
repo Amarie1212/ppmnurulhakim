@@ -20,6 +20,8 @@ router.get('/pengurus/home', requireAuth, async (req, res) => {
         const stats = await pool.query(`
             SELECT 
                 (SELECT COUNT(*) FROM tb_akun_santri WHERE status='PENDING') AS pending,
+                (SELECT COUNT(*) FROM tb_santri WHERE status_biodata='PENDING') AS biodata_pending,
+                (SELECT COUNT(*) FROM tb_pembayaran WHERE status='PENDING') AS payment_pending,
                 (SELECT COUNT(*) FROM tb_santri) AS total_santri,
                 (SELECT COUNT(*) FROM tb_santri WHERE jk='L') AS putra,
                 (SELECT COUNT(*) FROM tb_santri WHERE jk='P') AS putri
@@ -28,7 +30,7 @@ router.get('/pengurus/home', requireAuth, async (req, res) => {
         res.render('pengurus_home', {
             title: 'Beranda Pengurus',
             user: req.session.user,
-            stat: stats.rows[0] || { pending: 0, total_santri: 0, putra: 0, putri: 0 }
+            stat: stats.rows[0] || { pending: 0, biodata_pending: 0, payment_pending: 0, total_santri: 0, putra: 0, putri: 0 }
         });
     } catch (e) {
         console.error('[GET /pengurus/home] Error:', e.message);

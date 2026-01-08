@@ -39,7 +39,7 @@ app.get('/login', (req, res) => {
     }
     res.send('Tambahkan ?as=admin, ?as=ketua, ?as=keuangan, atau ?as=panitia untuk login dummy.');
 });
-app.get('/logout', (req, res) => { req.session.destroy(()=>res.redirect('/')); });
+// CATATAN: Route /logout sekarang ada di routes/public.js (dengan auto-delete akun REJECTED)
 
 // ===== Home (pakai home.ejs kamu) =====
 const pool = require('./db');
@@ -51,6 +51,55 @@ app.get('/', async (req, res) => {
     } catch (e) {
         console.log('[Home] CMS error:', e.message);
     }
+    
+    // [FIX] Refresh status akun santri dari database (agar update tanpa logout)
+    if (req.session?.user?.role === 'santri' && req.session?.user?.email) {
+        try {
+            const akunCheck = await pool.query(
+                `SELECT status, alasan_tolak FROM tb_akun_santri WHERE email = $1 LIMIT 1`,
+                [req.session.user.email]
+            );
+            if (akunCheck.rows.length > 0) {
+                req.session.user.status = akunCheck.rows[0].status;
+                req.session.user.alasan_tolak = akunCheck.rows[0].alasan_tolak;
+            }
+            
+            // Also refresh biodata status
+            const santriCheck = await pool.query(
+                `SELECT id, status_biodata, alasan_tolak FROM tb_santri WHERE email = $1 LIMIT 1`,
+                [req.session.user.email]
+            );
+            if (santriCheck.rows.length > 0) {
+                req.session.user.santri_id = santriCheck.rows[0].id;
+                req.session.user.biodataVerified = santriCheck.rows[0].status_biodata === 'VERIFIED';
+                req.session.user.biodataRejected = santriCheck.rows[0].status_biodata === 'REJECTED';
+                req.session.user.biodataReason = santriCheck.rows[0].alasan_tolak;
+                req.session.user.isBiodataEmpty = false;
+                
+                // Check payment status
+                const payCheck = await pool.query(
+                    `SELECT status FROM tb_pembayaran WHERE santri_id = $1 ORDER BY id DESC LIMIT 1`,
+                    [santriCheck.rows[0].id]
+                );
+                if (payCheck.rows.length > 0) {
+                    req.session.user.hasPaid = payCheck.rows[0].status === 'VERIFIED';
+                    req.session.user.paymentPending = payCheck.rows[0].status === 'PENDING';
+                    req.session.user.paymentRejected = payCheck.rows[0].status === 'REJECTED';
+                } else {
+                    req.session.user.hasPaid = false;
+                    req.session.user.paymentPending = false;
+                }
+            } else {
+                req.session.user.isBiodataEmpty = true;
+            }
+            
+            // Update res.locals so EJS sees the changes
+            res.locals.user = req.session.user;
+        } catch (e) {
+            console.log('[Home] Status refresh error:', e.message);
+        }
+    }
+    
     res.render('home', { title: 'PPM Nurul Hakim', cms });
 });
 

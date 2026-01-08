@@ -24,12 +24,24 @@ router.get('/', async (req, res) => {
       // Get santri_id from session or from database
       let santriId = req.session.user.santri_id;
       
+      // [FIX] Always get FRESH account status from tb_akun_santri
+      if (req.session.user.email) {
+        const akunCheck = await pool.query(
+          `SELECT status, alasan_tolak FROM tb_akun_santri WHERE email = $1 LIMIT 1`,
+          [req.session.user.email]
+        );
+        
+        if (akunCheck.rows.length > 0) {
+          // Update session with latest account status
+          req.session.user.status = akunCheck.rows[0].status;
+          req.session.user.alasan_tolak = akunCheck.rows[0].alasan_tolak;
+        }
+      }
       
       // Always get FRESH data from tb_santri to check status_biodata
-      
       if (req.session.user.email) {
         const santriCheck = await pool.query(
-          `SELECT id, status_biodata FROM tb_santri WHERE email = $1 LIMIT 1`,
+          `SELECT id, status_biodata, alasan_tolak FROM tb_santri WHERE email = $1 LIMIT 1`,
           [req.session.user.email]
         );
         
@@ -39,6 +51,7 @@ router.get('/', async (req, res) => {
           // status_biodata = 'VERIFIED' means approved, 'REJECTED' means rejected
           biodataVerified = santriCheck.rows[0].status_biodata === 'VERIFIED';
           req.session.user.biodataRejected = santriCheck.rows[0].status_biodata === 'REJECTED';
+          req.session.user.biodataReason = santriCheck.rows[0].alasan_tolak;
           isBiodataEmpty = false;
         } else {
           // Santri data not found (biodata empty)
@@ -89,6 +102,7 @@ router.get('/', async (req, res) => {
 
   res.render('home', { 
     title: 'PPM Nurul Hakim',
+    user: req.session.user || null,
     cms
   });
 });

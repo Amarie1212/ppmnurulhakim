@@ -32,12 +32,29 @@
       font-size: 0.95rem;
     }
 
+    /* Pop Animation */
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
     .form-section {
       background: var(--bg-2);
       border: 1px solid var(--border);
-      border-radius: 2px;
-      padding: 24px;
-      margin-bottom: 20px;
+      border-radius: 16px; /* Match info_santri */
+      padding: 32px; /* Match info_santri */
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2); /* Match info_santri */
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    .form-section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 4px;
+      background: var(--accent);
+      opacity: 0.8;
     }
 
     .section-header {
@@ -180,7 +197,7 @@
     .form-actions .btn {
       flex: 1;
       justify-content: center;
-      border-radius: 50px;
+      border-radius: 8px;
     }
     .btn {
       display: inline-flex;
@@ -227,6 +244,18 @@
         width: 100%;
         justify-content: center;
       }
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+    
+    /* Divider for merged sections */
+    .section-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 32px 0;
+      border: none;
     }
   </style>
 </head>
@@ -255,105 +284,115 @@
 
     <form id="pengumumanForm" action="/pengurus/kelola-pengumuman" method="POST">
       
-      <!-- Section: Jadwal Kedatangan -->
       <div class="form-section">
-        <div class="section-header">
-          <div class="section-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      
+        <!-- Section: Jadwal Kedatangan -->
+        <div class="form-block">
+          <div class="section-header">
+            <div class="section-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div>
+              <h3 class="section-title">Jadwal Kedatangan</h3>
+              <p class="section-subtitle">Tanggal open house / kedatangan santri</p>
+            </div>
           </div>
-          <div>
-            <h3 class="section-title">Jadwal Kedatangan</h3>
-            <p class="section-subtitle">Tanggal open house / kedatangan santri</p>
+          <div class="form-group">
+            <label class="form-label">Tanggal Kedatangan</label>
+            <input type="date" class="form-input" name="tanggal_kedatangan" style="max-width: 300px;" value="<%= info.tanggal_kedatangan ? new Date(info.tanggal_kedatangan).toISOString().split('T')[0] : '' %>">
+            <p class="form-hint">Akan ditampilkan dengan countdown di halaman Info Santri</p>
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Tanggal Kedatangan</label>
-          <input type="date" class="form-input" name="tanggal_kedatangan" style="max-width: 300px;" value="<%= info.tanggal_kedatangan ? new Date(info.tanggal_kedatangan).toISOString().split('T')[0] : '' %>">
-          <p class="form-hint">Akan ditampilkan dengan countdown di halaman Info Santri</p>
-        </div>
-      </div>
 
-      <!-- Section: Isi Pengumuman -->
-      <div class="form-section">
-        <div class="section-header">
-          <div class="section-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          </div>
-          <div>
-            <h3 class="section-title">Pengumuman</h3>
-            <p class="section-subtitle">Pesan penting untuk para santri</p>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Isi Pengumuman</label>
-          <textarea class="form-input form-textarea" name="pengumuman" placeholder="Tulis pengumuman untuk santri..."><%= info.pengumuman || '' %></textarea>
-        </div>
-      </div>
+        <hr class="section-divider">
 
-      <!-- Section: Peraturan Santri -->
-      <div class="form-section">
-        <div class="section-header">
-          <div class="section-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <!-- Section: Isi Pengumuman -->
+        <div class="form-block">
+          <div class="section-header">
+            <div class="section-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div>
+              <h3 class="section-title">Pengumuman</h3>
+              <p class="section-subtitle">Pesan penting untuk para santri</p>
+            </div>
           </div>
-          <div>
-            <h3 class="section-title">Peraturan Santri</h3>
-            <p class="section-subtitle">Daftar peraturan yang wajib dipatuhi</p>
+          <div class="form-group">
+            <label class="form-label">Isi Pengumuman</label>
+            <textarea class="form-input form-textarea" name="pengumuman" placeholder="Tulis pengumuman untuk santri..."><%= info.pengumuman || '' %></textarea>
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Daftar Peraturan (satu per baris)</label>
-          <% 
-            const defaultPeraturan = [
-              'Wajib mengikuti seluruh kegiatan pondok (sholat berjamaah, kajian, piket).',
-              'Dilarang membawa kendaraan bermotor ke area pondok.',
-              'Wajib menjaga kebersihan kamar dan lingkungan asrama.',
-              'Berpakaian sopan dan rapi sesuai syariat Islam.'
-            ];
-            const peraturanList = (Array.isArray(info.peraturan) && info.peraturan.length > 0) ? info.peraturan : defaultPeraturan;
-          %>
-          <textarea class="form-input form-textarea" name="peraturan" rows="8" placeholder="Tuliskan peraturan..."><%= peraturanList.join('\n') %></textarea>
-          <p class="form-hint">Gunakan Enter untuk memisahkan setiap poin peraturan</p>
-        </div>
-      </div>
 
-      <!-- Section: Kontak Panitia -->
-      <div class="form-section">
-        <div class="section-header">
-          <div class="section-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <hr class="section-divider">
+
+        <!-- Section: Peraturan Santri -->
+        <div class="form-block">
+          <div class="section-header">
+            <div class="section-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div>
+              <h3 class="section-title">Peraturan Santri</h3>
+              <p class="section-subtitle">Daftar peraturan yang wajib dipatuhi</p>
+            </div>
           </div>
-          <div>
-            <h3 class="section-title">Kontak Panitia</h3>
-            <p class="section-subtitle">Kontak yang bisa dihubungi santri</p>
+          <div class="form-group">
+            <label class="form-label">Daftar Peraturan (satu per baris)</label>
+            <% 
+              const defaultPeraturan = [
+                'Wajib mengikuti seluruh kegiatan pondok (sholat berjamaah, kajian, piket).',
+                'Dilarang membawa kendaraan bermotor ke area pondok.',
+                'Wajib menjaga kebersihan kamar dan lingkungan asrama.',
+                'Berpakaian sopan dan rapi sesuai syariat Islam.'
+              ];
+              const peraturanList = (Array.isArray(info.peraturan) && info.peraturan.length > 0) ? info.peraturan : defaultPeraturan;
+            %>
+            <textarea class="form-input form-textarea" name="peraturan" rows="8" placeholder="Tuliskan peraturan..."><%= peraturanList.join('\n') %></textarea>
+            <p class="form-hint">Gunakan Enter untuk memisahkan setiap poin peraturan</p>
           </div>
         </div>
-        
-        <div id="kontak-list" class="contact-list">
-          <% 
-            var kontakPanitiaData = (info && info.kontak_panitia) ? (typeof info.kontak_panitia === 'string' ? JSON.parse(info.kontak_panitia) : info.kontak_panitia) : [];
-          %>
-          <% kontakPanitiaData.forEach((k, i) => { %>
-          <div class="contact-row">
-            <select name="kontak_tipe[]">
-              <option value="whatsapp" <%= k.tipe === 'whatsapp' ? 'selected' : '' %>>WhatsApp</option>
-              <option value="email" <%= k.tipe === 'email' ? 'selected' : '' %>>Email</option>
-              <option value="instagram" <%= k.tipe === 'instagram' ? 'selected' : '' %>>Instagram</option>
-              <option value="phone" <%= k.tipe === 'phone' ? 'selected' : '' %>>Telepon</option>
-            </select>
-            <input type="text" name="kontak_label[]" placeholder="Nama/Label" value="<%= k.label || '' %>">
-            <input type="text" name="kontak_value[]" placeholder="Nomor/ID/Username" value="<%= k.value || '' %>">
-            <button type="button" class="btn-remove-contact" onclick="this.closest('.contact-row').remove()">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
+
+        <hr class="section-divider">
+
+        <!-- Section: Kontak Panitia -->
+        <div class="form-block">
+          <div class="section-header">
+            <div class="section-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <div>
+              <h3 class="section-title">Kontak Panitia</h3>
+              <p class="section-subtitle">Kontak yang bisa dihubungi santri</p>
+            </div>
           </div>
-          <% }); %>
+          
+          <div id="kontak-list" class="contact-list">
+            <% 
+              var kontakPanitiaData = (info && info.kontak_panitia) ? (typeof info.kontak_panitia === 'string' ? JSON.parse(info.kontak_panitia) : info.kontak_panitia) : [];
+            %>
+            <% kontakPanitiaData.forEach((k, i) => { %>
+            <div class="contact-row">
+              <select name="kontak_tipe[]">
+                <option value="whatsapp" <%= k.tipe === 'whatsapp' ? 'selected' : '' %>>WhatsApp</option>
+                <option value="email" <%= k.tipe === 'email' ? 'selected' : '' %>>Email</option>
+                <option value="instagram" <%= k.tipe === 'instagram' ? 'selected' : '' %>>Instagram</option>
+                <option value="phone" <%= k.tipe === 'phone' ? 'selected' : '' %>>Telepon</option>
+              </select>
+              <input type="text" name="kontak_label[]" placeholder="Nama/Label" value="<%= k.label || '' %>">
+              <input type="text" name="kontak_value[]" placeholder="Nomor/ID/Username" value="<%= k.value || '' %>">
+              <button type="button" class="btn-remove-contact" onclick="this.closest('.contact-row').remove()">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <% }); %>
+          </div>
+          
+          <button type="button" class="btn-add-contact" onclick="addKontakRow()">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Tambah Kontak
+          </button>
         </div>
-        
-        <button type="button" class="btn-add-contact" onclick="addKontakRow()">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Tambah Kontak
-        </button>
+      
       </div>
 
       <!-- Action Buttons -->

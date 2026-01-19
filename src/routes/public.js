@@ -222,7 +222,7 @@ router.get('/register', (req, res) => res.render('register', { title: 'Buat Akun
 
 router.post('/register', async (req, res) => {
   try {
-    const { nama, email, password, wa, kelompok, desa, daerah } = req.body;
+    const { nama, email, password, wa, kelompok, desa, daerah, kampus, prodi } = req.body;
     
     // 1. Cek Email
     const check = await pool.query('SELECT id FROM tb_akun_santri WHERE email=$1', [email]);
@@ -240,10 +240,10 @@ router.post('/register', async (req, res) => {
     // Kita gunakan RETURNING * agar bisa langsung ambil data untuk sesi
     const passhash = await bcrypt.hash(password, 10);
     const result = await pool.query(
-      `INSERT INTO tb_akun_santri (nama, email, passhash, wa, kelompok, desa, daerah, status) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, 'PENDING') 
+      `INSERT INTO tb_akun_santri (nama, email, passhash, wa, kelompok, desa, daerah, kampus, prodi, status) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'PENDING') 
        RETURNING *`,
-      [toTitleCase(nama), email.toLowerCase(), passhash, normPhone(wa), kelompok, desa, daerah]
+      [toTitleCase(nama), email.toLowerCase(), passhash, normPhone(wa), kelompok, desa, daerah, kampus, prodi]
     );
 
     const newUser = result.rows[0];
@@ -271,6 +271,8 @@ router.post('/register', async (req, res) => {
         email: newUser.email, 
         wa: newUser.wa,
         kelompok: newUser.kelompok, 
+        kampus: newUser.kampus,
+        prodi: newUser.prodi,
         desa: newUser.desa, 
         daerah: newUser.daerah,
         status: newUser.status, 
@@ -721,11 +723,27 @@ router.post('/edit-akun', requireSantriAuth, async (req, res) => {
    LOGOUT
    ============================================================ */
 router.get('/logout', (req, res) => {
-  req.session.destroy(() => res.redirect('/'));
+  const role = req.session.user?.role;
+  const isAdmin = ['admin', 'panitia', 'ketua', 'keuangan'].includes(role);
+  req.session.destroy(() => {
+    if (isAdmin) {
+      res.redirect('/panel-admin');
+    } else {
+      res.redirect('/');
+    }
+  });
 });
 
 router.post('/logout', (req, res) => {
-  req.session.destroy(() => res.redirect('/'));
+  const role = req.session.user?.role;
+  const isAdmin = ['admin', 'panitia', 'ketua', 'keuangan'].includes(role);
+  req.session.destroy(() => {
+    if (isAdmin) {
+      res.redirect('/panel-admin');
+    } else {
+      res.redirect('/');
+    }
+  });
 });
 
 module.exports = router;

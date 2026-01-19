@@ -21,8 +21,8 @@
   --bg-2: #ffffff;
   --text: #18181b;
   --muted: #71717a;
-  --accent: #16a34a;
-  --accent-hover: #15803d;
+  --accent: #10b981; /* Match styles.css */
+  --accent-hover: #059669; /* Match styles.css */
   --border: rgba(0, 0, 0, 0.12);
   --dot-color: rgba(0, 0, 0, 0.05);
 }
@@ -266,6 +266,15 @@ a {
   opacity: 1;
 }
 
+/* Status Dot (Notification) */
+.status-dot {
+  width: 8px; 
+  height: 8px; 
+  background-color: var(--danger); 
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
 /* ===== DESKTOP SIDEBAR ===== */
 .panel-pengurus {
   position: fixed;
@@ -317,7 +326,9 @@ a {
   overflow-y: auto;
 }
 .panel-link {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 14px 24px;
   color: var(--text);
   border-bottom: 1px solid var(--border);
@@ -395,20 +406,20 @@ a {
   background: var(--bg-3);
 }
 :root[data-theme="light"] .table thead {
-  background: #f8fafc;
+  background: transparent; /* Was #f8fafc */
 }
 .table th {
-  padding: 18px 20px;
+  padding: 10px 16px; /* More compact */
   text-align: left;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: 0.85rem; /* Slightly larger base */
+  font-weight: 600; /* Reduced from 700 */
+  /* text-transform: uppercase; REMOVED */
+  letter-spacing: normal; /* Reset tracking */
   color: var(--muted);
   border-bottom: 2px solid var(--border);
 }
 .table td {
-  padding: 16px 20px;
+  padding: 8px 16px; /* More compact */
   vertical-align: middle;
   border-bottom: 1px solid var(--border);
   color: var(--text);
@@ -426,11 +437,17 @@ a {
 /* Mobile responsive for table */
 @media (max-width: 768px) {
   .table-responsive {
-    margin: 0 -16px;
-    padding: 0 16px;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0;
+    padding: 0;
   }
-  .table { min-width: 600px; }
-  .table th, .table td { padding: 12px 14px; }
+  .table { min-width: 100%; } /* Allow shrink if needed, or min-width 600px handled by specific pages */
+  
+  /* Font Size Match - More Compact */
+  .table th { font-size: 0.85rem; padding: 8px 12px; } /* More compact for mobile */
+  .table td { font-size: 0.9rem; padding: 8px 12px; } /* More compact for mobile */
   
   /* Fix Nama Santri agar tidak sempit/wrap */
   .table .cell-nama {
@@ -440,7 +457,7 @@ a {
 }
 
 /* Global cell-nama style (desktop & mobile) */
-.cell-nama { font-weight: 700; color: var(--text); }
+.cell-nama { font-weight: 400; color: var(--text); }
 
 .avatar-initial {
   width: 32px; height: 32px; border-radius: 50%;
@@ -1391,4 +1408,30 @@ a {
   .form-card-custom {
     padding: 16px;
   }
+}
+
+/* LOGOUT BUTTON (Red Pill Outline) */
+.logout-btn {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px;
+  border-radius: 50px; /* Fully rounded pill */
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  background: transparent;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.logout-btn:hover {
+  background: var(--danger);
+  color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+  transform: translateY(-1px);
+}
+.logout-btn:active {
+  transform: translateY(0);
 }

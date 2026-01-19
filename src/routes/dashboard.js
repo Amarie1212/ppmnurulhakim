@@ -74,54 +74,7 @@ router.get('/pengurus', requireAuth, async (req, res) => {
     }
 });
 
-/* ============================================================
-    3. VERIFIKASI AKUN (ACC PENDAFTAR BARU)
-    ============================================================ */
-// Akses: Admin, Panitia
-router.get('/pengurus/verifikasi', requireAuth, async (req, res) => {
-    if (['ketua', 'keuangan'].includes(req.session.user.role)) {
-        return res.redirect('/pengurus/home'); // Ketua dan Keuangan tidak perlu mengelola verifikasi
-    }
-    
-    try {
-        const { rows } = await pool.query(`
-            SELECT 
-                id, nama, email, wa, 
-                kelompok, desa, daerah, 
-                to_char(created_at, 'DD Mon HH24:MI') as created_fmt
-            FROM tb_akun_santri 
-            WHERE status = 'PENDING' 
-            ORDER BY created_at ASC
-        `);
-        
-        res.render('verifikasi', { 
-            title: 'Verifikasi Akun', 
-            user: req.session.user, 
-            akun: rows 
-        });
-    } catch (e) {
-        console.error('[GET /verifikasi] Error:', e.message);
-        res.send("Error memuat halaman verifikasi");
-    }
-});
 
-// Proses Tombol ACC / Tolak
-router.post('/pengurus/verifikasi', requireAuth, async (req, res) => {
-    if (['ketua', 'keuangan'].includes(req.session.user.role)) return res.redirect('/pengurus/home');
-
-    const { id, aksi } = req.body;
-    try {
-        if (aksi === 'verify') {
-            await pool.query("UPDATE tb_akun_santri SET status='VERIFIED' WHERE id=$1", [id]);
-        } else if (aksi === 'reject') {
-            await pool.query("UPDATE tb_akun_santri SET status='REJECTED' WHERE id=$1", [id]);
-        }
-    } catch (e) {
-        console.error('[POST /verifikasi] Error:', e.message);
-    }
-    // Refresh halaman
-    res.redirect('/pengurus/verifikasi');
-});
 
 /* ============================================================
     4. DETAIL SANTRI
@@ -200,7 +153,7 @@ router.get('/pengurus/keuangan', requireAuth, async (req, res) => {
         const role = req.session.user.role;
         let laporan = [];
 
-        // Simulasi data laporan untuk Keuangan dan Ketua
+        // Laporan untuk Keuangan dan Ketua
         if (role === 'keuangan' || role === 'ketua') {
             laporan = [
                 { id: 1, nama_santri: 'Budi Santoso', status: 'Menunggu Verifikasi', jumlah: 500000, tanggal: '2025-01-10' },
@@ -221,17 +174,17 @@ router.get('/pengurus/keuangan', requireAuth, async (req, res) => {
     }
 });
 
-// Aksi Keuangan (Hanya Admin & Keuangan)
+// Aksi Keuangan (Hanya Keuangan)
 router.post('/pengurus/keuangan/verify', requireAuth, async (req, res) => {
-    if (!['admin', 'keuangan'].includes(req.session.user.role)) return res.status(403).send('Akses ditolak.');
+    if (req.session.user.role !== 'keuangan') return res.status(403).send('Akses ditolak.');
     // Logic verifikasi pembayaran...
     // Contoh: await pool.query("UPDATE tb_pembayaran SET status='VERIFIED' WHERE id=$1", [req.body.id]);
     res.redirect('/pengurus/keuangan?status=success_verify');
 });
 
-// Aksi Keuangan (Hanya Admin & Keuangan)
+// Aksi Keuangan (Hanya Keuangan)
 router.post('/pengurus/keuangan/reject', requireAuth, async (req, res) => {
-    if (!['admin', 'keuangan'].includes(req.session.user.role)) return res.status(403).send('Akses ditolak.');
+    if (req.session.user.role !== 'keuangan') return res.status(403).send('Akses ditolak.');
     // Logic tolak pembayaran...
     res.redirect('/pengurus/keuangan?status=success_reject');
 });

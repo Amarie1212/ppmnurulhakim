@@ -179,8 +179,8 @@
         <div class="col-12"><div class="divider"></div></div>
 
         <div class="col-12"><h3 class="sec-title">Informasi Akademik</h3></div>
-        <div class="col-6"><label class="label">Kampus <span style="color:var(--danger)">*</span></label><input class="input" name="kampus" value="<%= (data && data.kampus) || '' %>" required></div>
-        <div class="col-6"><label class="label">Prodi / Jurusan <span style="color:var(--danger)">*</span></label><input class="input" name="prodi" value="<%= (data && data.prodi) || '' %>" required></div>
+        <div class="col-6"><label class="label">Kampus <span style="color:var(--danger)">*</span></label><input class="input" name="kampus" value="<%= (data && data.kampus) ? data.kampus : (user.kampus || '') %>" required></div>
+        <div class="col-6"><label class="label">Prodi / Jurusan <span style="color:var(--danger)">*</span></label><input class="input" name="prodi" value="<%= (data && data.prodi) ? data.prodi : (user.prodi || '') %>" required></div>
         <div class="col-6">
           <label class="label">Jenjang <span style="color:var(--danger)">*</span></label>
           <select class="select" name="jenjang" required>

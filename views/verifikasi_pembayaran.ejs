@@ -79,25 +79,37 @@
       background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: #ef4444; 
     }
     
-    /* Section Cards - Dark Theme */
+    /* Section Cards - Clean Style (Match Verifikasi.ejs) */
     .biodata-section {
-      background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 16px; margin-bottom: 16px;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+      margin-bottom: 24px;
     }
     .biodata-section-title {
-      font-size: 0.95rem; font-weight: 700; color: var(--accent); margin: 0 0 14px;
-      display: flex; align-items: center; gap: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border);
     }
-    .biodata-section-title svg { width: 18px; height: 18px; }
+    .biodata-section-title svg { width: 20px; height: 20px; color: var(--accent); }
     
     .info-row { 
-      display: flex; justify-content: space-between; align-items: flex-start; /* Specific for payment */
-      padding: 12px 0; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: flex-start; 
+      padding: 12px 0;
+      border-bottom: 1px dashed var(--border);
     }
     .info-row:last-child { border-bottom: none; }
-    .info-label { color: var(--muted); font-size: 0.9rem; font-weight: 500; }
+    .info-label { color: var(--muted); font-size: 0.9rem; font-weight: 500; min-width: 100px; }
     .info-val { 
-      font-weight: 600; text-align: right; word-break: break-word; 
-      max-width: 60%; color: var(--text); font-size: 0.95rem;
+      font-weight: 400; text-align: right; word-break: break-word; 
+      max-width: 65%; color: var(--text); font-size: 0.95rem; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; line-height: 1.5;
     }
     
     .modal-actions { display: flex; gap: 12px; padding: 20px 24px; border-top: 1px solid var(--border); }
@@ -133,7 +145,35 @@
     
     .page-title { margin-bottom: 24px; font-weight: 800; }
 
-    /* Mobile responsive (Standardized) */
+    /* ANIMATION */
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    
+    .table-card {
+      background: var(--bg-2); /* Match Pengurus */
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    
+    /* SCROLL WRAPPER (Match Pengurus) */
+    .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      width: 100%;
+    }
+
+    /* Make table compact/rapat (Match Pengurus) */
+    .table th { padding: 12px 16px !important; }
+    .table td { padding: 10px 16px !important; }
+    
+    /* Remove Bold from Name (Match Pengurus) */
+    .cell-nama { font-weight: 400 !important; }
+
+    /* Mobile responsive (Standardized Match Pengurus) */
     @media (max-width: 768px) {
       .page-title { font-size: 1.3rem !important; }
       .tab-buttons { gap: 6px; padding: 4px; }
@@ -151,8 +191,12 @@
     }
     
     @media (max-width: 480px) {
-      .table th, .table td { font-size: 0.7rem !important; padding: 8px 4px !important; }
-      .btn-small { padding: 5px 8px !important; font-size: 0.7rem !important; }
+      .table { min-width: 500px; } /* Ensure horizontal scroll spacing */
+      .table th, .table td {
+        font-size: 0.8rem !important; /* Match Pengurus */
+        padding: 12px 10px !important; /* Match Pengurus */
+      }
+      .btn-small { padding: 8px 14px !important; font-size: 0.8rem !important; }
     }
   </style>
 </head>
@@ -189,37 +233,39 @@
       </div>
     <% } else { %>
       <div class="table-card">
-        <table class="table">
-          <thead>
-            <tr>
-              <th style="text-align:center" width="60">No</th>
-              <th>Nama Santri</th>
-              <th>Tanggal Upload</th>
-              <th width="100" style="text-align:center">Bukti</th>
-              <th style="text-align:center">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% pembayaran.forEach((p, i) => { %>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
               <tr>
-                <td style="text-align:center; color:var(--muted); font-size:0.9rem"><%= i + 1 %></td>
-                 <td class="cell-nama"><%= p.nama_santri %></td>
-                 <td style="color:var(--muted); font-size:0.85rem"><%= p.tanggal_upload %></td>
-                 <td>
-                   <div style="display:flex; justify-content:center;">
-                     <button type="button" onclick="openZoom('<%= p.bukti_path %>')" style="background:var(--bg-2); border:1px solid var(--border); border-radius:6px; padding:4px 8px; display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; color:var(--text); transition:all .2s;">
-                        <img src="<%= p.bukti_path %>" style="width:24px; height:24px; object-fit:cover; border-radius:4px;">
-                        Lihat
-                     </button>
-                   </div>
-                 </td>
-                <td style="text-align:center">
-                  <button type="button" class="btn-small btn-detail-link" onclick="showDetailModal('<%= p.id %>', '<%= p.nama_santri %>', '<%= p.nama_pengirim || '-' %>', '<%= p.nama_bank || '-' %>', '<%= p.nomor_rekening || '-' %>', '<%= p.tanggal_transfer || '-' %>', '<%= p.bukti_path %>', '<%= p.tanggal_upload %>')">Proses</button>
-                </td>
+                <th style="text-align:center" width="60">No</th>
+                <th width="100" style="text-align:center">Bukti</th>
+                <th>Nama Santri</th>
+                <th width="150">Tanggal</th>
+                <th style="text-align:center">Aksi</th>
               </tr>
-            <% }) %>
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              <% pembayaran.forEach((p, i) => { %>
+                <tr>
+                  <td style="text-align:center; color:var(--muted); font-size:0.9rem"><%= i + 1 %></td>
+                   <td>
+                     <div style="display:flex; justify-content:center;">
+                       <button type="button" onclick="openZoom('<%= p.bukti_path %>')" style="background:transparent; border:1px solid var(--border); border-radius:50px; padding:4px 12px 4px 4px; display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.8rem; font-weight:600; width:auto; color:var(--text); transition:all .2s;">
+                          <img src="<%= p.bukti_path %>" style="width:24px; height:24px; object-fit:cover; border-radius:50%;">
+                          Lihat
+                       </button>
+                     </div>
+                   </td>
+                   <td class="cell-nama"><%= p.nama_santri %></td>
+                   <td style="color:var(--muted); font-size:0.85rem; white-space: nowrap;"><%= p.tanggal_upload %></td>
+                  <td style="text-align:center">
+                    <button type="button" class="btn-small btn-detail-link" onclick="showDetailModal('<%= p.id %>', '<%= p.nama_santri %>', '<%= p.nama_pengirim || '-' %>', '<%= p.nama_bank || '-' %>', '<%= p.nomor_rekening || '-' %>', '<%= p.tanggal_transfer || '-' %>', '<%= p.bukti_path %>', '<%= p.tanggal_upload %>')">Proses</button>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
       </div>
     <% } %>
   </div>

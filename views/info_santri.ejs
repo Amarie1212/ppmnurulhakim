@@ -9,168 +9,335 @@
   <link rel="stylesheet" href="/styles.css" />
   <link rel="stylesheet" href="/form.css" />
   <style>
-    /* Custom styles specific to Info Page features */
-    .countdown-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
-    .countdown-icon { width: 52px; height: 52px; border-radius: 4px; background: rgba(34, 197, 94, 0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .countdown-icon svg { width: 26px; height: 26px; color: var(--accent); }
-    .countdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
-    .countdown-item { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 12px 6px; text-align: center; }
-    .countdown-number { font-size: 1.5rem; font-weight: 800; color: var(--accent); line-height: 1; margin-bottom: 4px; }
-    .countdown-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
-    .countdown-message { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 4px; padding: 14px; color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
-    
-    .rule-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; margin-bottom: 8px; }
-    .rule-number { width: 24px; height: 24px; border-radius: 2px; background: rgba(34, 197, 94, 0.15); color: var(--accent); font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .rule-text { color: var(--text); font-size: 0.9rem; line-height: 1.5; }
+    /* Pop Animation */
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
 
-    .brand-wrap { display: flex; align-items: center; gap: 12px; }
+    /* Modern Card Style */
+    .modern-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2);
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    .modern-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 4px;
+      background: var(--accent);
+      opacity: 0.8;
+    }
 
-    /* Contacts Grid */
-    .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
-    .contact-item { display: flex; align-items: center; gap: 14px; padding: 16px 18px; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; text-decoration: none; color: var(--text); transition: all 0.2s; }
-    .contact-item:hover { border-color: var(--accent); transform: translateY(-2px); }
-    .contact-icon-wrap { width: 44px; height: 44px; border-radius: 3px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .contact-icon-wrap svg { width: 22px; height: 22px; }
+    /* Countdown Section */
+    .countdown-header { 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between;
+      gap: 16px; 
+      margin-bottom: 20px; 
+    }
+    .countdown-icon-box {
+      width: 40px; height: 40px; /* Smaller */
+      border-radius: 10px;
+      background: rgba(34, 197, 94, 0.1);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
     
-    .contact-icon-wrap.whatsapp { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
-    .contact-icon-wrap.email { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
-    .contact-icon-wrap.instagram { background: rgba(225, 48, 108, 0.12); color: #E1306C; }
-    .contact-icon-wrap.phone { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+    .countdown-grid { 
+      display: grid; 
+      grid-template-columns: repeat(4, 1fr); 
+      gap: 12px; 
+      margin: 16px 0 24px; 
+    }
+    .countdown-item { 
+      background: var(--bg); 
+      border: 1px solid var(--border); 
+      border-radius: 10px; 
+      padding: 12px 8px; /* Compact padding */
+      text-align: center; 
+      position: relative;
+    }
+    .countdown-number { 
+      font-size: 1.5rem; /* Smaller font */
+      font-weight: 800; 
+      color: var(--text); 
+      line-height: 1.1; 
+      margin-bottom: 4px;
+      font-variant-numeric: tabular-nums;
+    }
+    .countdown-label { 
+      font-size: 0.7rem; 
+      color: var(--muted); 
+      text-transform: uppercase; 
+      font-weight: 700; 
+      letter-spacing: 0.5px;
+    }
+
+    .info-alert {
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.15);
+      border-radius: 12px;
+      padding: 16px; /* Compact */
+      display: flex;
+      gap: 12px;
+      color: #93c5fd;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      align-items: flex-start;
+    }
+
+    /* Rules Section */
+    .rules-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .rule-card { 
+      display: flex; 
+      gap: 12px; 
+      padding: 14px; 
+      background: var(--bg); 
+      border: 1px solid var(--border); 
+      border-radius: 10px; 
+    }
+    .rule-num { 
+      width: 28px; height: 28px; 
+      border-radius: 6px; 
+      background: var(--bg-2); 
+      border: 1px solid var(--border);
+      color: var(--accent); 
+      font-weight: 700; 
+      display: flex; align-items: center; justify-content: center; 
+      flex-shrink: 0; 
+      font-size: 0.9rem;
+    }
+    .rule-content {
+      flex: 1;
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* Contacts Grid - Simple & Clean */
+    .contact-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+      gap: 16px; 
+    }
+    .contact-card { 
+      display: flex; 
+      align-items: center; 
+      gap: 16px; 
+      padding: 16px; 
+      background: var(--bg-2); 
+      border: 1px solid var(--border); 
+      border-radius: 12px; 
+      text-decoration: none; 
+      color: var(--text); 
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-sm);
+    }
+    .contact-card:hover {
+      transform: translateY(-4px) scale(1.02);
+      border-color: var(--accent);
+      background: var(--bg-3);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .contact-icon { 
+      width: 48px; height: 48px; 
+      border-radius: 14px; 
+      display: flex; align-items: center; justify-content: center; 
+      flex-shrink: 0; 
+      background: var(--accent);
+      color: white !important;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+    }
+    .contact-icon::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 60%);
+    }
     
-    .contact-info { flex: 1; min-width: 0; }
-    .contact-label { font-weight: 600; font-size: 0.9rem; margin-bottom: 2px; }
-    .contact-value { color: var(--muted); font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .contact-info h4 { font-size: 1rem; font-weight: 700; margin-bottom: 2px; color: var(--text); }
+    .contact-info p { font-size: 0.85rem; color: var(--muted); margin:0; letter-spacing: 0.5px; }
+
+    /* Section Headings inside Card */
+    .section-head {
+      margin: 32px 0 16px;
+      display: flex; align-items: center; gap: 10px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-head h3 {
+      font-size: 1.1rem; font-weight: 700; color: var(--text);
+    }
+
+    .divider { height: 1px; background: var(--border); margin: 40px 0; opacity: 0.5; }
 
     @media (max-width: 640px) {
-      .countdown-grid { gap: 8px; }
-      .countdown-number { font-size: 1.2rem; }
-      .contact-grid { grid-template-columns: 1fr; }
+      .modern-card { padding: 20px; }
+      .countdown-grid { gap: 8px; grid-template-columns: repeat(4, 1fr); margin: 20px 0; }
+      .countdown-number { font-size: 1.25rem; }
+      .countdown-label { font-size: 0.6rem; }
     }
   </style>
 </head>
 <body class="form-page layout-form">
 
-<%- include('partials/santri_navbar', { title: 'Pengumuman dan Info', backLink: '/', showHamburger: false }) %>
+<%- include('partials/santri_navbar', { title: 'Pengumuman & Informasi', backLink: '/', showHamburger: false }) %>
 
-<main class="form-wrap">
-  <div class="form-card">
-    <div class="grid-12">
-      
-      <!-- Countdown Section -->
-      <div class="col-12">
-        <div class="smooth-box">
-          <div class="countdown-header">
-            <div class="countdown-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+<main class="form-wrap" style="max-width: 900px; margin-top: calc(var(--nav-h) + 40px);">
+  
+  <div class="modern-card">
+    
+    <!-- Countdown Section -->
+    <div>
+        <div class="countdown-header">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="countdown-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
             </div>
             <div>
-              <div style="font-weight:700; font-size:1.1rem; margin-bottom:4px;">Jadwal Kedatangan</div>
+              <div style="font-size:0.75rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px">Jadwal Kedatangan</div>
               <% if (cms.tanggal_kedatangan) { %>
-                <div style="color:var(--accent); font-weight:600;"><%= new Date(cms.tanggal_kedatangan).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></div>
+                <div style="font-size:0.95rem; font-weight:700; color:var(--text);">
+                  <%= new Date(cms.tanggal_kedatangan).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) %>
+                </div>
               <% } else { %>
-                <div style="color:var(--muted);">Akan diumumkan</div>
+                <div style="color:var(--text); font-weight:700; font-size:0.95rem;">Segera Diumumkan</div>
               <% } %>
             </div>
           </div>
           
           <% if (cms.tanggal_kedatangan) { %>
-          <div class="countdown-grid" id="countdownGrid">
-             <div class="countdown-item"><div class="countdown-number" id="days">0</div><div class="countdown-label">Hari</div></div>
-             <div class="countdown-item"><div class="countdown-number" id="hours">0</div><div class="countdown-label">Jam</div></div>
-             <div class="countdown-item"><div class="countdown-number" id="minutes">0</div><div class="countdown-label">Menit</div></div>
-             <div class="countdown-item"><div class="countdown-number" id="seconds">0</div><div class="countdown-label">Detik</div></div>
+          <div style="text-align:right;">
+             <span style="display:inline-block; width:6px; height:6px; background:var(--accent); border-radius:50%; margin-right:4px;"></span>
+             <span style="font-size:0.75rem; font-weight:600; color:var(--accent);">Live</span>
           </div>
           <% } %>
-          
-          <div class="countdown-message">
-            <strong>📋 Pengumuman:</strong> <%= cms.pengumuman || 'Pastikan Anda sudah melengkapi biodata dan pembayaran shodaqoh operasional sebelum tanggal kedatangan.' %>
+        </div>
+
+        <% if (cms.tanggal_kedatangan) { %>
+        <div class="countdown-grid" id="countdownGrid">
+           <div class="countdown-item">
+             <div class="countdown-number" id="days">00</div>
+             <div class="countdown-label">Hari</div>
+           </div>
+           <div class="countdown-item">
+             <div class="countdown-number" id="hours">00</div>
+             <div class="countdown-label">Jam</div>
+           </div>
+           <div class="countdown-item">
+             <div class="countdown-number" id="minutes">00</div>
+             <div class="countdown-label">Menit</div>
+           </div>
+           <div class="countdown-item">
+             <div class="countdown-number" id="seconds">00</div>
+             <div class="countdown-label">Detik</div>
+           </div>
+        </div>
+        <% } %>
+
+        <div class="info-alert">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" style="flex-shrink:0;"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <div>
+            <strong>Catatan Penting:</strong><br>
+            <%= cms.pengumuman || 'Harap melengkapi seluruh berkas dan administrasi sebelum tanggal kedatangan yang telah ditentukan.' %>
           </div>
         </div>
-      </div>
+    </div>
 
-      <div class="col-12"><div class="divider"></div></div>
-      
-      <!-- Rules Section -->
-      <div class="col-12"><h3 class="sec-title">Peraturan & Ketentuan</h3></div>
-      <div class="col-12">
-        <div class="smooth-box">
-          <div style="margin-bottom:16px; display:flex; align-items:center; gap:10px;">
-             <div style="width:36px; height:36px; background:rgba(34,197,94,0.1); border-radius:4px; display:flex; align-items:center; justify-content:center; color:var(--accent);">
-               <svg style="width:18px;height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-             </div>
-             <div>
-               <div style="font-weight:700;">Tata Tertib Aturan Santri</div>
-               <div style="font-size:0.8rem; color:var(--muted);">Daftar peraturan dan ketentuan yang berlaku</div>
-             </div>
+    <!-- Divider -->
+    <div class="section-head">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+      <h3>Peraturan & Ketentuan</h3>
+    </div>
+
+    <!-- Rules Section -->
+    <div>
+        <% 
+          const peraturan = Array.isArray(cms.peraturan) ? cms.peraturan : []; 
+        %>
+        <% if (peraturan.length > 0) { %>
+          <div class="rules-container">
+            <% peraturan.forEach((rule, idx) => { %>
+              <div class="rule-card">
+                <div class="rule-num"><%= idx + 1 %></div>
+                <div class="rule-content"><%= rule %></div>
+              </div>
+            <% }) %>
           </div>
-          
-          <% 
-            const peraturan = Array.isArray(cms.peraturan) ? cms.peraturan : []; 
-          %>
-          <% if (peraturan.length > 0) { %>
-            <div class="rules-list">
-              <% peraturan.forEach((rule, idx) => { %>
-                <div class="rule-item">
-                  <div class="rule-number"><%= idx + 1 %></div>
-                  <div class="rule-text"><%= rule %></div>
-                </div>
-              <% }) %>
-            </div>
-          <% } else { %>
-            <div style="text-align:center; color:var(--muted); padding:20px; font-style:italic;">Belum ada data peraturan.</div>
-          <% } %>
-        </div>
-      </div>
+        <% } else { %>
+          <div style="text-align:center; color:var(--muted); padding:30px; font-style:italic;">Belum ada peraturan yang ditambahkan.</div>
+        <% } %>
+    </div>
 
-      <div class="col-12"><div class="divider"></div></div>
+    <!-- Divider -->
+    <div class="section-head" style="margin-top:40px;">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+        <h3>Kontak Panitia</h3>
+    </div>
 
-      <!-- Contacts Section -->
-      <div class="col-12"><h3 class="sec-title">Kontak Panitia</h3></div>
-      <div class="col-12">
+    <!-- Contacts Section -->
+    <div class="contact-grid">
         <% 
           const kontakPanitia = (cms && cms.kontak_panitia) 
             ? (typeof cms.kontak_panitia === 'string' ? JSON.parse(cms.kontak_panitia) : cms.kontak_panitia) 
             : [];
         %>
         <% if (kontakPanitia && kontakPanitia.length > 0) { %>
-          <div class="contact-grid">
             <% kontakPanitia.forEach(kontak => { 
                 let iconClass = 'phone';
                 let iconSvg = '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>';
                 
-                const type = (kontak.tipe || '').toLowerCase(); // Changed from 'jenis' to 'tipe' to match original
-                const label = kontak.label || 'Kontak';
-                let val = kontak.value; // Changed from 'nilai' to 'value' to match original
+                const type = (kontak.tipe || '').toLowerCase(); 
+                const label = kontak.label || 'Customer Service';
+                let val = kontak.value; 
                 let href = '#';
+                let color = "#10B981"; // Default Green
                 
                 if (type === 'whatsapp') {
-                  iconClass = 'whatsapp';
+                  color = "#10B981"; // WA Green
                   iconSvg = '<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.304-1.654a11.882 11.882 0 005.713 1.456h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>';
-                  href = 'https://wa.me/' + val.replace(/^0/, '62').replace(/\D/g, '');
-                } else if (type === 'email') {
-                  iconClass = 'email';
+                   href = 'https://wa.me/' + val.replace(/^0/, '62').replace(/\D/g, '');
+                 } else if (type === 'email') {
+                  color = "#ef4444"; // Red
                   iconSvg = '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>';
                   href = 'mailto:' + val;
-                } else if (type === 'instagram') {
-                  iconClass = 'instagram';
+                 } else if (type === 'instagram') {
+                  color = "#E1306C"; // Pink
                   iconSvg = '<rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/>';
                   href = val.startsWith('http') ? val : 'https://instagram.com/' + val.replace('@','');
                 }
             %>
-            <a href="<%= href %>" class="contact-item" target="_blank">
-              <div class="contact-icon-wrap <%= iconClass %>">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><%- iconSvg %></svg>
+            <a href="<%= href %>" class="contact-card" target="_blank">
+              <div class="contact-icon" style="background:<%= color %>">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><%- iconSvg %></svg>
               </div>
               <div class="contact-info">
-                <div class="contact-label"><%= label %></div>
-                <div class="contact-value"><%= val %></div>
+                <h4><%= label %></h4>
+                <p><%= val %></p>
               </div>
             </a>
             <% }) %>
-          </div>
         <% } else { %>
-          <div style="text-align:center; color:var(--muted); padding:20px;">Belum ada kontak panitia.</div>
+          <div style="background:var(--bg); border:1px solid var(--border); padding:20px; border-radius:12px; grid-column:1/-1; text-align:center; color:var(--muted);">
+            Belum ada kontak yang ditambahkan.
+          </div>
         <% } %>
+      </div>
 
     </div>
   </div>
@@ -184,7 +351,7 @@
 </footer>
 
 <script>
-  // Theme Toggle
+  // Theme Toggle (Same logic, preserved)
   const root = document.documentElement;
   function setFabIcon(theme) {
     const sun = '<svg class="icon" viewBox="0 0 24 24"><path d="M6.76 4.84l-1.8-1.79L3.5 4.5l1.79 1.79 1.47-1.45zM1 13h3v-2H1v2zm10-9h2V1h-2v3zm7.24.84L18.5 4.5l-1.46 1.47 1.79 1.79 1.41-1.41zM20 13h3v-2h-3v2zm-7 7h2v-3h-2v3zm5.74-2.16l1.79 1.79 1.41-1.41-1.79-1.79-1.41 1.41zM4.5 18.5l1.79-1.79-1.41-1.41-1.79 1.79 1.41 1.41zM12 6a6 6 0 1 1 0 12 6 6 0 0 1 0-12z"></path></svg>';
@@ -218,22 +385,16 @@
       const diff = targetDate - now;
       
       if (diff <= 0) {
-        document.getElementById('days').textContent = '0';
-        document.getElementById('hours').textContent = '0';
-        document.getElementById('minutes').textContent = '0';
-        document.getElementById('seconds').textContent = '0';
+        ['days','hours','minutes','seconds'].forEach(id => document.getElementById(id).textContent = '00');
         return;
       }
       
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      const pad = (n) => String(n).padStart(2, '0');
       
-      document.getElementById('days').textContent = days;
-      document.getElementById('hours').textContent = hours;
-      document.getElementById('minutes').textContent = minutes;
-      document.getElementById('seconds').textContent = seconds;
+      document.getElementById('days').textContent = pad(Math.floor(diff / (1000 * 60 * 60 * 24)));
+      document.getElementById('hours').textContent = pad(Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
+      document.getElementById('minutes').textContent = pad(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)));
+      document.getElementById('seconds').textContent = pad(Math.floor((diff % (1000 * 60)) / 1000));
     }
     
     updateCountdown();

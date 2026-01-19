@@ -183,11 +183,7 @@ router.post('/pengurus/kelola-akun/delete', requireAdmin, async (req, res) => {
 /* ============================================================
     6. EXPORT LAPORAN PEMBAYARAN KE CSV/EXCEL
     ============================================================ */
-// (Keep existing export route if needed, or remove if centralized in pengurus.js)
-router.get('/pengurus/laporan-pembayaran/export', async (req, res) => {
-    // ... (existing code or redirect to new Excel export) ...
-    res.redirect('/pengurus/laporan-masuk/export-excel');
-});
+
 
 /* ============================================================
     7. BACKUP DATABASE (PG_DUMP)

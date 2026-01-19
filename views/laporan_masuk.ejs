@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><%= title %></title>
   
+  <!-- Apply theme immediately to prevent flash -->
+  <script>
+    (function() {
+      var theme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+  
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css" />
   <link rel="stylesheet" href="/duty.css" />
@@ -120,6 +128,64 @@
       .table { min-width: 500px; }
       .table th, .table td { font-size: 0.8rem !important; padding: 12px 10px !important; }
     }
+    
+    /* Button Styles from verifikasi_pembayaran.ejs */
+    .btn-small { padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; transition: all .2s; }
+    .btn-detail-link { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.15); }
+    .btn-detail-link:hover { background: #3b82f6; color: #fff; }
+    
+    /* Animation Keyframes */
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* TOOLBAR (Search & Filter) */
+    .toolbar {
+      display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;
+    }
+    .search-group { position: relative; flex: 1; min-width: 200px; }
+    .search-group svg {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--muted); width: 18px; height: 18px; pointer-events: none;
+    }
+    .search-input {
+      width: 100%; padding: 12px 16px 12px 42px;
+      border-radius: 12px; border: 1px solid var(--border);
+      background: var(--bg-2); color: var(--text);
+      font-size: 0.95rem; font-weight: 500;
+      transition: all 0.2s;
+    }
+    .search-input:focus {
+      border-color: var(--accent); outline: none;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+    }
+    
+    .filter-group { display: flex; gap: 12px; align-items: center; }
+    .filter-input {
+      padding: 11px 16px;
+      border-radius: 12px; border: 1px solid var(--border);
+      background: var(--bg-2); color: var(--text);
+      font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      min-width: 150px; transition: all 0.2s;
+      color-scheme: dark;
+    }
+    .filter-input:focus { border-color: var(--accent); outline: none; }
+
+    .btn-apply {
+      background: var(--accent); color: #000; border: none;
+      padding: 12px 24px; border-radius: 12px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s; font-size: 0.9rem;
+    }
+    .btn-apply:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2); }
+
+    .btn-reset {
+      background: var(--bg-2); color: var(--text); border: 1px solid var(--border);
+      padding: 11px 20px; border-radius: 12px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; font-size: 0.9rem;
+      text-decoration: none; display: flex; align-items: center;
+    }
+    .btn-reset:hover { background: var(--border); }
   </style>
 </head>
 <body>
@@ -140,59 +206,189 @@
   </div>
 </header>
 
-<%- include('partials/pengurus_sidebar', { currentPage: 'laporan-masuk', user: user, stat: null }) %>
 
-<main class="section">
-  <div class="container">
+  <%- include('partials/pengurus_sidebar', { currentPage: 'laporan-masuk', user: user, stat: null }) %>
 
+  <main class="section">
+    <div class="container">
 
-    <% if(!pembayaran || pembayaran.length === 0) { %>
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-        </svg>
-        <h4>Belum ada pembayaran</h4>
-        <p>Belum ada pembayaran yang diverifikasi</p>
-      </div>
-    <% } else { %>
-      <div class="table-card">
-        <table class="table">
-          <thead>
-            <tr>
-              <th style="text-align:center" width="60">No</th>
-              <th>Nama Santri</th>
-              <th>Tanggal Dikirim</th>
-              <th style="text-align:center" width="150">Bukti Pembayaran</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% pembayaran.forEach((p, i) => { %>
-              <tr>
-                <td style="text-align:center; color:var(--muted); font-size:0.9rem"><%= i + 1 %></td>
-                <td class="cell-nama"><%= p.nama_santri %></td>
-                <td style="color:var(--muted); font-size:0.85rem"><%= p.tanggal_upload %></td>
-                <td style="text-align:center">
-                  <div style="display:flex; justify-content:center;">
-                    <button type="button" onclick="openZoom('<%= p.bukti_path %>')" style="background:var(--bg-2); border:1px solid var(--border); border-radius:6px; padding:4px 8px; display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; color:var(--text); transition:all .2s;">
-                      <img src="<%= p.bukti_path %>" style="width:24px; height:24px; object-fit:cover; border-radius:4px;">
-                      Lihat
-                    </button>
-                  </div>
-                </td>
-              </tr>
+      <!-- TOOLBAR FILTER -->
+      <form id="filterForm" method="GET" action="/pengurus/laporan-masuk" class="toolbar">
+        <div class="search-group">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" name="search" class="search-input" placeholder="Cari nama santri atau pengirim..." value="<%= search %>">
+        </div>
+        
+        <div class="filter-group">
+          <select name="month" class="filter-input">
+            <option value="">Semua Bulan</option>
+            <% months.forEach(m => { %>
+              <option value="<%= m.value %>" <%= month === m.value ? 'selected' : '' %>><%= m.name %></option>
             <% }) %>
-          </tbody>
-        </table>
+          </select>
+
+          <select name="year" class="filter-input" style="min-width: 100px;">
+            <option value="">Semua Tahun</option>
+            <% years.forEach(y => { %>
+              <option value="<%= y %>" <%= year === y ? 'selected' : '' %>><%= y %></option>
+            <% }) %>
+          </select>
+          
+        </div>
+      </form>
+
+      <% if(!pembayaran || pembayaran.length === 0) { %>
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          <h4>Belum ada pembayaran</h4>
+          <p>Belum ada pembayaran yang diverifikasi</p>
+        </div>
+      <% } else { %>
+        <div class="table-card" style="animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th style="text-align:center" width="60">No</th>
+                  <th style="text-align:center" width="120">Bukti</th>
+                  <th>Nama Santri</th>
+                  <th style="white-space: nowrap;">Tanggal</th>
+                  <th style="text-align:center" width="100">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% pembayaran.forEach((p, i) => { %>
+                  <tr>
+                    <td style="text-align:center; color:var(--muted); font-size:0.9rem"><%= i + 1 %></td>
+                    <td style="text-align:center">
+                      <div style="display:flex; justify-content:center;">
+                        <button type="button" onclick="openZoom('<%= p.bukti_path %>')" style="background:transparent; border:1px solid var(--border); border-radius:50px; padding:4px 12px 4px 4px; display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.8rem; font-weight:600; width:auto; color:var(--text); transition:all .2s;">
+                          <img src="<%= p.bukti_path %>" style="width:24px; height:24px; object-fit:cover; border-radius:50%;">
+                          Lihat
+                        </button>
+                      </div>
+                    </td>
+                    <td class="cell-nama" style="font-weight:400"><%= p.nama_santri %></td>
+                    <td style="color:var(--muted); font-size:0.85rem; white-space: nowrap;"><%= p.tanggal_upload %></td>
+                    <td style="text-align:center">
+                      <div style="display:flex; justify-content:center;">
+                        <button type="button" 
+                          onclick="showDetail('<%= p.nama_santri %>', '<%= p.nama_pengirim || '-' %>', '<%= p.nama_bank || '-' %>', '<%= p.nomor_rekening || '-' %>', '<%= p.tanggal_transfer || '-' %>', '<%= p.tanggal_upload %>', '<%= p.bukti_path %>')" 
+                          class="btn-small btn-detail-link">
+                          Detail
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </main>
+
+  <button id="themeFab" class="theme-fab"></button>
+
+  <!-- Modal Detail (Matched Reference Design) -->
+  <div id="detailModal" class="modal-overlay" style="display:none;" onclick="closeDetail()">
+    <div class="modal-box" onclick="event.stopPropagation()" style="background:var(--bg-2); border:1px solid var(--border); border-radius:12px; max-width:480px; width:95%; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); overflow:hidden; transform:scale(0.95); opacity:0; transition:all 0.2s; padding:0; display:flex; flex-direction:column; max-height:90vh;">
+      
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border);">
+        <h3 style="margin:0; font-size:1.1rem; font-weight:700;">Detail Pembayaran</h3>
+        <button onclick="closeDetail()" style="background:transparent; border:none; color:var(--muted); font-size:1.5rem; cursor:pointer; line-height:1; padding:4px;">&times;</button>
       </div>
-    <% } %>
+      
+      <div style="overflow-y:auto; flex:1;">
+        <!-- Image Section -->
+        <div style="padding:24px 24px 16px; text-align:center;">
+          <div style="border-radius:8px; overflow:hidden; border:1px solid var(--border); display:inline-block; max-width:100%;">
+            <img id="modalBukti" src="" onclick="openZoom(this.src)" style="max-height:220px; max-width:100%; display:block; cursor:zoom-in;">
+          </div>
+          <p style="margin:12px 0 0; font-size:0.8rem; color:var(--muted);">Klik gambar untuk memperbesar</p>
+        </div>
+
+        <!-- Info Header -->
+        <div style="padding:0 24px 16px;">
+          <div style="display:flex; align-items:center; gap:8px; border-bottom:2px solid var(--border); padding-bottom:8px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" style="color:var(--accent);"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <h4 style="margin:0; font-size:1rem; font-weight:700;">Info Pembayaran</h4>
+          </div>
+        </div>
+
+        <!-- Details List -->
+        <div style="padding:0 24px 24px;">
+          <div class="detail-row" style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border-light, rgba(0,0,0,0.05));">
+            <span style="color:var(--muted); font-size:0.9rem;">Nama Santri</span>
+            <span id="modalNama" style="font-weight:600; text-align:right;">-</span>
+          </div>
+          <div class="detail-row" style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border-light, rgba(0,0,0,0.05));">
+            <span style="color:var(--muted); font-size:0.9rem;">Nama Pengirim</span>
+            <span id="modalPengirim" style="font-weight:500; text-align:right;">-</span>
+          </div>
+          <div class="detail-row" style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border-light, rgba(0,0,0,0.05));">
+            <span style="color:var(--muted); font-size:0.9rem;">Nama Bank</span>
+            <span id="modalBank" style="font-weight:500; text-align:right;">-</span>
+          </div>
+          <div class="detail-row" style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border-light, rgba(0,0,0,0.05));">
+            <span style="color:var(--muted); font-size:0.9rem;">Nomor Rekening</span>
+            <span id="modalRekening" style="font-weight:500; text-align:right;">-</span>
+          </div>
+          <div class="detail-row" style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border-light, rgba(0,0,0,0.05));">
+            <span style="color:var(--muted); font-size:0.9rem;">Tanggal Transfer</span>
+            <span id="modalTglTransfer" style="font-weight:500; text-align:right;">-</span>
+          </div>
+          <div class="detail-row" style="display:flex; justify-content:space-between; padding:12px 0;">
+            <span style="color:var(--muted); font-size:0.9rem;">Tanggal Upload</span>
+            <span id="modalTanggal" style="font-weight:500; text-align:right;">-</span>
+          </div>
+        </div>
+      </div>
+      
+      <div style="padding:16px 24px; border-top:1px solid var(--border); text-align:right; background:var(--bg);">
+        <button onclick="closeDetail()" style="background:var(--accent); border:none; padding:10px 24px; border-radius:6px; font-size:0.95rem; font-weight:600; color:#000; cursor:pointer; width:100%;">Tutup</button>
+      </div>
+    </div>
   </div>
-</main>
 
-<button id="themeFab" class="theme-fab"></button>
+  <script>
+    function showDetail(nama, pengirim, bank, rekening, tglTransfer, tglUpload, bukti) {
+      const modal = document.getElementById('detailModal');
+      const box = modal.querySelector('.modal-box');
+      
+      document.getElementById('modalNama').textContent = nama;
+      document.getElementById('modalPengirim').textContent = pengirim;
+      document.getElementById('modalBank').textContent = bank;
+      document.getElementById('modalRekening').textContent = rekening;
+      document.getElementById('modalTglTransfer').textContent = tglTransfer;
+      document.getElementById('modalTanggal').textContent = tglUpload;
+      document.getElementById('modalBukti').src = bukti;
+      
+      modal.style.display = 'flex';
+      requestAnimationFrame(() => {
+        box.style.transform = 'scale(1)';
+        box.style.opacity = '1';
+      });
+    }
 
-<script>
-  // Image Zoom
-  // Image Zoom Styled (Boxed)
+    function closeDetail() {
+      const modal = document.getElementById('detailModal');
+      const box = modal.querySelector('.modal-box');
+      
+      box.style.transform = 'scale(0.95)';
+      box.style.opacity = '0';
+      
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 200);
+    }
+
+    // reuse existing showDetail ...
+
+  // Image Zoom Function (Identical to Laporan Pembayaran)
   function openZoom(src) {
     const modal = document.createElement('div');
     modal.style.cssText = `
@@ -270,11 +466,23 @@
     modal.onclick = (e) => { if (e.target === modal) close(); };
     closeBtn.onclick = close;
   }
+  
+  // Clean up unused styles if any
+  if (document.getElementById('zoomStyles')) {
+    document.getElementById('zoomStyles').remove();
+  }
+  // Auto-submit filter form
+  const filterForm = document.getElementById('filterForm');
+  if (filterForm) {
+    const inputs = filterForm.querySelectorAll('input, select');
+    inputs.forEach(input => {
+      input.addEventListener('change', () => {
+        filterForm.submit();
+      });
+    });
+  }
 </script>
 
 <%- include('partials/pengurus_nav_script') %>
 
 </body>
-</html>
-
-

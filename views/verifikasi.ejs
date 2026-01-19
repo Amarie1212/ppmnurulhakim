@@ -60,6 +60,52 @@
       box-shadow: 0 25px 50px rgba(0,0,0,0.5);
       animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
     }
+    /* Pop Animation */
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    
+    .table-card {
+      background: var(--bg-2); /* Match Pengurus */
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    /* SCROLL WRAPPER (Match Pengurus) */
+    .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      width: 100%;
+    }
+
+    /* Make table compact/rapat (Match Pengurus) */
+    .table th { padding: 12px 16px !important; }
+    .table td { padding: 10px 16px !important; }
+    
+    /* Remove Bold from Name (Match Pengurus) */
+    .cell-nama { font-weight: 400 !important; }
+
+    /* Mobile responsive (Match pengurus.ejs - no font override) */
+    @media (max-width: 768px) {
+      .table {
+        min-width: 500px;
+      }
+      /* No font-size override - let duty.css default apply (0.85rem th, 0.9rem td) */
+      
+      /* Match Button Size */
+      .btn-detail-link, .btn-small {
+        padding: 8px 14px !important;
+        font-size: 0.8rem !important;
+      }
+    }
+    
+    /* Remove Bold from Name (Match Pengurus) */
+    .cell-nama { font-weight: 400 !important; }
+
+    /* Modal Animation */
     @keyframes modalPop { 
       0% { transform: scale(0.8); opacity: 0; }
       100% { transform: scale(1); opacity: 1; } 
@@ -92,35 +138,37 @@
       color: #ef4444; 
     }
     
-    /* Section Cards - Dark Theme */
+    /* Section Cards - Clean Style */
     .biodata-section {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 16px;
-      margin-bottom: 16px;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+      margin-bottom: 24px;
     }
     .biodata-section-title {
-      font-size: 0.95rem;
+      font-size: 1rem;
       font-weight: 700;
-      color: var(--accent);
-      margin: 0 0 14px;
+      color: var(--text);
+      margin: 0 0 16px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border);
     }
-    .biodata-section-title svg { width: 18px; height: 18px; }
+    .biodata-section-title svg { width: 20px; height: 20px; color: var(--accent); }
     
     .info-row { 
-      display: flex; justify-content: space-between; align-items: center; 
+      display: flex; justify-content: space-between; align-items: flex-start; 
       padding: 12px 0;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px dashed var(--border);
     }
     .info-row:last-child { border-bottom: none; }
-    .info-label { color: var(--muted); font-size: 0.9rem; font-weight: 500; }
+    .info-label { color: var(--muted); font-size: 0.9rem; font-weight: 500; min-width: 100px; }
     .info-val { 
-      font-weight: 600; text-align: right; word-break: break-word; 
-      max-width: 60%; color: var(--text); font-size: 0.95rem; display: flex; align-items: center; justify-content: flex-end; gap: 6px;
+      font-weight: 400; text-align: right; word-break: break-word; 
+      max-width: 65%; color: var(--text); font-size: 0.95rem; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; line-height: 1.5;
     }
     
     .modal-actions { display: flex; gap: 12px; padding: 20px 24px; border-top: 1px solid var(--border); }
@@ -280,7 +328,8 @@
         </div>
       <% } else { %>
       <div class="table-card">
-        <table class="table">
+        <div class="table-responsive">
+          <table class="table">
           <thead>
             <tr>
               <th width="60" style="text-align:center">No</th>
@@ -294,13 +343,13 @@
             <% akun.forEach((a, index) => { %>
               <tr>
                 <td style="text-align:center; color:var(--muted); font-size:0.9rem"><%= index + 1 %></td>
-                 <td style="font-weight:700"><%= a.nama %></td>
+                 <td class="cell-nama"><%= a.nama %></td>
                  <td><%= a.daerah || '-' %></td>
                  <td>
-                   <% if(a.wa) { %><a href="https://wa.me/<%= a.wa.startsWith('0') ? '62' + a.wa.slice(1) : a.wa %>" target="_blank" style="color:var(--accent);text-decoration:none;display:inline-flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.304-1.654a11.882 11.882 0 005.713 1.456h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg><%= a.wa %></a><% } %>
+                   <% if(a.wa) { %><a href="https://wa.me/<%= a.wa.startsWith('0') ? '62' + a.wa.slice(1) : a.wa %>" target="_blank" style="color:var(--accent); text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-weight:500;"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style="margin-top:-1px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.304-1.654a11.882 11.882 0 005.713 1.456h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg><%= a.wa %></a><% } %>
                  </td>
                 <td style="text-align:center">
-                  <button class="btn-small btn-detail-link" onclick="openAccountModal(this)"
+                  <button class="btn btn-detail" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); padding: 6px 12px; font-size: 0.85rem; border-radius: 6px;" onclick="openAccountModal(this)"
                     data-id="<%= a.id %>"
                     data-nama="<%= a.nama %>"
                     data-email="<%= a.email %>"
@@ -308,6 +357,8 @@
                     data-kelompok="<%= a.kelompok %>"
                     data-desa="<%= a.desa %>"
                     data-daerah="<%= a.daerah %>"
+                    data-kampus="<%= a.kampus %>"
+                    data-prodi="<%= a.prodi %>"
                     data-tgl="<%= a.created_fmt %>"
                   >
                     Proses
@@ -333,7 +384,8 @@
         </div>
       <% } else { %>
       <div class="table-card">
-        <table class="table">
+        <div class="table-responsive">
+          <table class="table">
           <thead>
             <tr>
               <th width="60" style="text-align:center">No</th>
@@ -347,13 +399,13 @@
             <% biodata.forEach((b, index) => { %>
               <tr>
                 <td style="text-align:center; color:var(--muted); font-size:0.9rem"><%= index + 1 %></td>
-                <td style="font-weight:700"><%= b.nama %></td>
+                <td class="cell-nama"><%= b.nama %></td>
                 <td><%= b.jk === 'L' ? 'Laki-laki' : 'Perempuan' %></td>
                 <td>
-                  <% if(b.wa) { %><a href="https://wa.me/<%= b.wa.startsWith('0') ? '62' + b.wa.slice(1) : b.wa %>" target="_blank" style="color:var(--accent);text-decoration:none;display:inline-flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.304-1.654a11.882 11.882 0 005.713 1.456h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg><%= b.wa %></a><% } %>
+                   <% if(b.wa) { %><a href="https://wa.me/<%= b.wa.startsWith('0') ? '62' + b.wa.slice(1) : b.wa %>" target="_blank" style="color:var(--accent); text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-weight:500;"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style="margin-top:-1px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.304-1.654a11.882 11.882 0 005.713 1.456h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg><%= b.wa %></a><% } %>
                 </td>
                 <td style="text-align:center">
-                  <button class="btn-small btn-detail-link" onclick="openBiodataModal(this)"
+                  <button class="btn btn-detail" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); padding: 6px 12px; font-size: 0.85rem; border-radius: 6px;" onclick="openBiodataModal(this)"
                     data-id="<%= b.id %>"
                     data-nama="<%= b.nama %>"
                     data-jk="<%= b.jk === 'L' ? 'Laki-laki' : 'Perempuan' %>"
@@ -420,6 +472,8 @@
         <div class="info-row"><span class="info-label">Kelompok</span><span class="info-val" id="a-kelompok"></span></div>
         <div class="info-row"><span class="info-label">Desa</span><span class="info-val" id="a-desa"></span></div>
         <div class="info-row"><span class="info-label">Daerah</span><span class="info-val" id="a-daerah"></span></div>
+        <div class="info-row"><span class="info-label">Kampus</span><span class="info-val" id="a-kampus"></span></div>
+        <div class="info-row"><span class="info-label">Prodi</span><span class="info-val" id="a-prodi"></span></div>
         <div class="info-row"><span class="info-label">Tgl Daftar</span><span class="info-val" id="a-tgl"></span></div>
       </div>
     </div>
@@ -580,6 +634,11 @@
       document.querySelectorAll('.tab-btn')[1].classList.add('active');
       document.getElementById('tab-biodata').classList.add('active');
     }
+
+    // Update URL agar saat refresh tetap di tab yang sama
+    const url = new URL(window.location);
+    url.searchParams.set('tab', tab);
+    window.history.pushState({}, '', url);
   }
 
   function closeModal(id) { 
@@ -598,6 +657,8 @@
       document.getElementById('a-kelompok').textContent = d.kelompok || '-';
       document.getElementById('a-desa').textContent = d.desa || '-';
       document.getElementById('a-daerah').textContent = d.daerah || '-';
+      document.getElementById('a-kampus').textContent = d.kampus || '-';
+      document.getElementById('a-prodi').textContent = d.prodi || '-';
       document.getElementById('a-tgl').textContent = d.tgl;
       
       let waNum = d.wa || '';

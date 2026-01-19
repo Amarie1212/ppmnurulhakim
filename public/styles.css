@@ -527,7 +527,7 @@ a { color: inherit; text-decoration: none; }
 .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; margin-bottom: 12px; line-height: 1.2; }
 .hero p { color: #d1d5db; font-size: 1.2rem; max-width: 700px; margin: 0 auto; }
 
-.section { padding: 80px 0; }
+.section { padding: 50px 0; }
 .section.alt { background: var(--bg-2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 .section h2 { text-align: center; margin-bottom: 20px; font-weight: 800; font-size: 2rem; }
 .lead { max-width: 800px; margin: 0 auto 40px; color: var(--muted); text-align: center; }
@@ -680,7 +680,7 @@ a { color: inherit; text-decoration: none; }
   
   /* Responsive sizes for mobile */
   .brand { font-size: 1rem; }
-  .section { padding: 60px 0; }
+  .section { padding: 40px 0; }
   .section h2 { font-size: 1.5rem; }
   .lead { font-size: 0.9rem; margin-bottom: 30px; }
   .cards { gap: 16px; }

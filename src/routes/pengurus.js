@@ -4,6 +4,7 @@ const pool = require('../db');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const ExcelJS = require('exceljs');
 
 // Galeri upload storage
 const galeriStorage = multer.diskStorage({
@@ -44,9 +45,10 @@ async function getAdminStats() {
     const res = await pool.query(`
       SELECT 
         (SELECT COUNT(*) FROM tb_akun_santri WHERE status='PENDING') AS pending,
+        (SELECT COUNT(*) FROM tb_santri WHERE status_biodata IS NULL OR status_biodata = 'PENDING') AS biodata_pending,
         (SELECT COUNT(*) FROM tb_pembayaran WHERE status='PENDING') AS pending_payment
     `);
-    return res.rows[0] || { pending: 0, pending_payment: 0 };
+    return res.rows[0] || { pending: 0, biodata_pending: 0, pending_payment: 0 };
   } catch (e) {
     console.error('[getAdminStats] Error:', e.message);
     return { pending: 0, pending_payment: 0 };
@@ -280,44 +282,6 @@ router.post('/pengurus/biodata/verify', requireAuth, async (req, res) => {
 });
 
 
-
-/* ============================================================
-   2b. LAPORAN DATA SANTRI (Spreadsheet View)
-   Akses: Admin, Panitia, Ketua
-   ============================================================ */
-router.get('/pengurus/laporan-santri', requireAuth, async (req, res) => {
-  // Cek role - hanya admin, panitia, ketua
-  if (!['admin', 'panitia', 'ketua'].includes(req.session.user.role)) {
-    return res.redirect('/pengurus/home');
-  }
-  
-  try {
-    const { rows } = await pool.query(`
-      SELECT 
-        s.id, s.nama, s.jk, s.wa, s.email,
-        s.kelompok, s.desa, s.daerah, s.alamat,
-        s.sekolah_asal, s.nama_ayah, s.nama_ibu,
-        s.status_biodata, s.angkatan, s.created_at
-      FROM tb_santri s
-      ORDER BY 
-        CASE s.jk WHEN 'L' THEN 0 ELSE 1 END,
-        s.nama ASC
-    `);
-    
-    const stat = await getAdminStats();
-    
-    res.render('laporan_santri', {
-      title: 'Laporan Data Santri',
-      user: req.session.user,
-      santri: rows,
-      stat
-    });
-  } catch (e) {
-    console.error('[GET /pengurus/laporan-santri] Error:', e.message);
-    res.redirect('/pengurus/home');
-  }
-});
-
 /* ============================================================
    2c. SPREADSHEET ONLINE (Google Sheets Embed)
    Akses: Admin, Panitia, Keuangan
@@ -371,42 +335,70 @@ router.get('/pengurus/export-santri', requireAuth, async (req, res) => {
       ORDER BY s.jk ASC, s.nama ASC
     `);
 
-    // Build CSV content
-    const headers = ['Nama', 'Jenis Kelamin', 'No WhatsApp', 'Email', 'Kelompok', 'Desa', 'Daerah', 'Kelurahan', 'Kecamatan', 'Kota/Kab', 'Provinsi', 'Kampus', 'Prodi', 'Jenjang', 'Angkatan', 'Nama Ayah', 'HP Ayah', 'Nama Ibu', 'HP Ibu', 'Tanggal Daftar'];
-    
-    let csv = headers.join(',') + '\n';
-    
-    rows.forEach(row => {
-      const values = [
-        row.nama || '',
-        row.jenis_kelamin || '',
-        row.no_whatsapp || '',
-        row.email || '',
-        row.kelompok || '',
-        row.desa || '',
-        row.daerah || '',
-        row.kelurahan || '',
-        row.kecamatan || '',
-        row.kota_kab || '',
-        row.provinsi || '',
-        row.kampus || '',
-        row.prodi || '',
-        row.jenjang || '',
-        row.angkatan || '',
-        row.ayah_nama || '',
-        row.ayah_hp || '',
-        row.ibu_nama || '',
-        row.ibu_hp || '',
-        row.tanggal_daftar || ''
-      ].map(v => `"${String(v).replace(/"/g, '""')}"`);
-      csv += values.join(',') + '\n';
+    // Build Excel File using ExcelJS
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Data Santri');
+
+    // Define Columns
+    worksheet.columns = [
+      { header: 'Nama', key: 'nama', width: 30 },
+      { header: 'Jenis Kelamin', key: 'jenis_kelamin', width: 15 },
+      { header: 'No WhatsApp', key: 'no_whatsapp', width: 18 },
+      { header: 'Email', key: 'email', width: 25 },
+      { header: 'Kelompok', key: 'kelompok', width: 20 },
+      { header: 'Desa', key: 'desa', width: 20 },
+      { header: 'Daerah', key: 'daerah', width: 15 },
+      { header: 'Kelurahan', key: 'kelurahan', width: 20 },
+      { header: 'Kecamatan', key: 'kecamatan', width: 20 },
+      { header: 'Kota/Kab', key: 'kota_kab', width: 20 },
+      { header: 'Provinsi', key: 'provinsi', width: 20 },
+      { header: 'Kampus', key: 'kampus', width: 25 },
+      { header: 'Prodi', key: 'prodi', width: 20 },
+      { header: 'Jenjang', key: 'jenjang', width: 10 },
+      { header: 'Angkatan', key: 'angkatan', width: 10 },
+      { header: 'Nama Ayah', key: 'ayah_nama', width: 25 },
+      { header: 'HP Ayah', key: 'ayah_hp', width: 18 },
+      { header: 'Nama Ibu', key: 'ibu_nama', width: 25 },
+      { header: 'HP Ibu', key: 'ibu_hp', width: 18 },
+      { header: 'Tanggal Daftar', key: 'tanggal_daftar', width: 15 }
+    ];
+
+    // Add Data
+    worksheet.addRows(rows);
+
+    // Style Header Row
+    const headerRow = worksheet.getRow(1);
+    headerRow.font = { bold: true, size: 12, color: { argb: 'FFFFFF' } };
+    headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '16a34a' } }; // Green accent
+    headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+    headerRow.height = 30;
+
+    // Style Data Rows (Borders & Alignment)
+    worksheet.eachRow((row, rowNumber) => {
+      row.eachCell((cell) => {
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' }
+        };
+        cell.alignment = { vertical: 'middle', wrapText: true };
+      });
+      if (rowNumber > 1) {
+         // Center alignment for specific columns like Gender, Year, Level
+         row.getCell('jenis_kelamin').alignment = { vertical: 'middle', horizontal: 'center' };
+         row.getCell('jenjang').alignment = { vertical: 'middle', horizontal: 'center' };
+         row.getCell('angkatan').alignment = { vertical: 'middle', horizontal: 'center' };
+      }
     });
 
-    // Set headers for CSV download
-    const filename = `data_santri_${new Date().toISOString().split('T')[0]}.csv`;
-    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    // Set headers for Excel download
+    const filename = `data_santri_${new Date().toISOString().split('T')[0]}.xlsx`;
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.send('\uFEFF' + csv); // BOM for Excel UTF-8 support
+
+    await workbook.xlsx.write(res);
+    res.end();
   } catch (e) {
     console.error('[GET /pengurus/export-santri] Error:', e.message);
     res.redirect('/pengurus');
@@ -418,12 +410,16 @@ router.get('/pengurus/export-santri', requireAuth, async (req, res) => {
    ============================================================ */
 // Tampilkan Tabel Akun Pending + Biodata Pending
 router.get('/pengurus/verifikasi', requireAuth, async (req, res) => {
+  // Hanya admin & panitia yang boleh akses verifikasi pendaftaran
+  if (!['admin', 'panitia'].includes(req.session.user.role)) {
+    return res.redirect('/pengurus/home');
+  }
   try {
     // Tab 1: Akun Pending
     const akunResult = await pool.query(`
       SELECT 
         id, nama, email, wa, 
-        kelompok, desa, daerah, 
+        kelompok, desa, daerah, kampus, prodi,
         to_char(created_at, 'DD Mon HH24:MI') as created_fmt
       FROM tb_akun_santri 
       WHERE status = 'PENDING' 
@@ -467,12 +463,16 @@ router.get('/pengurus/verifikasi', requireAuth, async (req, res) => {
     });
   } catch (e) {
     console.error('[GET /verifikasi] Error:', e.message);
-    res.send("Error memuat halaman verifikasi");
+    res.send("Error memuat halaman verifikasi: " + e.message);
   }
 });
 
 // Proses Verifikasi Akun (Tab 1)
 router.post('/pengurus/verifikasi', requireAuth, async (req, res) => {
+  // Hanya admin & panitia yang boleh verifikasi pendaftaran
+  if (!['admin', 'panitia'].includes(req.session.user.role)) {
+    return res.status(403).send('Akses ditolak');
+  }
   const { id, aksi } = req.body;
   try {
     if (aksi === 'verify') {
@@ -489,6 +489,10 @@ router.post('/pengurus/verifikasi', requireAuth, async (req, res) => {
 
 // Proses Verifikasi Biodata (Tab 2)
 router.post('/pengurus/verifikasi-biodata', requireAuth, async (req, res) => {
+  // Hanya admin & panitia yang boleh verifikasi biodata
+  if (!['admin', 'panitia'].includes(req.session.user.role)) {
+    return res.status(403).send('Akses ditolak');
+  }
   const { id, aksi } = req.body;
   // Note: This route seems unused or redundant with /pengurus/biodata/verify below?
   // Checking views/verifikasi.ejs, it posts to /pengurus/biodata/verify.
@@ -568,65 +572,191 @@ router.get('/pengurus/export.csv', requireAuth, async (req, res) => {
    ============================================================ */
 // GET - Tampilkan daftar pembayaran yang perlu diverifikasi
 router.get('/pengurus/verifikasi-pembayaran', requireAuth, async (req, res) => {
-  // KU-2, KU-3: Hanya Keuangan yang boleh akses pembayaran
+  // KU-3: Hanya Keuangan boleh verifikasi pembayaran
   if (req.session.user.role !== 'keuangan') {
     return res.redirect('/pengurus/home');
   }
 
-  let pembayaran = [];
-  let riwayat = [];
-  
   try {
-    // Query untuk ambil pembayaran pending (dengan field baru)
-    const pending = await pool.query(`
+    const { rows } = await pool.query(`
       SELECT 
         p.id,
         COALESCE(s.nama, a.nama, 'Santri #' || p.santri_id::text) AS nama_santri,
-        p.nama_pengirim,
         p.nama_bank,
+        p.nama_pengirim,
         p.nomor_rekening,
-        to_char(p.tanggal_transfer, 'DD Mon YYYY') AS tanggal_transfer,
-        p.keterangan,
         p.bukti_path,
-        to_char(p.created_at, 'DD Mon YYYY HH24:MI') AS tanggal_upload
+        to_char(p.tanggal_transfer, 'DD Mon YYYY') AS tanggal_transfer,
+        to_char(p.created_at, 'DD Mon YYYY HH24:MI') AS created_at
       FROM tb_pembayaran p
       LEFT JOIN tb_santri s ON p.santri_id = s.id
       LEFT JOIN tb_akun_santri a ON s.email = a.email
       WHERE p.status = 'PENDING'
-      ORDER BY p.created_at DESC
+      ORDER BY p.created_at ASC
     `);
-    pembayaran = pending.rows;
-    
-    // Query untuk ambil riwayat yang sudah diverifikasi (10 terakhir)
-    const verified = await pool.query(`
-      SELECT 
-        p.id,
-        COALESCE(s.nama, a.nama, 'Santri #' || p.santri_id::text) AS nama_santri,
-        p.keterangan,
-        to_char(p.created_at, 'DD Mon YYYY') AS tanggal_upload
-      FROM tb_pembayaran p
-      LEFT JOIN tb_santri s ON p.santri_id = s.id
-      LEFT JOIN tb_akun_santri a ON s.email = a.email
-      WHERE p.status = 'VERIFIED'
-      ORDER BY p.created_at DESC
-      LIMIT 10
-    `);
-    riwayat = verified.rows;
-    
-    console.log('[Verifikasi Pembayaran] Pending:', pembayaran.length, 'Verified:', riwayat.length);
+
+    res.render('verifikasi_pembayaran', {
+      title: 'Verifikasi Pembayaran',
+      user: req.session.user,
+      pembayaran: rows
+    });
   } catch (e) {
-    console.log('[Verifikasi Pembayaran] Error:', e.message);
+    console.error('[GET /verifikasi-pembayaran] Error:', e.message);
+    res.redirect('/pengurus/home');
+  }
+});
+
+/* ============================================================
+   6b. EXPORT LAPORAN PEMBAYARAN TO EXCEL
+   ============================================================ */
+router.get('/pengurus/laporan-pembayaran/export', requireAuth, async (req, res) => {
+  if (!['admin', 'keuangan', 'ketua'].includes(req.session.user.role)) {
+    return res.redirect('/pengurus/home');
   }
 
-  const stat = await getAdminStats();
+  const search = req.query.search || '';
+  const month = req.query.month || '';
+  const year = req.query.year || '';
 
-  res.render('verifikasi_pembayaran', {
-    title: 'Verifikasi Pembayaran',
-    user: req.session.user,
-    pembayaran,
-    riwayat,
-    stat
-  });
+  try {
+    // 1. Query SUDAH BAYAR
+    let queryText = `
+      SELECT 
+        p.id, 
+        s.nama AS nama_santri,
+        p.nama_bank,
+        p.nama_pengirim,
+        to_char(p.created_at, 'DD-MM-YYYY HH24:MI') AS tanggal_upload,
+        p.status
+      FROM tb_pembayaran p
+      LEFT JOIN tb_santri s ON p.santri_id = s.id
+      WHERE 1=1
+    `;
+
+    const queryParams = [];
+
+    if (search) {
+      queryParams.push(`%${search}%`);
+      queryText += ` AND (s.nama ILIKE $${queryParams.length} OR p.nama_pengirim ILIKE $${queryParams.length})`;
+    }
+
+    if (month) {
+      queryParams.push(month);
+      queryText += ` AND to_char(p.created_at, 'MM') = $${queryParams.length}`;
+    }
+    if (year) {
+      queryParams.push(year);
+      queryText += ` AND to_char(p.created_at, 'YYYY') = $${queryParams.length}`;
+    }
+
+    queryText += ` ORDER BY p.created_at DESC`;
+
+    // 2. Query BELUM BAYAR (Logic: Santri Verified - Verified Payments)
+    let belumQuery = `
+      SELECT 
+        s.nama,
+        a.wa
+      FROM tb_santri s
+      JOIN tb_akun_santri a ON s.email = a.email
+      WHERE a.status = 'VERIFIED'
+        AND NOT EXISTS (
+          SELECT 1 FROM tb_pembayaran p WHERE p.santri_id = s.id AND p.status = 'VERIFIED'
+        )
+    `;
+    const belumParams = [];
+    
+    if (search) {
+      belumParams.push(`%${search}%`);
+      belumQuery += ` AND s.nama ILIKE $${belumParams.length}`;
+    }
+
+    belumQuery += ` ORDER BY s.nama ASC`;
+
+    // Execute all queries
+    const [sudahResult, belumResult] = await Promise.all([
+      pool.query(queryText, queryParams),
+      pool.query(belumQuery, belumParams)
+    ]);
+
+    const workbook = new ExcelJS.Workbook();
+
+    // SHEET 1: SUDAH BAYAR
+    const sheetSudah = workbook.addWorksheet('Sudah Bayar');
+    sheetSudah.columns = [
+      { header: 'No', key: 'no', width: 5 },
+      { header: 'Nama Santri', key: 'nama_santri', width: 30 },
+      { header: 'Bank Pengirim', key: 'nama_bank', width: 20 },
+      { header: 'Atas Nama', key: 'nama_pengirim', width: 25 },
+      { header: 'Tanggal Upload', key: 'tanggal_upload', width: 20 },
+      { header: 'Status', key: 'status', width: 15 }
+    ];
+
+    sudahResult.rows.forEach((row, index) => {
+      sheetSudah.addRow({
+        no: index + 1,
+        nama_santri: row.nama_santri || 'User Belum Ada Biodata',
+        nama_bank: row.nama_bank,
+        nama_pengirim: row.nama_pengirim,
+        tanggal_upload: row.tanggal_upload,
+        status: row.status
+      });
+    });
+
+    // Style Header Sheet 1
+    const headerRow1 = sheetSudah.getRow(1);
+    headerRow1.font = { bold: true, color: { argb: 'FFFFFF' } };
+    headerRow1.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '16a34a' } };
+    headerRow1.alignment = { vertical: 'middle', horizontal: 'center' };
+    
+    sheetSudah.eachRow((row) => {
+      row.eachCell((cell) => {
+        cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+        cell.alignment = { vertical: 'middle' };
+      });
+    });
+
+    // SHEET 2: BELUM BAYAR
+    const sheetBelum = workbook.addWorksheet('Belum Bayar');
+    sheetBelum.columns = [
+      { header: 'No', key: 'no', width: 5 },
+      { header: 'Nama Santri', key: 'nama', width: 30 },
+      { header: 'WA / Telepon', key: 'wa', width: 20 }
+    ];
+
+    belumResult.rows.forEach((row, index) => {
+      sheetBelum.addRow({
+        no: index + 1,
+        nama: row.nama,
+        wa: row.wa || '-'
+      });
+    });
+
+    // Style Header Sheet 2
+    const headerRow2 = sheetBelum.getRow(1);
+    headerRow2.font = { bold: true, color: { argb: 'FFFFFF' } };
+    headerRow2.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'ef4444' } }; // Red for 'Belum Bayar' to differ? Or Green? User asked for Green button, but let's stick to Green for consistency or maybe Red/Orange. User didn't specify. I'll use Green to be safe and consistent.
+    // Edit: Actually, red might be more semantic for "Unpaid". But to be safe, I'll use the same Green (16a34a) as requested for the button style.
+    headerRow2.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '16a34a' } }; 
+    headerRow2.alignment = { vertical: 'middle', horizontal: 'center' };
+
+    sheetBelum.eachRow((row) => {
+      row.eachCell((cell) => {
+        cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+        cell.alignment = { vertical: 'middle' };
+      });
+    });
+
+    const filename = `Laporan_Pembayaran_${new Date().toISOString().split('T')[0]}.xlsx`;
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+    await workbook.xlsx.write(res);
+    res.end();
+
+  } catch (e) {
+    console.error('[GET /pengurus/laporan-pembayaran/export] Error:', e.message);
+    res.redirect('/pengurus/home');
+  }
 });
 
 // POST - Terima pembayaran
@@ -655,7 +785,7 @@ router.post('/pengurus/verifikasi-pembayaran/verify', requireAuth, async (req, r
 
 // POST - Verifikasi pembayaran (unified endpoint)
 router.post('/pengurus/verifikasi-pembayaran', requireAuth, async (req, res) => {
-  // KU-3: Hanya Keuangan yang boleh verifikasi pembayaran
+  // KU-3: Hanya Keuangan boleh verifikasi pembayaran
   if (req.session.user.role !== 'keuangan') {
     return res.redirect('/pengurus/home');
   }
@@ -725,8 +855,8 @@ router.post('/pengurus/verifikasi-pembayaran', requireAuth, async (req, res) => 
 
 // POST - Tolak pembayaran (hapus dari database)
 router.post('/pengurus/verifikasi-pembayaran/reject', requireAuth, async (req, res) => {
-  // KU-3: Hanya Keuangan yang boleh verifikasi pembayaran
-  if (req.session.user.role !== 'keuangan') {
+  // KU-3: Admin & Keuangan boleh verifikasi pembayaran
+  if (!['admin', 'keuangan'].includes(req.session.user.role)) {
     return res.redirect('/pengurus/home');
   }
 
@@ -745,7 +875,7 @@ router.post('/pengurus/verifikasi-pembayaran/reject', requireAuth, async (req, r
    7. LAPORAN PEMBAYARAN (YANG SUDAH DIVERIFIKASI)
    ============================================================ */
 router.get('/pengurus/laporan-pembayaran', requireAuth, async (req, res) => {
-  // KU-4: Hanya Keuangan yang boleh akses laporan pembayaran
+  // KU-4: Hanya Keuangan boleh akses laporan pembayaran
   if (req.session.user.role !== 'keuangan') {
     return res.redirect('/pengurus/home');
   }
@@ -754,25 +884,79 @@ router.get('/pengurus/laporan-pembayaran', requireAuth, async (req, res) => {
   let riwayat = [];
   let belumBayar = [];
   
+  // Capture filters
+  const search = req.query.search || '';
+  const month = req.query.month || '';
+  const year = req.query.year || '';
+  const activeTab = req.query.tab || 'sudah';
+
+    // Get available months and years from database
+    const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    let months = [];
+    let years = [];
+    
+    try {
+      const monthRes = await pool.query(`SELECT DISTINCT TO_CHAR(created_at, 'MM') as value FROM tb_pembayaran WHERE status='VERIFIED' ORDER BY value ASC`);
+      months = monthRes.rows.map(r => ({
+        value: r.value,
+        name: monthNames[parseInt(r.value) - 1]
+      }));
+
+      const yearRes = await pool.query(`SELECT DISTINCT TO_CHAR(created_at, 'YYYY') as year FROM tb_pembayaran WHERE status='VERIFIED' ORDER BY year DESC`);
+      years = yearRes.rows.map(r => r.year);
+
+      if (years.length === 0) {
+        years = [new Date().getFullYear().toString()];
+      }
+    } catch (e) {
+      console.error('Error fetching filter options:', e);
+      years = [new Date().getFullYear().toString()];
+    }
+
   try {
-    // Data pembayaran yang sudah diverifikasi
-    const pembayaranResult = await pool.query(`
+    // 1. Build Query for VERIFIED payments
+    let queryText = `
       SELECT 
         p.id,
         COALESCE(s.nama, a.nama, 'Santri #' || p.santri_id::text) AS nama_santri,
         p.keterangan,
         p.bukti_path,
+        p.nama_pengirim,
+        p.nama_bank,
+        p.nomor_rekening,
+        to_char(p.tanggal_transfer, 'DD Mon YYYY') AS tanggal_transfer,
         to_char(p.created_at, 'DD Mon YYYY') AS tanggal_upload
       FROM tb_pembayaran p
       LEFT JOIN tb_santri s ON p.santri_id = s.id
       LEFT JOIN tb_akun_santri a ON s.email = a.email
       WHERE p.status = 'VERIFIED'
-      ORDER BY p.created_at DESC
-    `);
+    `;
+
+    const queryParams = [];
+    if (search) {
+      queryParams.push(`%${search}%`);
+      queryText += ` AND (s.nama ILIKE $${queryParams.length} OR p.nama_pengirim ILIKE $${queryParams.length})`;
+    }
+    if (month) {
+      queryParams.push(month);
+      queryText += ` AND to_char(p.created_at, 'MM') = $${queryParams.length}`;
+    }
+    if (year) {
+      queryParams.push(year);
+      queryText += ` AND to_char(p.created_at, 'YYYY') = $${queryParams.length}`;
+    }
+
+    queryText += ` ORDER BY p.created_at DESC`;
+
+    const pembayaranResult = await pool.query(queryText, queryParams);
     pembayaran = pembayaranResult.rows;
     
-    // Data santri yang BELUM bayar (tidak ada pembayaran VERIFIED)
-    const belumBayarResult = await pool.query(`
+    // 2. Data santri yang BELUM bayar (tidak ada pembayaran VERIFIED / PENDING bulan ini?)
+    // Note: Logic 'Belum Bayar' is tricky with month filter. 
+    // If filtering by month X, 'Belum Bayar' should probably show those who haven't paid in month X?
+    // For now, we keep the original logic (Not Exists Verified Payment EVER) but apply Search filter if present.
+    
+    let belumQuery = `
       SELECT 
         s.id,
         s.nama,
@@ -783,41 +967,60 @@ router.get('/pengurus/laporan-pembayaran', requireAuth, async (req, res) => {
         AND NOT EXISTS (
           SELECT 1 FROM tb_pembayaran p WHERE p.santri_id = s.id AND p.status = 'VERIFIED'
         )
-      ORDER BY s.nama ASC
-    `);
+    `;
+    const belumParams = [];
+    
+    if (search) {
+      belumParams.push(`%${search}%`);
+      belumQuery += ` AND s.nama ILIKE $${belumParams.length}`;
+    }
+
+    belumQuery += ` ORDER BY s.nama ASC`;
+
+    const belumBayarResult = await pool.query(belumQuery, belumParams);
     belumBayar = belumBayarResult.rows;
     
-    // Riwayat laporan yang sudah dikirim
-    const riwayatResult = await pool.query(`
-      SELECT 
-        id,
-        to_char(periode_mulai, 'DD Mon YYYY') AS periode_mulai,
-        to_char(periode_akhir, 'DD Mon YYYY') AS periode_akhir,
-        total_pembayaran,
-        status,
-        komentar_ketua,
-        to_char(dibuat_at, 'DD Mon YYYY') AS dibuat_at
-      FROM tb_laporan
-      ORDER BY dibuat_at DESC
-      LIMIT 20
-    `);
-    riwayat = riwayatResult.rows;
-  } catch (e) {
-    console.log('[Laporan Pembayaran] Error:', e.message);
+    // Get available months and years from database
+    const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    let months = [];
+    let years = [];
+    
+    try {
+      const monthRes = await pool.query(`SELECT DISTINCT TO_CHAR(created_at, 'MM') as value FROM tb_pembayaran WHERE status='VERIFIED' ORDER BY value ASC`);
+      months = monthRes.rows.map(r => ({
+        value: r.value,
+        name: monthNames[parseInt(r.value) - 1]
+      }));
+
+      const yearRes = await pool.query(`SELECT DISTINCT TO_CHAR(created_at, 'YYYY') as year FROM tb_pembayaran WHERE status='VERIFIED' ORDER BY year DESC`);
+      years = yearRes.rows.map(r => r.year);
+
+      if (years.length === 0) {
+        years = [new Date().getFullYear().toString()];
+      }
+    } catch (e) {
+      console.error('Error fetching filter options:', e);
+      years = [new Date().getFullYear().toString()];
+    }
+
+    res.render('laporan_pembayaran', {
+      title: 'Laporan Pembayaran',
+      user: req.session.user,
+      pembayaran,
+      riwayat,
+      belumBayar,
+      search,
+      month,
+      year,
+      months,
+      years,
+      activeTab
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.redirect('/pengurus/home');
   }
-
-  const stat = await getAdminStats();
-
-  res.render('laporan_pembayaran', {
-    title: 'Laporan Pembayaran',
-    user: req.session.user,
-    pembayaran,
-    belumBayar,
-    riwayat,
-    success: req.query.success === '1',
-    error: req.query.error || null,
-    stat
-  });
 });
 
 /* ============================================================
@@ -908,24 +1111,73 @@ router.post('/pengurus/laporan/submit', requireAuth, async (req, res) => {
    9. LAPORAN MASUK (UNTUK KETUA/ADMIN) - VERIFIED PAYMENTS ONLY
    ============================================================ */
 router.get('/pengurus/laporan-masuk', requireAuth, async (req, res) => {
-  // Hanya ketua dan admin yang boleh akses
-  if (!['admin', 'ketua'].includes(req.session.user.role)) {
+  // Hanya ketua yang boleh akses laporan ini
+  if (req.session.user.role !== 'ketua') {
     return res.redirect('/pengurus/home');
   }
   
+  // Capture filters
+  const search = req.query.search || '';
+  const month = req.query.month || '';
+  const year = req.query.year || '';
+
+    // Get available months and years from database
+    const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    let months = [];
+    let years = [];
+    
+    try {
+      const monthRes = await pool.query(`SELECT DISTINCT TO_CHAR(created_at, 'MM') as value FROM tb_pembayaran WHERE status='VERIFIED' ORDER BY value ASC`);
+      months = monthRes.rows.map(r => ({
+        value: r.value,
+        name: monthNames[parseInt(r.value) - 1]
+      }));
+
+      const yearRes = await pool.query(`SELECT DISTINCT TO_CHAR(created_at, 'YYYY') as year FROM tb_pembayaran WHERE status='VERIFIED' ORDER BY year DESC`);
+      years = yearRes.rows.map(r => r.year);
+
+      if (years.length === 0) {
+        years = [new Date().getFullYear().toString()];
+      }
+    } catch (e) {
+      console.error('Error fetching filter options:', e);
+      years = [new Date().getFullYear().toString()];
+    }
+
   try {
-    // Get pembayaran yang sudah diverifikasi
-    const { rows: pembayaran } = await pool.query(`
+    // 1. Build Query for VERIFIED payments
+    let queryText = `
       SELECT 
         p.id AS pembayaran_id,
         p.bukti_path,
+        p.nama_pengirim,
+        p.nama_bank,
+        p.nomor_rekening,
+        to_char(p.tanggal_transfer, 'DD Mon YYYY') AS tanggal_transfer,
         s.nama AS nama_santri,
         to_char(p.created_at, 'DD Mon YYYY HH24:MI') AS tanggal_upload
       FROM tb_pembayaran p
       JOIN tb_santri s ON p.santri_id = s.id
       WHERE p.status = 'VERIFIED'
-      ORDER BY p.created_at DESC
-    `);
+    `;
+
+    const queryParams = [];
+    if (search) {
+      queryParams.push(`%${search}%`);
+      queryText += ` AND (s.nama ILIKE $${queryParams.length} OR p.nama_pengirim ILIKE $${queryParams.length})`;
+    }
+    if (month) {
+      queryParams.push(month);
+      queryText += ` AND to_char(p.created_at, 'MM') = $${queryParams.length}`;
+    }
+    if (year) {
+      queryParams.push(year);
+      queryText += ` AND to_char(p.created_at, 'YYYY') = $${queryParams.length}`;
+    }
+
+    queryText += ` ORDER BY p.created_at DESC`;
+
+    const { rows: pembayaran } = await pool.query(queryText, queryParams);
 
     const stat = await getAdminStats();
 
@@ -933,7 +1185,12 @@ router.get('/pengurus/laporan-masuk', requireAuth, async (req, res) => {
       title: 'Laporan Pembayaran Masuk',
       user: req.session.user,
       pembayaran,
-      stat
+      stat,
+      search,
+      month,
+      year,
+      months,
+      years
     });
   } catch (e) {
     console.error('[GET /pengurus/laporan-masuk] Error:', e.message);
@@ -943,15 +1200,18 @@ router.get('/pengurus/laporan-masuk', requireAuth, async (req, res) => {
 
 // GET - Export Laporan Masuk ke Excel (Paid & Unpaid)
 router.get('/pengurus/laporan-masuk/export-excel', requireAuth, async (req, res) => {
-  if (!['admin', 'ketua'].includes(req.session.user.role)) {
+  if (req.session.user.role !== 'ketua') {
     return res.redirect('/pengurus/home');
   }
 
   const ExcelJS = require('exceljs');
+  const search = req.query.search || '';
+  const month = req.query.month || '';
+  const year = req.query.year || '';
 
   try {
     // 1. Fetch Data: Sudah Bayar (Verified)
-    const paidResult = await pool.query(`
+    let paidQuery = `
       SELECT 
         s.nama AS nama_santri,
         s.email,
@@ -964,8 +1224,25 @@ router.get('/pengurus/laporan-masuk/export-excel', requireAuth, async (req, res)
       FROM tb_pembayaran p
       JOIN tb_santri s ON p.santri_id = s.id
       WHERE p.status = 'VERIFIED'
-      ORDER BY p.created_at DESC
-    `);
+    `;
+
+    const paidParams = [];
+    if (search) {
+      paidParams.push(`%${search}%`);
+      paidQuery += ` AND (s.nama ILIKE $${paidParams.length} OR p.nama_pengirim ILIKE $${paidParams.length})`;
+    }
+    if (month) {
+      paidParams.push(month);
+      paidQuery += ` AND to_char(p.created_at, 'MM') = $${paidParams.length}`;
+    }
+    if (year) {
+      paidParams.push(year);
+      paidQuery += ` AND to_char(p.created_at, 'YYYY') = $${paidParams.length}`;
+    }
+
+    paidQuery += ` ORDER BY p.created_at DESC`;
+
+    const paidResult = await pool.query(paidQuery, paidParams);
     const paidData = paidResult.rows;
 
     // 2. Fetch Data: Belum Bayar
@@ -1072,7 +1349,7 @@ router.get('/pengurus/laporan-masuk/export-excel', requireAuth, async (req, res)
 
 // GET - Detail Laporan (lihat bukti pembayaran)
 router.get('/pengurus/laporan-masuk/:id/detail', requireAuth, async (req, res) => {
-  if (!['admin', 'ketua'].includes(req.session.user.role)) {
+  if (req.session.user.role !== 'ketua') {
     return res.redirect('/pengurus/home');
   }
 
@@ -1131,7 +1408,7 @@ router.get('/pengurus/laporan-masuk/:id/detail', requireAuth, async (req, res) =
    10. APPROVE LAPORAN
    ============================================================ */
 router.post('/pengurus/laporan/approve', requireAuth, async (req, res) => {
-  if (!['admin', 'ketua'].includes(req.session.user.role)) {
+  if (req.session.user.role !== 'ketua') {
     return res.redirect('/pengurus/home');
   }
 
@@ -1155,7 +1432,7 @@ router.post('/pengurus/laporan/approve', requireAuth, async (req, res) => {
    11. REJECT LAPORAN
    ============================================================ */
 router.post('/pengurus/laporan/reject', requireAuth, async (req, res) => {
-  if (!['admin', 'ketua'].includes(req.session.user.role)) {
+  if (req.session.user.role !== 'ketua') {
     return res.redirect('/pengurus/home');
   }
 
@@ -1179,8 +1456,8 @@ router.post('/pengurus/laporan/reject', requireAuth, async (req, res) => {
    12. RIWAYAT LAPORAN
    ============================================================ */
 router.get('/pengurus/riwayat-laporan', requireAuth, async (req, res) => {
-  // Admin, keuangan, dan ketua boleh akses
-  if (!['admin', 'keuangan', 'ketua'].includes(req.session.user.role)) {
+  // Hanya keuangan dan ketua yang boleh akses
+  if (!['keuangan', 'ketua'].includes(req.session.user.role)) {
     return res.redirect('/pengurus/home');
   }
 
@@ -1320,6 +1597,36 @@ router.post('/pengurus/kelola-pengumuman', requireAuth, async (req, res) => {
   } catch (e) {
     console.error('[POST /kelola-pengumuman] Error:', e.message);
     res.redirect('/pengurus/kelola-pengumuman');
+  }
+});
+
+/* ============================================================
+   14. LAPORAN DATA SANTRI (ADMIN, PANITIA, KETUA)
+   ============================================================ */
+router.get('/pengurus/laporan-santri', requireAuth, async (req, res) => {
+  // Hanya admin, panitia, dan ketua yang boleh akses
+  if (!['admin', 'panitia', 'ketua'].includes(req.session.user.role)) {
+    return res.redirect('/pengurus/home');
+  }
+
+  try {
+    const { rows: santri } = await pool.query(`
+      SELECT 
+        s.*,
+        (s.kelurahan || ', ' || s.kecamatan || ', ' || s.kota_kab) as alamat_display,
+        to_char(s.created_at, 'DD Mon YYYY HH24:MI') AS created_fmt
+      FROM tb_santri s
+      ORDER BY s.nama ASC
+    `);
+
+    res.render('laporan_santri', {
+      title: 'Laporan Data Santri',
+      user: req.session.user,
+      santri
+    });
+  } catch (e) {
+    console.error('[GET /pengurus/laporan-santri] Error:', e.message);
+    res.status(500).send('Terjadi kesalahan database.');
   }
 });
 

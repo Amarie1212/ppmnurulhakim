@@ -496,7 +496,12 @@ router.post('/pembayaran', requireSantriAuth, refreshSantriSession, upload.singl
   try {
     const santriId = req.session.user.santri_id;
     const buktiGambar = req.file ? `/uploads/${req.file.filename}` : null;
-    const namaPengisi = req.body.nama_pengisi || null;
+    
+    // Extract new form fields
+    const namaPengirim = req.body.nama_pengirim || null;
+    const namaBank = req.body.nama_bank || null;
+    const nomorRekening = req.body.nomor_rekening || null;
+    const tanggalTransfer = req.body.tanggal_transfer || null;
     
     if (!buktiGambar) {
       return res.redirect('/pembayaran?error=nobukti');
@@ -506,12 +511,17 @@ router.post('/pembayaran', requireSantriAuth, refreshSantriSession, upload.singl
     if (!santriId) {
       return res.redirect('/pembayaran?error=nobiodata');
     }
+    
+    // Validasi field wajib
+    if (!namaBank || !nomorRekening || !tanggalTransfer) {
+      return res.redirect('/pembayaran?error=incomplete');
+    }
 
-    // Insert ke tabel pembayaran (nama_pengisi disimpan di keterangan)
+    // Insert ke tabel pembayaran dengan field baru
     await pool.query(`
-      INSERT INTO tb_pembayaran (santri_id, keterangan, bukti_path, status, created_at)
-      VALUES ($1, $2, $3, 'PENDING', NOW())
-    `, [santriId, namaPengisi, buktiGambar]);
+      INSERT INTO tb_pembayaran (santri_id, nama_pengirim, nama_bank, nomor_rekening, tanggal_transfer, bukti_path, status, created_at)
+      VALUES ($1, $2, $3, $4, $5, $6, 'PENDING', NOW())
+    `, [santriId, namaPengirim, namaBank, nomorRekening, tanggalTransfer, buktiGambar]);
 
     res.redirect('/pembayaran?toast=payment_success');
   } catch (e) {

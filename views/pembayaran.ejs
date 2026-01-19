@@ -93,7 +93,7 @@
 </head>
 <body class="form-page layout-form">
 
-<%- include('partials/santri_navbar', { title: 'Shodaqoh Operasional', backLink: '/' }) %>
+<%- include('partials/santri_navbar', { title: 'Shodaqoh Operasional', backLink: '/', showHamburger: false }) %>
 
 <main class="form-wrap">
   <div class="form-card">
@@ -129,23 +129,44 @@
       <form action="/pembayaran" method="POST" enctype="multipart/form-data">
         <div class="grid-12">
           
-          <div class="col-12"><h3 class="sec-title">Upload Bukti</h3></div>
-          
-          <% if (user.paymentRejected) { %>
-            <div class="col-12" style="text-align:center; margin-bottom:12px;">
-               <span style="display:inline-block; color:#ef4444; font-weight:600; font-size:1rem; padding:8px 16px; border-radius:100px; background:rgba(239,68,68,0.08);">
-                  Ditolak: "<%= user.paymentReason || 'Bukti tidak valid' %>"
-               </span>
-            </div>
-          <% } %>
+          <div class="col-12"><h3 class="sec-title">Data Transfer</h3></div>
           
           <div class="col-12">
-            <label class="label">Nama Penyetor <span class="hint">(Opsional)</span></label>
-            <input class="input" type="text" name="nama_pengisi" placeholder="Kosongkan jika sama dengan pendaftar">
+            <label class="label">Nama Pengirim <span class="hint">(Opsional jika sama dengan pendaftar)</span></label>
+            <input class="input" type="text" name="nama_pengirim" placeholder="Nama sesuai rekening pengirim">
           </div>
           
+          <div class="col-12 col-md-6">
+            <label class="label">Nama Bank <span class="req">*</span></label>
+            <select class="input" name="nama_bank" required>
+              <option value="">-- Pilih Bank --</option>
+              <option value="BSI">BSI (Bank Syariah Indonesia)</option>
+              <option value="BRI">BRI</option>
+              <option value="BNI">BNI</option>
+              <option value="Mandiri">Mandiri</option>
+              <option value="BCA">BCA</option>
+              <option value="CIMB Niaga">CIMB Niaga</option>
+              <option value="BTN">BTN</option>
+              <option value="Lainnya">Lainnya</option>
+            </select>
+          </div>
+          
+          <div class="col-12 col-md-6">
+            <label class="label">Nomor Rekening Pengirim <span class="req">*</span></label>
+            <input class="input" type="text" name="nomor_rekening" placeholder="Contoh: 1234567890" required pattern="[0-9]+" title="Hanya angka">
+          </div>
+          
+          <div class="col-12 col-md-6">
+            <label class="label">Tanggal Transfer <span class="req">*</span></label>
+            <input class="input" type="date" name="tanggal_transfer" required>
+          </div>
+          
+          <div class="col-12"><div class="divider"></div></div>
+          
+          <div class="col-12"><h3 class="sec-title">Upload Bukti</h3></div>
+          
           <div class="col-12">
-            <label class="label">Bukti Transfer (JPG/PNG, maks 5MB)</label>
+            <label class="label">Bukti Transfer (JPG/PNG, maks 5MB) <span class="req">*</span></label>
             <input type="file" class="file" name="bukti" id="buktiInput" accept=".jpg,.jpeg,.png" required>
             <div class="preview-wrap" id="previewWrap" style="display:none;">
               <img id="previewImg" alt="Preview">

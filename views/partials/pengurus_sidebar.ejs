@@ -22,7 +22,8 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="opacity:0.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
   </a>
 
-  <% if (user.role !== 'keuangan') { %>
+  <%# AD-4, PN-4: Data Santri (Admin & Panitia only) %>
+  <% if (user.role === 'admin' || user.role === 'panitia') { %>
     <a class="admin-dd-item <%= currentPage === 'santri' ? 'active' : '' %>" href="/pengurus">
       <div style="display:flex; align-items:center; gap:10px;">
         Data Santri
@@ -30,35 +31,54 @@
     </a>
   <% } %>
   
+  <%# AD-2+3, PN-2+3: Verifikasi Akun & Biodata (Admin & Panitia) %>
   <% if (user.role === 'admin' || user.role === 'panitia') { %>
     <a class="admin-dd-item <%= currentPage === 'verifikasi' ? 'active' : '' %>" href="/pengurus/verifikasi">
       <div style="display:flex; align-items:center; gap:10px;">
         Verifikasi Pendaftaran
       </div>
-      <% if(stat && stat.pending > 0){ %>
-        <span style="background:var(--danger); color:white; padding:2px 8px; border-radius:10px; font-size:0.75rem; font-weight:700;"><%= stat.pending %></span>
+      <% if(typeof stat !== 'undefined' && stat && (stat.pending > 0 || stat.biodata_pending > 0)){ %>
+        <div style="width:8px; height:8px; background:#ef4444; border-radius:50%"></div>
       <% } %>
     </a>
   <% } %>
-  <% if (user.role === 'admin' || user.role === 'keuangan') { %>
+  
+  <%# KU-2+3: Verifikasi Pembayaran (Keuangan only) %>
+  <% if (user.role === 'keuangan') { %>
     <a class="admin-dd-item <%= currentPage === 'verif-bayar' ? 'active' : '' %>" href="/pengurus/verifikasi-pembayaran" style="display:flex; justify-content:space-between; align-items:center;">
       Verifikasi Pembayaran
-      <% if(stat && stat.pending_payment > 0){ %>
-        <span style="background:var(--danger); color:white; padding:2px 8px; border-radius:10px; font-size:0.7em;"><%= stat.pending_payment %></span>
+      <% if(typeof stat !== 'undefined' && stat && stat.pending_payment > 0){ %>
+        <div style="width:8px; height:8px; background:#ef4444; border-radius:50%"></div>
       <% } %>
     </a>
   <% } %>
-  <% if (user.role === 'admin' || user.role === 'keuangan') { %>
+  
+  <%# AD-5, PN-5, KH-3: Laporan Data Santri (Admin, Panitia, Ketua) %>
+  <% if (user.role === 'admin' || user.role === 'panitia' || user.role === 'ketua') { %>
+    <a class="admin-dd-item <%= currentPage === 'laporan-santri' ? 'active' : '' %>" href="/pengurus/laporan-santri">Laporan Data Santri</a>
+  <% } %>
+  
+  <%# KU-4: Laporan Pembayaran (Keuangan only) %>
+  <% if (user.role === 'keuangan') { %>
     <a class="admin-dd-item <%= currentPage === 'laporan-bayar' ? 'active' : '' %>" href="/pengurus/laporan-pembayaran">Laporan Pembayaran</a>
   <% } %>
-  <% if (user.role === 'admin' || user.role === 'ketua') { %>
+  
+  <%# KH-2: Melihat Laporan Pembayaran Masuk (Ketua only) %>
+  <% if (user.role === 'ketua') { %>
     <a class="admin-dd-item <%= currentPage === 'laporan-masuk' ? 'active' : '' %>" href="/pengurus/laporan-masuk">Laporan Pembayaran Masuk</a>
   <% } %>
+  
+  <%# KU-5: Melihat Santri Belum Bayar (Keuangan only) %>
+  <% if (user.role === 'keuangan') { %>
+    <a class="admin-dd-item <%= currentPage === 'belum-bayar' ? 'active' : '' %>" href="/pengurus/laporan-pembayaran">Data Santri Belum Bayar</a>
+  <% } %>
 
-
+  <%# AD-7: Kelola Akun Pengurus (Admin only) %>
   <% if (user.role === 'admin') { %>
     <a class="admin-dd-item <%= currentPage === 'akun' ? 'active' : '' %>" href="/pengurus/kelola-akun">Kelola Akun Pengurus</a>
   <% } %>
+  
+  <%# AD-6, PN-6: Kelola Pengumuman (Admin & Panitia) %>
   <% if (user.role === 'admin' || user.role === 'panitia') { %>
     <a class="admin-dd-item <%= currentPage === 'kelola-pengumuman' ? 'active' : '' %>" href="/pengurus/kelola-pengumuman">Kelola Pengumuman</a>
   <% } %>
@@ -80,36 +100,57 @@
     <a href="/" class="panel-link" style="color:var(--accent)">Lihat Website Utama ↗</a>
     <div style="height:1px; background:var(--border); margin:10px 0;"></div>
 
-    <% if (user.role !== 'keuangan') { %>
+    <%# AD-4, PN-4: Data Santri (Admin & Panitia only) %>
+    <% if (user.role === 'admin' || user.role === 'panitia') { %>
       <a href="/pengurus" class="panel-link <%= currentPage === 'santri' ? 'active' : '' %>">Data Santri</a>
     <% } %>
+    
+    <%# AD-2+3, PN-2+3: Verifikasi Akun & Biodata (Admin & Panitia) %>
     <% if (user.role === 'admin' || user.role === 'panitia') { %>
       <a href="/pengurus/verifikasi" class="panel-link <%= currentPage === 'verifikasi' ? 'active' : '' %>">
         Verifikasi Pendaftaran 
-        <% if(stat && stat.pending > 0){ %>
-          <span style="background:var(--danger); color:white; padding:2px 8px; border-radius:10px; font-size:0.7em; margin-left:auto"><%= stat.pending %></span>
+        <% if(typeof stat !== 'undefined' && stat && (stat.pending > 0 || stat.biodata_pending > 0)){ %>
+          <div style="width:8px; height:8px; background:#ef4444; border-radius:50%; margin-left:auto"></div>
         <% } %>
       </a>
     <% } %>
-    <% if (user.role === 'admin' || user.role === 'keuangan') { %>
+    
+    <%# KU-2+3: Verifikasi Pembayaran (Keuangan only) %>
+    <% if (user.role === 'keuangan') { %>
         <a href="/pengurus/verifikasi-pembayaran" class="panel-link <%= currentPage === 'verif-bayar' ? 'active' : '' %>">
           Verifikasi Pembayaran
-          <% if(stat && stat.pending_payment > 0){ %>
-            <span style="background:var(--danger); color:white; padding:2px 8px; border-radius:10px; font-size:0.7em; margin-left:auto"><%= stat.pending_payment %></span>
+          <% if(typeof stat !== 'undefined' && stat && stat.pending_payment > 0){ %>
+            <div style="width:8px; height:8px; background:#ef4444; border-radius:50%; margin-left:auto"></div>
           <% } %>
         </a>
     <% } %>
-    <% if (user.role === 'admin' || user.role === 'keuangan') { %>
+    
+    <%# AD-5, PN-5, KH-3: Laporan Data Santri (Admin, Panitia, Ketua) %>
+    <% if (user.role === 'admin' || user.role === 'panitia' || user.role === 'ketua') { %>
+        <a href="/pengurus/laporan-santri" class="panel-link <%= currentPage === 'laporan-santri' ? 'active' : '' %>">Laporan Data Santri</a>
+    <% } %>
+    
+    <%# KU-4: Laporan Pembayaran (Keuangan only) %>
+    <% if (user.role === 'keuangan') { %>
         <a href="/pengurus/laporan-pembayaran" class="panel-link <%= currentPage === 'laporan-bayar' ? 'active' : '' %>">Laporan Pembayaran</a>
     <% } %>
-    <% if (user.role === 'admin' || user.role === 'ketua') { %>
+    
+    <%# KH-2: Melihat Laporan Pembayaran Masuk (Ketua only) %>
+    <% if (user.role === 'ketua') { %>
         <a href="/pengurus/laporan-masuk" class="panel-link <%= currentPage === 'laporan-masuk' ? 'active' : '' %>">Laporan Pembayaran Masuk</a>
     <% } %>
+    
+    <%# KU-5: Melihat Santri Belum Bayar (Keuangan only) %>
+    <% if (user.role === 'keuangan') { %>
+        <a href="/pengurus/laporan-pembayaran" class="panel-link <%= currentPage === 'belum-bayar' ? 'active' : '' %>">Data Santri Belum Bayar</a>
+    <% } %>
 
-
+    <%# AD-7: Kelola Akun Pengurus (Admin only) %>
     <% if (user.role === 'admin') { %>
       <a href="/pengurus/kelola-akun" class="panel-link <%= currentPage === 'akun' ? 'active' : '' %>">Kelola Akun Pengurus</a>
     <% } %>
+    
+    <%# AD-6, PN-6: Kelola Pengumuman (Admin & Panitia) %>
     <% if (user.role === 'admin' || user.role === 'panitia') { %>
       <a href="/pengurus/kelola-pengumuman" class="panel-link <%= currentPage === 'kelola-pengumuman' ? 'active' : '' %>">Kelola Pengumuman</a>
     <% } %>

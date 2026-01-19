@@ -67,36 +67,18 @@
       <h2 class="page-title">Dashboard Overview</h2>
     </div>
 
-    <!-- NOTIFIKASI VERIFIKASI PENDING -->
-    <% if ((user.role === 'admin' || user.role === 'panitia') && (stat.pending > 0 || stat.biodata_pending > 0)) { %>
-      <div style="background:rgba(239, 68, 68, 0.05); border:1px solid rgba(239, 68, 68, 0.2); border-radius:12px; padding:20px; display:flex; gap:16px; align-items:flex-start; margin-bottom:32px;">
-         <div style="background:rgba(239, 68, 68, 0.1); color:#ef4444; padding:10px; border-radius:8px; flex-shrink:0;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-         </div>
-         <div>
-            <div style="font-weight:700; color:#ef4444; font-size:1.1rem; margin-bottom:6px;">Menunggu Verifikasi</div>
-            <div style="color:var(--text); font-size:0.95rem; line-height:1.6; margin-bottom:12px;">
-               Halo <%= user.name %>, ada data pendaftaran yang perlu ditinjau:
-            </div>
-            <div style="display:flex; flex-wrap:wrap; gap:12px;">
-               <% if(stat.pending > 0) { %> 
-                 <a href="/pengurus/verifikasi" style="background:#ef4444; color:white; padding:6px 12px; border-radius:6px; font-weight:600; font-size:0.85rem; text-decoration:none;"><%= stat.pending %> Akun Baru &rarr;</a> 
-               <% } %>
-               <% if(stat.biodata_pending > 0) { %> 
-                 <a href="/pengurus/verifikasi" style="background:rgba(239,68,68,0.1); color:#ef4444; border:1px solid rgba(239,68,68,0.2); padding:6px 12px; border-radius:6px; font-weight:600; font-size:0.85rem; text-decoration:none;"><%= stat.biodata_pending %> Biodata &rarr;</a> 
-               <% } %>
-            </div>
-         </div>
-      </div>
-    <% } %>
+
 
     <div class="dashboard-grid">
       
       <% if (user.role === 'admin' || user.role === 'panitia') { %>
       <a href="/pengurus/verifikasi" class="dash-card">
         <div>
-          <div class="dash-icon" style="background:rgba(234, 88, 12, 0.1); color:#ea580c;">
+          <div class="dash-icon" style="background:rgba(234, 88, 12, 0.1); color:#ea580c; position:relative;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            <% if(stat.pending > 0 || stat.biodata_pending > 0) { %>
+              <div style="position:absolute; top:-2px; right:-2px; width:12px; height:12px; background:#ef4444; border:2px solid #fff; border-radius:50%;"></div>
+            <% } %>
           </div>
           <div class="dash-label">Verifikasi</div>
           
@@ -119,7 +101,8 @@
       </a>
       <% } %>
 
-      <% if (user.role !== 'keuangan') { %>
+      <%# AD-4, PN-4: Data Santri (Admin & Panitia only) %>
+      <% if (user.role === 'admin' || user.role === 'panitia') { %>
       <a href="/pengurus" class="dash-card">
         <div>
           <div class="dash-icon" style="background:rgba(34, 197, 94, 0.1); color:#22c55e;">
@@ -134,17 +117,22 @@
       </a>
       <% } %>
 
-      <% if (user.role === 'admin' || user.role === 'keuangan') { %>
+      <%# KU-2, KU-3: Verifikasi Pembayaran (Keuangan only) %>
+      <% if (user.role === 'keuangan') { %>
       <a href="/pengurus/verifikasi-pembayaran" class="dash-card">
         <div>
-          <div class="dash-icon" style="background:rgba(255, 193, 7, 0.1); color:#ffc107;">
+          <div class="dash-icon" style="background:rgba(255, 193, 7, 0.1); color:#ffc107; position:relative;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <% let pendBayar = stat.pending_payment || stat.payment_pending || 0; %>
+            <% if(pendBayar > 0) { %>
+              <div style="position:absolute; top:-2px; right:-2px; width:12px; height:12px; background:#ef4444; border:2px solid #fff; border-radius:50%;"></div>
+            <% } %>
           </div>
           <div class="dash-label">Verifikasi Bayar</div>
           
           <div style="display:flex; align-items:center; gap:24px; margin:12px 0 8px;">
             <div>
-              <div class="dash-stat" style="margin:0; font-size:1.8rem;"><%= stat.pending_payment || stat.payment_pending || 0 %></div>
+              <div class="dash-stat" style="margin:0; font-size:1.8rem;"><%= pendBayar %></div>
               <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px;">Pending</div>
             </div>
           </div>
@@ -169,7 +157,8 @@
       </a>
       <% } %>
       
-      <% if (user.role === 'admin' || user.role === 'ketua') { %>
+      <%# KH-2: Laporan Pembayaran Masuk (Ketua only) %>
+      <% if (user.role === 'ketua') { %>
       <a href="/pengurus/laporan-masuk" class="dash-card">
         <div>
           <div class="dash-icon" style="background:rgba(255, 193, 7, 0.1); color:#ffc107;">

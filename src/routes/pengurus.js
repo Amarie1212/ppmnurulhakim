@@ -568,8 +568,8 @@ router.get('/pengurus/export.csv', requireAuth, async (req, res) => {
    ============================================================ */
 // GET - Tampilkan daftar pembayaran yang perlu diverifikasi
 router.get('/pengurus/verifikasi-pembayaran', requireAuth, async (req, res) => {
-  // Hanya admin dan keuangan yang boleh akses
-  if (!['admin', 'keuangan'].includes(req.session.user.role)) {
+  // KU-2, KU-3: Hanya Keuangan yang boleh akses pembayaran
+  if (req.session.user.role !== 'keuangan') {
     return res.redirect('/pengurus/home');
   }
 
@@ -577,11 +577,15 @@ router.get('/pengurus/verifikasi-pembayaran', requireAuth, async (req, res) => {
   let riwayat = [];
   
   try {
-    // Query untuk ambil pembayaran pending
+    // Query untuk ambil pembayaran pending (dengan field baru)
     const pending = await pool.query(`
       SELECT 
         p.id,
         COALESCE(s.nama, a.nama, 'Santri #' || p.santri_id::text) AS nama_santri,
+        p.nama_pengirim,
+        p.nama_bank,
+        p.nomor_rekening,
+        to_char(p.tanggal_transfer, 'DD Mon YYYY') AS tanggal_transfer,
         p.keterangan,
         p.bukti_path,
         to_char(p.created_at, 'DD Mon YYYY HH24:MI') AS tanggal_upload
@@ -627,7 +631,8 @@ router.get('/pengurus/verifikasi-pembayaran', requireAuth, async (req, res) => {
 
 // POST - Terima pembayaran
 router.post('/pengurus/verifikasi-pembayaran/verify', requireAuth, async (req, res) => {
-  if (!['admin', 'keuangan'].includes(req.session.user.role)) {
+  // KU-3: Hanya Keuangan yang boleh verifikasi pembayaran
+  if (req.session.user.role !== 'keuangan') {
     return res.redirect('/pengurus/home');
   }
 
@@ -650,7 +655,8 @@ router.post('/pengurus/verifikasi-pembayaran/verify', requireAuth, async (req, r
 
 // POST - Verifikasi pembayaran (unified endpoint)
 router.post('/pengurus/verifikasi-pembayaran', requireAuth, async (req, res) => {
-  if (!['admin', 'keuangan'].includes(req.session.user.role)) {
+  // KU-3: Hanya Keuangan yang boleh verifikasi pembayaran
+  if (req.session.user.role !== 'keuangan') {
     return res.redirect('/pengurus/home');
   }
 
@@ -719,7 +725,8 @@ router.post('/pengurus/verifikasi-pembayaran', requireAuth, async (req, res) => 
 
 // POST - Tolak pembayaran (hapus dari database)
 router.post('/pengurus/verifikasi-pembayaran/reject', requireAuth, async (req, res) => {
-  if (!['admin', 'keuangan'].includes(req.session.user.role)) {
+  // KU-3: Hanya Keuangan yang boleh verifikasi pembayaran
+  if (req.session.user.role !== 'keuangan') {
     return res.redirect('/pengurus/home');
   }
 
@@ -738,8 +745,8 @@ router.post('/pengurus/verifikasi-pembayaran/reject', requireAuth, async (req, r
    7. LAPORAN PEMBAYARAN (YANG SUDAH DIVERIFIKASI)
    ============================================================ */
 router.get('/pengurus/laporan-pembayaran', requireAuth, async (req, res) => {
-  // Admin, keuangan, dan ketua boleh akses
-  if (!['admin', 'keuangan', 'ketua'].includes(req.session.user.role)) {
+  // KU-4: Hanya Keuangan yang boleh akses laporan pembayaran
+  if (req.session.user.role !== 'keuangan') {
     return res.redirect('/pengurus/home');
   }
 

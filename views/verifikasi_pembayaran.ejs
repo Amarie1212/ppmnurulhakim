@@ -214,7 +214,7 @@
                    </div>
                  </td>
                 <td style="text-align:center">
-                  <button type="button" class="btn-small btn-detail-link" onclick="showDetailModal('<%= p.id %>', '<%= p.nama_santri %>', '<%= p.keterangan || '-' %>', '<%= p.bukti_path %>', '<%= p.tanggal_upload %>')">Proses</button>
+                  <button type="button" class="btn-small btn-detail-link" onclick="showDetailModal('<%= p.id %>', '<%= p.nama_santri %>', '<%= p.nama_pengirim || '-' %>', '<%= p.nama_bank || '-' %>', '<%= p.nomor_rekening || '-' %>', '<%= p.tanggal_transfer || '-' %>', '<%= p.bukti_path %>', '<%= p.tanggal_upload %>')">Proses</button>
                 </td>
               </tr>
             <% }) %>
@@ -257,7 +257,10 @@
         Info Pembayaran
       </h4>
       <div class="info-row"><span class="info-label">Nama Santri</span><span class="info-val" id="detailNama"></span></div>
-      <div class="info-row"><span class="info-label">Keterangan</span><span class="info-val" id="detailKeterangan"></span></div>
+      <div class="info-row"><span class="info-label">Nama Pengirim</span><span class="info-val" id="detailPengirim"></span></div>
+      <div class="info-row"><span class="info-label">Nama Bank</span><span class="info-val" id="detailBank"></span></div>
+      <div class="info-row"><span class="info-label">Nomor Rekening</span><span class="info-val" id="detailRekening"></span></div>
+      <div class="info-row"><span class="info-label">Tanggal Transfer</span><span class="info-val" id="detailTglTransfer"></span></div>
       <div class="info-row"><span class="info-label">Tanggal Upload</span><span class="info-val" id="detailTanggal"></span></div>
     </div>
     
@@ -277,12 +280,15 @@
 <script>
   let currentPaymentId = '';
   
-  function showDetailModal(id, nama, nominal, bukti, tgl) {
+  function showDetailModal(id, nama, pengirim, bank, rekening, tglTransfer, bukti, tglUpload) {
     currentPaymentId = id;
     
     document.getElementById('detailNama').textContent = nama || '-'; 
-    document.getElementById('detailKeterangan').textContent = nominal || '-'; 
-    document.getElementById('detailTanggal').textContent = tgl || '-'; 
+    document.getElementById('detailPengirim').textContent = pengirim || '-'; 
+    document.getElementById('detailBank').textContent = bank || '-'; 
+    document.getElementById('detailRekening').textContent = rekening || '-'; 
+    document.getElementById('detailTglTransfer').textContent = tglTransfer || '-'; 
+    document.getElementById('detailTanggal').textContent = tglUpload || '-'; 
     
     const img = document.getElementById('detailBukti'); 
     if (bukti) {

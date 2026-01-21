@@ -185,7 +185,7 @@ router.post('/login', async (req, res) => {
    ROUTE: LOGIN ADMIN / PENGURUS (TERPISAH & RAHASIA)
    ============================================================ */
 router.get('/panel-admin', (req, res) => {
-  res.render('admin_login', { error: null });
+  res.render('admin_login', { title: 'PPM Nurul Hakim / Login Pengurus', error: null });
 });
 
 router.post('/panel-admin/login', async (req, res) => {
@@ -195,14 +195,14 @@ router.post('/panel-admin/login', async (req, res) => {
     
     // Email tidak ditemukan
     if (resPengurus.rows.length === 0) {
-      return res.render('admin_login', { error: 'Email belum terdaftar. Silakan daftar terlebih dahulu.' });
+      return res.render('admin_login', { title: 'PPM Nurul Hakim / Login Pengurus', error: 'Email belum terdaftar. Silakan daftar terlebih dahulu.' });
     }
     
     const u = resPengurus.rows[0];
     
     // Password salah
     if (!(await bcrypt.compare(password, u.passhash))) {
-      return res.render('admin_login', { error: 'Password salah. Silakan coba lagi.' });
+      return res.render('admin_login', { title: 'PPM Nurul Hakim / Login Pengurus', error: 'Password salah. Silakan coba lagi.' });
     }
     
     // Login berhasil
@@ -212,14 +212,14 @@ router.post('/panel-admin/login', async (req, res) => {
     });
   } catch (e) {
     console.error(e);
-    res.render('admin_login', { error: 'Terjadi kesalahan sistem.' });
+    res.render('admin_login', { title: 'PPM Nurul Hakim / Login Pengurus', error: 'Terjadi kesalahan sistem.' });
   }
 });
 
 /* ============================================================
    ROUTE: REGISTRASI SANTRI (AUTO LOGIN)
    ============================================================ */
-router.get('/register', (req, res) => res.render('register', { title: 'Buat Akun Baru', error: null }));
+router.get('/register', (req, res) => res.render('register', { title: 'PPM Nurul Hakim / Buat Akun Baru', error: null }));
 
 router.post('/register', async (req, res) => {
   try {
@@ -228,7 +228,7 @@ router.post('/register', async (req, res) => {
     // 1. Cek Email
     const check = await pool.query('SELECT id FROM tb_akun_santri WHERE email=$1', [email]);
     if (check.rows.length > 0) {
-        return res.render('register', { title: 'Buat Akun', error: 'Email sudah terdaftar.' });
+        return res.render('register', { title: 'PPM Nurul Hakim / Buat Akun', error: 'Email sudah terdaftar.' });
     }
 
     // 2. Cek Nama (tidak boleh duplikat, kecuali dari akun yang sudah REJECTED)
@@ -237,7 +237,7 @@ router.post('/register', async (req, res) => {
       [nama.trim()]
     );
     if (nameCheck.rows.length > 0) {
-        return res.render('register', { title: 'Buat Akun', error: 'Nama sudah digunakan. Silakan gunakan nama lain atau tambahkan inisial.' });
+        return res.render('register', { title: 'PPM Nurul Hakim / Buat Akun', error: 'Nama sudah digunakan. Silakan gunakan nama lain atau tambahkan inisial.' });
     }
 
     // 3. Hash Password & Insert
@@ -290,7 +290,7 @@ router.post('/register', async (req, res) => {
 
   } catch (e) {
     console.error(e);
-    res.render('register', { title: 'Error', error: 'Terjadi kesalahan sistem.' });
+    res.render('register', { title: 'PPM Nurul Hakim / Error', error: 'Terjadi kesalahan sistem.' });
   }
 });
 
@@ -312,7 +312,7 @@ router.get('/form', requireSantriAuth, refreshSantriSession, async (req, res) =>
     const passwordRaw = akunRes.rows.length > 0 ? akunRes.rows[0].passhash : '';
 
     res.render('form', {
-      title: 'Formulir Biodata', user: req.session.user,
+      title: 'PPM Nurul Hakim / Formulir Biodata', user: req.session.user,
       data: rows.length > 0 ? rows[0] : {}, 
       savedPassword: passwordRaw, // Kirim password ke view
       error: null
@@ -406,13 +406,13 @@ router.post('/form', requireSantriAuth, refreshSantriSession, upload.fields([
 
   } catch (e) {
     console.error(e);
-    res.render('form', { title: 'Formulir Biodata', user: req.session.user, data: req.body, error: 'Terjadi kesalahan sistem.' });
+    res.render('form', { title: 'PPM Nurul Hakim / Formulir Biodata', user: req.session.user, data: req.body, error: 'Terjadi kesalahan sistem.' });
   }
 });
 
 // GET - Tampilkan form register pengurus
 router.get('/panel-admin/register', (req, res) => {
-  res.render('admin_register', { error: null });
+  res.render('admin_register', { title: 'PPM Nurul Hakim / Daftar Pengurus', error: null });
 });
 
 // POST - Proses registrasi pengurus
@@ -423,7 +423,7 @@ router.post('/panel-admin/register', async (req, res) => {
     // 1. Cek Email
     const check = await pool.query("SELECT id FROM tb_pengurus WHERE email = $1", [email]);
     if (check.rows.length > 0) {
-      return res.render('admin_register', { error: 'Email pengurus sudah terdaftar.' });
+      return res.render('admin_register', { title: 'PPM Nurul Hakim / Daftar Pengurus', error: 'Email pengurus sudah terdaftar.' });
     }
 
     // 2. Hash Password
@@ -453,7 +453,7 @@ router.post('/panel-admin/register', async (req, res) => {
 
   } catch (e) {
     console.error(e);
-    res.render('admin_register', { error: 'Terjadi kesalahan sistem saat registrasi.' });
+    res.render('admin_register', { title: 'PPM Nurul Hakim / Daftar Pengurus', error: 'Terjadi kesalahan sistem saat registrasi.' });
   }
 });
 
@@ -502,7 +502,7 @@ router.get('/pembayaran', requireSantriAuth, refreshSantriSession, async (req, r
   req.session.user.hasPaid = verifiedCount > 0;
 
   res.render('pembayaran', {
-    title: 'Shodaqoh Operasional',
+    title: 'PPM Nurul Hakim / Shodaqoh Operasional',
     user: req.session.user,
     history,
     lastStatus,
@@ -590,7 +590,7 @@ router.get('/info-santri', requireSantriAuth, refreshSantriSession, async (req, 
   }
   
   res.render('info_santri', {
-    title: 'Pengumuman & Info Santri',
+    title: 'PPM Nurul Hakim / Pengumuman & Info Santri',
     user: req.session.user,
     cms
   });
@@ -703,7 +703,7 @@ router.get('/edit-akun', requireSantriAuth, async (req, res) => {
     const akun = rows[0];
     
     res.render('edit_akun', {
-      title: 'Edit Data Akun',
+      title: 'PPM Nurul Hakim / Edit Data Akun',
       user: req.session.user,
       akun,
       error: null,

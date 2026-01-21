@@ -82,7 +82,7 @@ router.get('/pengurus/home', requireAuth, async (req, res) => {
     `);
 
     res.render('pengurus_home', {
-      title: 'Beranda Pengurus',
+      title: 'PPM Nurul Hakim / Beranda Pengurus',
       user: req.session.user,
       stat: stats.rows[0] || { pending: 0, biodata_pending: 0, total_santri: 0, putra: 0, putri: 0, pending_payment: 0 }
     });
@@ -120,7 +120,7 @@ router.get('/pengurus', requireAuth, async (req, res) => {
     `);
 
     res.render('pengurus', {
-      title: 'Data Santri',
+      title: 'PPM Nurul Hakim / Data Santri',
       user: req.session.user,
       santri,
       stat
@@ -225,7 +225,7 @@ router.get('/pengurus/santri/:id/detail', requireAuth, async (req, res) => {
     
     // Render detail page with verification context
     res.render('detail', {
-      title: 'Detail Biodata - ' + santri.nama,
+      title: 'PPM Nurul Hakim / Detail Biodata - ' + santri.nama,
       user: req.session.user,
       s: santri,  // View uses 's' variable
       fromVerification: true  // Flag to show verification buttons
@@ -293,7 +293,7 @@ router.get('/pengurus/spreadsheet', requireAuth, async (req, res) => {
   }
   
   res.render('spreadsheet_online', {
-    title: 'Spreadsheet Online',
+    title: 'PPM Nurul Hakim / Spreadsheet Online',
     user: req.session.user
   });
 });
@@ -454,7 +454,7 @@ router.get('/pengurus/verifikasi', requireAuth, async (req, res) => {
     const stat = await getAdminStats();
 
     res.render('verifikasi', { 
-      title: 'Verifikasi', 
+      title: 'PPM Nurul Hakim / Verifikasi', 
       user: req.session.user, 
       akun: akunResult.rows,
       biodata: biodataRows,
@@ -525,7 +525,7 @@ router.get('/pengurus/santri/:id', requireAuth, async (req, res) => {
     s.phone = s.wa || '—';
 
     res.render('detail', {
-      title: 'Detail Santri',
+      title: 'PPM Nurul Hakim / Detail Santri',
       user: req.session.user,
       s,
       fromVerification: false
@@ -596,7 +596,7 @@ router.get('/pengurus/verifikasi-pembayaran', requireAuth, async (req, res) => {
     `);
 
     res.render('verifikasi_pembayaran', {
-      title: 'Verifikasi Pembayaran',
+      title: 'PPM Nurul Hakim / Verifikasi Pembayaran',
       user: req.session.user,
       pembayaran: rows
     });

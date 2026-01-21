@@ -28,7 +28,7 @@ router.get('/pengurus/home', requireAuth, async (req, res) => {
         `);
 
         res.render('pengurus_home', {
-            title: 'Beranda Pengurus',
+            title: 'PPM Nurul Hakim / Beranda Pengurus',
             user: req.session.user,
             stat: stats.rows[0] || { pending: 0, biodata_pending: 0, payment_pending: 0, total_santri: 0, putra: 0, putri: 0 }
         });
@@ -64,7 +64,7 @@ router.get('/pengurus', requireAuth, async (req, res) => {
         `);
 
         res.render('pengurus', {
-            title: 'Data Santri',
+            title: 'PPM Nurul Hakim / Data Santri',
             user: req.session.user,
             santri
         });
@@ -97,7 +97,7 @@ router.get('/pengurus/santri/:id', requireAuth, async (req, res) => {
         s.phone = s.wa || '—';
 
         res.render('detail', {
-            title: 'Detail Santri',
+            title: 'PPM Nurul Hakim / Detail Santri',
             user: req.session.user,
             s,
             fromVerification: false
@@ -162,7 +162,7 @@ router.get('/pengurus/keuangan', requireAuth, async (req, res) => {
         }
 
         res.render('pengurus_keuangan', {
-            title: 'Manajemen Keuangan',
+            title: 'PPM Nurul Hakim / Manajemen Keuangan',
             user: req.session.user,
             laporan,
             // Visibilitas tombol aksi diatur di EJS

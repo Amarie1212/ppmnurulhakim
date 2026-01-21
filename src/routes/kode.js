@@ -19,7 +19,7 @@ router.get('/pengurus/kode', mustPengurus, async (req, res) => {
   const current = rows[0] || { value: '', updated_by: '-', updated_at: new Date() };
 
   res.render('kode', {
-    title: 'Kelola Kode',
+    title: 'PPM Nurul Hakim / Kelola Kode',
     user: req.session.user,
     accessCode: current.value,
     meta: current,
@@ -37,7 +37,7 @@ router.post('/pengurus/kode', mustPengurus, async (req, res) => {
     );
     const current = rows[0] || { value: '', updated_by: '-', updated_at: new Date() };
     return res.render('kode', {
-      title: 'Kelola Kode',
+      title: 'PPM Nurul Hakim / Kelola Kode',
       user: req.session.user,
       accessCode: current.value,
       meta: current,

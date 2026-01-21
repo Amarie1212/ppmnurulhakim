@@ -39,7 +39,7 @@ router.get('/pengurus/kelola-akun', requireAdmin, async (req, res) => {
         delete req.session.message;
 
         res.render('kelola_akun', {
-            title: 'Kelola Akun Pengurus',
+            title: 'PPM Nurul Hakim / Kelola Akun Pengurus',
             user: req.session.user,
             pengurus: pengurusList,
             error: msg?.type === 'error' ? msg.text : null,

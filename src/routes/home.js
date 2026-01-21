@@ -100,10 +100,30 @@ router.get('/', async (req, res) => {
     req.session.user.biodataVerified = biodataVerified;
   }
 
+  // Fetch stat for pengurus (for red dot indicators)
+  let stat = null;
+  if (req.session?.user && ['admin', 'keuangan', 'ketua', 'panitia'].includes(req.session.user.role)) {
+    try {
+      const pendingAccount = await pool.query(`SELECT COUNT(*) FROM tb_akun_santri WHERE status = 'PENDING'`);
+      const pendingBiodata = await pool.query(`SELECT COUNT(*) FROM tb_santri WHERE status_biodata = 'PENDING'`);
+      const pendingPayment = await pool.query(`SELECT COUNT(*) FROM tb_pembayaran WHERE status = 'PENDING'`);
+      
+      stat = {
+        pending: parseInt(pendingAccount.rows[0].count) || 0,
+        biodata_pending: parseInt(pendingBiodata.rows[0].count) || 0,
+        pending_payment: parseInt(pendingPayment.rows[0].count) || 0
+      };
+    } catch (e) {
+      console.log('[Home] Stat fetch error:', e.message);
+    }
+  }
+
   res.render('home', { 
     title: 'PPM Nurul Hakim',
     user: req.session.user || null,
-    cms
+    cms,
+    stat,
+    currentPage: 'home'
   });
 });
 

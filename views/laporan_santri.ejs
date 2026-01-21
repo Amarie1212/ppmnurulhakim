@@ -167,9 +167,9 @@
         <thead>
           <tr>
             <th width="60" style="text-align:center">No</th>
-            <th>Nama Santri</th>
-            <th style="white-space: nowrap; min-width: 150px;">Jenis Kelamin</th>
-            <th>Kontak</th>
+            <th style="text-align:left">Nama Santri</th>
+            <th style="white-space: nowrap; min-width: 150px; text-align:center">Jenis Kelamin</th>
+            <th style="text-align:center">Kontak</th>
             <th style="text-align:center">Aksi</th>
           </tr>
         </thead>
@@ -182,9 +182,9 @@
           %>
             <tr data-periode="<%= s.angkatan || '' %>" data-gender="<%= jkLabel %>">
               <td style="text-align:center; color:var(--muted); font-size:0.9rem"><%= index + 1 %></td>
-              <td class="cell-nama"><%= s.nama %></td>
-              <td><%= jkLabel %></td>
-              <td class="cell-phone">
+              <td class="cell-nama" style="text-align:left"><%= s.nama %></td>
+              <td style="text-align:center"><%= jkLabel %></td>
+              <td class="cell-phone" style="text-align:center">
                 <% if (s.wa) { %>
                   <a href="https://wa.me/<%= s.wa.replace(/^0/, '62').replace(/\D/g, '') %>" target="_blank" style="color:var(--accent); text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-weight:500;">
                     <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style="margin-top:-1px">

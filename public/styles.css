@@ -716,9 +716,9 @@ a { color: inherit; text-decoration: none; }
   #santriToggle,
   #pengurusToggle { display: flex !important; }
 
-  .admin-dd { display: none !important; } 
-  .admin-dd-scrim { display: none !important; }
-  .panel-pengurus { display: flex !important; }
+  .admin-dd { display: block; } /* Allow popup on desktop (JS toggles opacity) */
+  .admin-dd-scrim { display: block; }
+  .panel-pengurus { display: none !important; }
 }
 
 /* --- Pengurus Mobile Dropdown (Unified) --- */

@@ -1,71 +1,40 @@
 <script>
-  /* Navigation Logic untuk Pengurus Pages */
+  /* Navigation Logic untuk Pengurus Pages - Popup Menu */
   (function initNav(){
     const btn = document.getElementById('navToggle');
-    const dd = document.getElementById('mobileDropdown');
-    const ddScrim = document.getElementById('mobileScrim');
-    const panel = document.getElementById('panelPengurus');
-    const panelScrim = document.getElementById('panelPengurusScrim');
+    const menu = document.getElementById('pengurusMenu');
+    const scrim = document.getElementById('pengurusScrim');
 
-    if (!btn) return;
+    if (!btn || !menu) return;
 
-    function closeAll() {
-      // Close desktop panel
-      if(panel) { 
-        panel.classList.remove('open'); 
-        if(panelScrim) panelScrim.classList.remove('open'); 
-        setTimeout(()=>{ 
-          panel.hidden = true; 
-          if(panelScrim) panelScrim.hidden = true;
-        }, 300); 
-      }
-      // Close mobile dropdown
-      if(dd) { 
-        dd.classList.remove('open'); 
-        if(ddScrim) ddScrim.classList.remove('open'); 
-      }
+    function openMenu() {
+      btn.classList.add('active');
+      menu.style.display = 'flex';
+      menu.offsetHeight; // Force reflow
+      menu.classList.add('open');
+      scrim.classList.add('open');
+    }
+
+    function closeMenu() {
       btn.classList.remove('active');
-      document.body.classList.remove('no-scroll');
+      menu.classList.remove('open');
+      scrim.classList.remove('open');
+      setTimeout(() => {
+        if(!menu.classList.contains('open')) menu.style.display = 'none';
+      }, 200);
     }
 
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const isActive = btn.classList.contains('active');
-      
-      if (isActive) {
-        closeAll();
-      } else {
-        btn.classList.add('active');
-        // Mobile: Show dropdown
-        if (window.innerWidth < 768) {
-          if(dd) { 
-            dd.classList.add('open'); 
-            if(ddScrim) ddScrim.classList.add('open'); 
-          }
-        } 
-        // Desktop: Show sidebar panel
-        else {
-          if(panel) { 
-            panel.hidden = false; 
-            if(panelScrim) panelScrim.hidden = false; 
-            requestAnimationFrame(() => { 
-              panel.classList.add('open'); 
-              if(panelScrim) panelScrim.classList.add('open'); 
-            }); 
-            document.body.classList.add('no-scroll'); 
-          }
-        }
-      }
+      menu.classList.contains('open') ? closeMenu() : openMenu();
     });
 
-    if(ddScrim) ddScrim.addEventListener('click', closeAll);
-    if(panelScrim) panelScrim.addEventListener('click', closeAll);
+    if(scrim) scrim.addEventListener('click', closeMenu);
     
-    // Close button for sidebar panel
-    const closeBtn = document.getElementById('closePanelPengurus');
-    if(closeBtn) closeBtn.addEventListener('click', closeAll);
-    
-    window.addEventListener('resize', closeAll);
+    // Close menu when clicking any link
+    menu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', closeMenu);
+    });
   })();
 
   /* Theme Logic */

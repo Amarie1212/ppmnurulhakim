@@ -253,8 +253,8 @@
                 <tr>
                   <th style="text-align:center" width="60">No</th>
                   <th style="text-align:center" width="120">Bukti</th>
-                  <th>Nama Santri</th>
-                  <th style="white-space: nowrap;">Tanggal</th>
+                  <th style="text-align:left">Nama Santri</th>
+                  <th style="white-space: nowrap; text-align:center;">Tanggal</th>
                   <th style="text-align:center" width="100">Aksi</th>
                 </tr>
               </thead>
@@ -270,8 +270,8 @@
                         </button>
                       </div>
                     </td>
-                    <td class="cell-nama" style="font-weight:400"><%= p.nama_santri %></td>
-                    <td style="color:var(--muted); font-size:0.85rem; white-space: nowrap;"><%= p.tanggal_upload %></td>
+                    <td class="cell-nama" style="font-weight:400; text-align:left"><%= p.nama_santri %></td>
+                    <td style="text-align:center; color:var(--muted); font-size:0.85rem; white-space: nowrap;"><%= p.tanggal_upload %></td>
                     <td style="text-align:center">
                       <div style="display:flex; justify-content:center;">
                         <button type="button" 

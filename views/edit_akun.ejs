@@ -36,14 +36,13 @@
       <a href="/" class="btn-back-inline" aria-label="Kembali ke Beranda" title="Kembali ke Beranda">
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
       </a>
-      <div class="brand">PPM Nurul Hakim</div>
+      <div class="brand">Edit Data Akun</div>
     </div>
   </div>
 </header>
 
 <main class="form-wrap">
   <div class="form-card">
-    <h2 class="form-title">Edit Data Akun</h2>
     
     <% if (user.status === 'REJECTED') { %>
       <div style="text-align:center; margin-bottom:24px;">
@@ -52,7 +51,7 @@
          </span>
       </div>
     <% } else { %>
-      <p class="lead" style="text-align:center; margin-bottom:30px; font-size:0.95rem; line-height:1.6; color:var(--muted);">
+      <p class="lead" style="text-align:center; margin-bottom:20px; font-size:0.95rem; line-height:1.6; color:var(--muted);">
         Halo, <strong style="color:var(--text)"><%= user.name %></strong>!<br>
         <span>Silakan edit data akun Anda di bawah ini.</span>
       </p>
@@ -66,46 +65,23 @@
 
     <form action="/edit-akun" method="POST">
       <div class="grid-12">
-
-        <div class="col-12"><h3 class="sec-title">Data Akun</h3></div>
-
-        <div class="col-12">
-          <label class="label">Nama Lengkap <span style="color:var(--danger)">*</span></label>
-          <input class="input" name="nama" value="<%= akun.nama || '' %>" required style="font-weight:600;">
-        </div>
-
-        <div class="col-6">
-          <label class="label">Email</label>
-          <input type="email" class="input" value="<%= akun.email || '' %>" readonly style="opacity:0.7; cursor:default;">
-        </div>
-
-        <div class="col-6">
-          <label class="label">No WhatsApp <span style="color:var(--danger)">*</span></label>
-          <input class="input" name="wa" value="<%= akun.wa || '' %>" placeholder="08..." required>
-        </div>
+        <div class="col-12"><label class="label">Nama Lengkap <span style="color:var(--danger)">*</span></label><input class="input" name="nama" value="<%= akun.nama || '' %>" required></div>
+        <div class="col-12"><label class="label">Email</label><input type="email" class="input" value="<%= akun.email || '' %>" readonly style="opacity:0.7; cursor:default;"></div>
+        <div class="col-6"><label class="label">No WhatsApp <span style="color:var(--danger)">*</span></label><input class="input" name="wa" value="<%= akun.wa || '' %>" placeholder="08..." required></div>
+        <div class="col-6"></div>
 
         <div class="col-12"><div class="divider"></div></div>
+        
+        <div class="col-4"><label class="label">Asal Kelompok <span style="color:var(--danger)">*</span></label><input class="input" name="kelompok" value="<%= akun.kelompok || '' %>" required></div>
+        <div class="col-4"><label class="label">Asal Desa <span style="color:var(--danger)">*</span></label><input class="input" name="desa" value="<%= akun.desa || '' %>" required></div>
+        <div class="col-4"><label class="label">Asal Daerah <span style="color:var(--danger)">*</span></label><input class="input" name="daerah" value="<%= akun.daerah || '' %>" required></div>
 
-        <div class="col-12"><h3 class="sec-title">Asal Majlis Taklim</h3></div>
-
-        <div class="col-4">
-          <label class="label">Kelompok <span style="color:var(--danger)">*</span></label>
-          <input class="input" name="kelompok" value="<%= akun.kelompok || '' %>" required>
-        </div>
-
-        <div class="col-4">
-          <label class="label">Desa <span style="color:var(--danger)">*</span></label>
-          <input class="input" name="desa" value="<%= akun.desa || '' %>" required>
-        </div>
-
-        <div class="col-4">
-          <label class="label">Daerah <span style="color:var(--danger)">*</span></label>
-          <input class="input" name="daerah" value="<%= akun.daerah || '' %>" required>
-        </div>
+        <div class="col-6"><label class="label">Kampus <span style="color:var(--danger)">*</span></label><input class="input" name="kampus" value="<%= akun.kampus || '' %>" required></div>
+        <div class="col-6"><label class="label">Prodi / Jurusan <span style="color:var(--danger)">*</span></label><input class="input" name="prodi" value="<%= akun.prodi || '' %>" required></div>
 
         <div class="col-12 actions">
-          <a href="/" class="btn-ghost" style="text-decoration:none;">Batal</a>
-          <button class="btn-nav" type="submit" style="padding:12px 24px; font-size:1rem;">Simpan & Kirim Ulang</button>
+          <a href="/" class="btn-ghost">Batal</a>
+          <button class="btn-nav" type="submit">Simpan & Kirim Ulang</button>
         </div>
       </div>
     </form>

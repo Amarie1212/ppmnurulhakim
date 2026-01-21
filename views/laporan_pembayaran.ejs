@@ -181,7 +181,8 @@
       .page-title { font-size: 1.3rem !important; margin: 0 !important; }
       .btn-export { width: 100%; justify-content: center; }
     }
-      
+
+    @media (max-width: 768px) {
       /* Stat cards smaller */
       .stat-row { gap: 10px !important; flex-wrap: wrap; }
       .stat-card { 
@@ -352,8 +353,8 @@
                 <tr>
                   <th style="text-align:center" width="60">No</th>
                   <th width="100" style="text-align:center">Bukti</th>
-                  <th>Nama Santri</th>
-                  <th style="white-space: nowrap;">Tanggal Upload</th>
+                  <th style="text-align:left">Nama Santri</th>
+                  <th style="white-space: nowrap; text-align:center;">Tanggal Upload</th>
                   <th style="text-align:center" width="100">Aksi</th>
                 </tr>
               </thead>
@@ -369,8 +370,8 @@
                         </button>
                       </div>
                     </td>
-                    <td class="cell-nama"><%= p.nama_santri %></td>
-                    <td style="color:var(--muted); font-size:0.85rem; white-space: nowrap;"><%= p.tanggal_upload %></td>
+                    <td class="cell-nama" style="text-align:left"><%= p.nama_santri %></td>
+                    <td style="text-align:center; color:var(--muted); font-size:0.85rem; white-space: nowrap;"><%= p.tanggal_upload %></td>
                     <td style="text-align:center">
                       <div style="display:flex; justify-content:center;">
                         <button type="button" 
@@ -407,16 +408,16 @@
               <thead>
                 <tr>
                   <th style="text-align:center" width="60">No</th>
-                  <th>Nama Santri</th>
-                  <th>Kontak</th>
+                  <th style="text-align:left">Nama Santri</th>
+                  <th style="text-align:center">Kontak</th>
                 </tr>
               </thead>
               <tbody>
                 <% belumBayar.forEach((s, i) => { %>
                   <tr>
                     <td style="text-align:center; color:var(--muted); font-size:0.9rem"><%= i + 1 %></td>
-                    <td class="cell-nama"><%= s.nama %></td>
-                    <td>
+                    <td class="cell-nama" style="text-align:left"><%= s.nama %></td>
+                    <td style="text-align:center">
                       <% if (s.wa) { %>
                         <a href="https://wa.me/<%= s.wa.replace(/^0/, '62').replace(/\D/g, '') %>" target="_blank" style="color:var(--accent); text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-weight:500;">
                           <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style="margin-top:-1px">

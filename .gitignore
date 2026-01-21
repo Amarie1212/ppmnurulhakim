@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Environment variables (PENTING: jangan push ke GitHub!)
+.env
+.env.local
+.env.production
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Uploads (jika ada)
+uploads/
+public/uploads/
+
+# Temporary files
+*.tmp
+temp_*.js

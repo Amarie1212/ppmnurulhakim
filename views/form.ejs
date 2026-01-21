@@ -88,8 +88,13 @@
         </div>
 
         <div class="col-6">
-          <label class="label">Password</label>
-          <input type="password" class="input" name="password" <%= isEditable %>>
+          <label class="label" style="display:block; margin-bottom:8px;">Password</label>
+          <div style="position:relative; width:100%;">
+            <input type="password" class="input" name="password" id="password" value="<%= savedPassword %>" style="width:100%; padding-right: 45px; color: var(--text); background: var(--input-bg);">
+            <button type="button" onclick="togglePassword()" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:transparent; border:none; cursor:pointer; padding:6px; display:flex; align-items:center; justify-content:center; z-index:10; color:var(--text); opacity:0.7;" title="Lihat Password">
+              <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px; height:20px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
         </div>
 
         <div class="col-12"><div class="divider"></div></div>
@@ -284,6 +289,25 @@
 
 <script>
   function toTitle(el){ const v=(el.value||'').toLowerCase().trim(); if(!v) return; el.value=v.replace(/\b([a-z])/g,c=>c.toUpperCase()); }
+
+  // Toggle Password
+  function togglePassword() {
+    const input = document.getElementById('password');
+    const icon = document.getElementById('eyeIcon');
+
+    // Toggle Icon & Input Type
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+      icon.parentElement.style.color = 'var(--text)';
+      icon.parentElement.style.opacity = '1';
+    } else {
+      input.type = 'password';
+      icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+      icon.parentElement.style.color = 'var(--text)';
+      icon.parentElement.style.opacity = '0.7';
+    }
+  }
 
   // Toggle Sertifikat Upload
   function toggleSertifikatUpload() {

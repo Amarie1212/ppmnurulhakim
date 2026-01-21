@@ -239,8 +239,8 @@
               <tr>
                 <th style="text-align:center" width="60">No</th>
                 <th width="100" style="text-align:center">Bukti</th>
-                <th>Nama Santri</th>
-                <th width="150">Tanggal</th>
+                <th style="text-align:left">Nama Santri</th>
+                <th width="150" style="text-align:center">Tanggal</th>
                 <th style="text-align:center">Aksi</th>
               </tr>
             </thead>
@@ -256,8 +256,8 @@
                        </button>
                      </div>
                    </td>
-                   <td class="cell-nama"><%= p.nama_santri %></td>
-                   <td style="color:var(--muted); font-size:0.85rem; white-space: nowrap;"><%= p.tanggal_upload %></td>
+                   <td class="cell-nama" style="text-align:left"><%= p.nama_santri %></td>
+                   <td style="text-align:center; color:var(--muted); font-size:0.85rem; white-space: nowrap;"><%= p.tanggal_upload %></td>
                   <td style="text-align:center">
                     <button type="button" class="btn-small btn-detail-link" onclick="showDetailModal('<%= p.id %>', '<%= p.nama_santri %>', '<%= p.nama_pengirim || '-' %>', '<%= p.nama_bank || '-' %>', '<%= p.nomor_rekening || '-' %>', '<%= p.tanggal_transfer || '-' %>', '<%= p.bukti_path %>', '<%= p.tanggal_upload %>')">Proses</button>
                   </td>

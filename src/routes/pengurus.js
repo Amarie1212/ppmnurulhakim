@@ -587,7 +587,7 @@ router.get('/pengurus/verifikasi-pembayaran', requireAuth, async (req, res) => {
         p.nomor_rekening,
         p.bukti_path,
         to_char(p.tanggal_transfer, 'DD Mon YYYY') AS tanggal_transfer,
-        to_char(p.created_at, 'DD Mon YYYY HH24:MI') AS created_at
+        to_char(p.created_at, 'DD Mon YYYY HH24:MI') AS tanggal_upload
       FROM tb_pembayaran p
       LEFT JOIN tb_santri s ON p.santri_id = s.id
       LEFT JOIN tb_akun_santri a ON s.email = a.email

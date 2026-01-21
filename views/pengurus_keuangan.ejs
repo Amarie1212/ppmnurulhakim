@@ -142,11 +142,11 @@
         <table class="table">
           <thead>
             <tr>
-              <th width="50">No</th>
-              <th>Nama Santri</th>
-              <th>Jumlah</th>
-              <th>Tanggal</th>
-              <th>Status</th>
+              <th width="50" style="text-align:center">No</th>
+              <th style="text-align:left">Nama Santri</th>
+              <th style="text-align:center">Jumlah</th>
+              <th style="text-align:center">Tanggal</th>
+              <th style="text-align:center">Status</th>
               <% if (user.role === 'admin' || user.role === 'keuangan') { %>
               <th style="text-align:center">Aksi</th>
               <% } %>
@@ -163,10 +163,10 @@
             <% laporan.forEach((item, index) => { %>
               <tr>
                 <td style="text-align:center; color:var(--muted)"><%= index + 1 %></td>
-                <td class="cell-nama"><%= item.nama_santri %></td>
-                <td>Rp <%= item.jumlah?.toLocaleString('id-ID') || '-' %></td>
-                <td style="color:var(--muted); font-size:0.85rem"><%= item.tanggal %></td>
-                <td>
+                <td class="cell-nama" style="text-align:left"><%= item.nama_santri %></td>
+                <td style="text-align:center">Rp <%= item.jumlah?.toLocaleString('id-ID') || '-' %></td>
+                <td style="text-align:center; color:var(--muted); font-size:0.85rem"><%= item.tanggal %></td>
+                <td style="text-align:center">
                   <% if(item.status === 'Menunggu Verifikasi'){ %>
                     <span class="status-badge status-pending">Pending</span>
                   <% } else if(item.status === 'Terverifikasi'){ %>

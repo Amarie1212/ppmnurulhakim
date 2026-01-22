@@ -376,8 +376,14 @@
                     <td style="text-align:center">
                       <div style="display:flex; justify-content:center;">
                         <button type="button" 
-                          onclick="showDetail('<%= p.nama_santri %>', '<%= p.nama_pengirim || '-' %>', '<%= p.nama_bank || '-' %>', '<%= p.nomor_rekening || '-' %>', '<%= p.tanggal_transfer || '-' %>', '<%= p.tanggal_upload %>', '<%= p.bukti_path %>')" 
-                          class="btn-small btn-detail-link">
+                          class="btn-small btn-detail-link btn-show-detail"
+                          data-nama="<%= p.nama_santri %>"
+                          data-pengirim="<%= p.nama_pengirim || '-' %>"
+                          data-bank="<%= p.nama_bank || '-' %>"
+                          data-rekening="<%= p.nomor_rekening || '-' %>"
+                          data-tgl-transfer="<%= p.tanggal_transfer || '-' %>"
+                          data-tgl-upload="<%= p.tanggal_upload %>"
+                          data-bukti="<%= p.bukti_path %>">
                           Detail
                         </button>
                       </div>
@@ -534,6 +540,15 @@
       modal.style.display = 'none';
     }, 200);
   }
+  // Event listener for detail buttons using data attributes
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.btn-show-detail').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const d = this.dataset;
+        showDetail(d.nama, d.pengirim, d.bank, d.rekening, d.tglTransfer, d.tglUpload, d.bukti);
+      });
+    });
+  });
 </script>
 
 <script>

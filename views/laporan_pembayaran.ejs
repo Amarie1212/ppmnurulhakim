@@ -213,7 +213,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      opacity: 0; /* Animated by JS */
+      /* opacity handled by JS */
       transition: opacity 0.2s ease;
     }
 
@@ -524,6 +524,7 @@
     
     modal.style.display = 'flex';
     requestAnimationFrame(() => {
+      modal.style.opacity = '1';
       box.style.transform = 'scale(1)';
       box.style.opacity = '1';
     });
@@ -533,6 +534,7 @@
     const modal = document.getElementById('detailModal');
     const box = modal.querySelector('.modal-box');
     
+    modal.style.opacity = '0';
     box.style.transform = 'scale(0.95)';
     box.style.opacity = '0';
     

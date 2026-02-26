@@ -44,8 +44,8 @@ async function getAdminStats() {
   try {
     const res = await pool.query(`
       SELECT 
-        (SELECT COUNT(*) FROM tb_akun_santri WHERE status='PENDING') AS pending,
-        (SELECT COUNT(*) FROM tb_santri WHERE status_biodata IS NULL OR status_biodata = 'PENDING') AS biodata_pending,
+        (SELECT COUNT(*) FROM tb_registrasi_akun WHERE status='PENDING') AS pending,
+        (SELECT COUNT(*) FROM tb_biodata_santri WHERE status_biodata IS NULL OR status_biodata = 'PENDING') AS biodata_pending,
         (SELECT COUNT(*) FROM tb_pembayaran WHERE status='PENDING') AS pending_payment
     `);
     return res.rows[0] || { pending: 0, biodata_pending: 0, pending_payment: 0 };
@@ -73,11 +73,11 @@ router.get('/pengurus/home', requireAuth, async (req, res) => {
     // Ambil data statistik lengkap untuk dashboard
     const stats = await pool.query(`
       SELECT 
-        (SELECT COUNT(*) FROM tb_akun_santri WHERE status='PENDING') AS pending,
-        (SELECT COUNT(*) FROM tb_santri WHERE status_biodata IS NULL OR status_biodata = 'PENDING') AS biodata_pending,
-        (SELECT COUNT(*) FROM tb_santri) AS total_santri,
-        (SELECT COUNT(*) FROM tb_santri WHERE jk='L') AS putra,
-        (SELECT COUNT(*) FROM tb_santri WHERE jk='P') AS putri,
+        (SELECT COUNT(*) FROM tb_registrasi_akun WHERE status='PENDING') AS pending,
+        (SELECT COUNT(*) FROM tb_biodata_santri WHERE status_biodata IS NULL OR status_biodata = 'PENDING') AS biodata_pending,
+        (SELECT COUNT(*) FROM tb_biodata_santri) AS total_santri,
+        (SELECT COUNT(*) FROM tb_biodata_santri WHERE jk='L') AS putra,
+        (SELECT COUNT(*) FROM tb_biodata_santri WHERE jk='P') AS putri,
         (SELECT COUNT(*) FROM tb_pembayaran WHERE status='PENDING') AS pending_payment
     `);
 
@@ -114,7 +114,7 @@ router.get('/pengurus', requireAuth, async (req, res) => {
         wa AS phone, 
         angkatan,
         to_char(created_at, 'DD Mon YYYY HH24:MI') AS created_fmt
-      FROM tb_santri 
+      FROM tb_biodata_santri 
       ORDER BY jk ASC, nama ASC 
       LIMIT 200
     `);
@@ -137,7 +137,7 @@ router.get('/pengurus', requireAuth, async (req, res) => {
 router.post('/pengurus/santri/update', requireAuth, async (req, res) => {
   try {
     const { id, nama, wa } = req.body;
-    await pool.query('UPDATE tb_santri SET nama = $1, wa = $2 WHERE id = $3', [nama, wa, id]);
+    await pool.query('UPDATE tb_biodata_santri SET nama = $1, wa = $2 WHERE id = $3', [nama, wa, id]);
     res.redirect('/pengurus');
   } catch (e) {
     console.error('[POST /pengurus/santri/update] Error:', e.message);
@@ -158,7 +158,7 @@ router.post('/pengurus/santri/:id/delete', requireAuth, async (req, res) => {
   
   try {
     // Get santri data (email & files) first for cascading delete
-    const santriResult = await pool.query('SELECT email, foto_path, kk_path, ktp_path, sertifikat_path FROM tb_santri WHERE id = $1', [id]);
+    const santriResult = await pool.query('SELECT email, foto_path, kk_path, ktp_path, sertifikat_path FROM tb_biodata_santri WHERE id = $1', [id]);
     
     if (santriResult.rows.length > 0) {
       const s = santriResult.rows[0];
@@ -186,14 +186,14 @@ router.post('/pengurus/santri/:id/delete', requireAuth, async (req, res) => {
       });
       
       // Delete child records first (respects foreign key constraints)
-      // Delete from tb_pembayaran first (has FK to tb_santri)
+      // Delete from tb_pembayaran first (has FK to tb_biodata_santri)
       await pool.query('DELETE FROM tb_pembayaran WHERE santri_id = $1', [id]);
       
-      // Delete from tb_santri
-      await pool.query('DELETE FROM tb_santri WHERE id = $1', [id]);
+      // Delete from tb_biodata_santri
+      await pool.query('DELETE FROM tb_biodata_santri WHERE id = $1', [id]);
       
-      // Also delete from tb_akun_santri if exists
-      await pool.query('DELETE FROM tb_akun_santri WHERE email = $1', [email]);
+      // Also delete from tb_registrasi_akun if exists
+      await pool.query('DELETE FROM tb_registrasi_akun WHERE email = $1', [email]);
       
       console.log(`[DELETE SANTRI] Santri ID ${id} (${email}) and all files deleted by ${req.session.user.name}`);
     }
@@ -214,7 +214,7 @@ router.get('/pengurus/santri/:id/detail', requireAuth, async (req, res) => {
     
     // Get santri biodata lengkap
     const { rows } = await pool.query(`
-      SELECT * FROM tb_santri WHERE id = $1 LIMIT 1
+      SELECT * FROM tb_biodata_santri WHERE id = $1 LIMIT 1
     `, [id]);
     
     if (rows.length === 0) {
@@ -248,29 +248,48 @@ router.post('/pengurus/biodata/verify', requireAuth, async (req, res) => {
   const { santri_id, action } = req.body;
   
   try {
+    // Ambil nama santri dulu untuk logging
+    const santriData = await pool.query("SELECT nama FROM tb_biodata_santri WHERE id=$1", [santri_id]);
+    const namaSantri = santriData.rows[0]?.nama || 'Unknown';
+    
     if (action === 'approve') {
       // Approve biodata - Set status_biodata = 'VERIFIED'
       await pool.query(`
-        UPDATE tb_santri 
+        UPDATE tb_biodata_santri 
         SET status_biodata = 'VERIFIED'
         WHERE id = $1
       `, [santri_id]);
       
-      console.log(`[Biodata Verify] Biodata santri ID ${santri_id} APPROVED`);
+      // Update tb_hasil_verifikasi_daftar
+      const existCheck = await pool.query("SELECT id FROM tb_hasil_verifikasi_daftar WHERE nama=$1", [namaSantri]);
+      if (existCheck.rows.length > 0) {
+        await pool.query("UPDATE tb_hasil_verifikasi_daftar SET biodata='VERIFIED', updated_at=NOW() WHERE nama=$1", [namaSantri]);
+      } else {
+        await pool.query("INSERT INTO tb_hasil_verifikasi_daftar (nama, akun, biodata) VALUES ($1, 'PENDING', 'VERIFIED')", [namaSantri]);
+      }
+      
+      console.log(`[Biodata Verify] Biodata santri ${namaSantri} APPROVED`);
       res.redirect('/pengurus/verifikasi?tab=biodata&success=approved');
       
     } else if (action === 'reject') {
       // Reject biodata - Set status REJECTED dan simpan alasan
-      // Data TIDAK DIHAPUS agar santri bisa perbaiki
       const { alasan } = req.body;
       await pool.query(`
-        UPDATE tb_santri 
+        UPDATE tb_biodata_santri 
         SET status_biodata = 'REJECTED',
             alasan_tolak = $2
         WHERE id = $1
       `, [santri_id, alasan]);
       
-      console.log(`[Biodata Verify] Biodata santri ID ${santri_id} REJECTED - reason: ${alasan}`);
+      // Update tb_hasil_verifikasi_daftar
+      const existCheck = await pool.query("SELECT id FROM tb_hasil_verifikasi_daftar WHERE nama=$1", [namaSantri]);
+      if (existCheck.rows.length > 0) {
+        await pool.query("UPDATE tb_hasil_verifikasi_daftar SET biodata='REJECTED', alasan_tolak_biodata=$2, updated_at=NOW() WHERE nama=$1", [namaSantri, alasan]);
+      } else {
+        await pool.query("INSERT INTO tb_hasil_verifikasi_daftar (nama, akun, biodata, alasan_tolak_biodata) VALUES ($1, 'PENDING', 'REJECTED', $2)", [namaSantri, alasan]);
+      }
+      
+      console.log(`[Biodata Verify] Biodata santri ${namaSantri} REJECTED - reason: ${alasan}`);
       res.redirect('/pengurus/verifikasi?tab=biodata&success=rejected');
     } else {
       res.redirect('/pengurus/verifikasi?tab=biodata');
@@ -331,7 +350,7 @@ router.get('/pengurus/export-santri', requireAuth, async (req, res) => {
         s.ibu_nama,
         s.ibu_hp,
         to_char(s.created_at, 'DD-MM-YYYY') AS tanggal_daftar
-      FROM tb_santri s
+      FROM tb_biodata_santri s
       ORDER BY s.jk ASC, s.nama ASC
     `);
 
@@ -421,7 +440,7 @@ router.get('/pengurus/verifikasi', requireAuth, async (req, res) => {
         id, nama, email, wa, 
         kelompok, desa, daerah, kampus, prodi,
         to_char(created_at, 'DD Mon HH24:MI') as created_fmt
-      FROM tb_akun_santri 
+      FROM tb_registrasi_akun 
       WHERE status = 'PENDING' 
       ORDER BY created_at ASC
     `);
@@ -438,8 +457,8 @@ router.get('/pengurus/verifikasi', requireAuth, async (req, res) => {
           s.ayah_nama, s.ayah_hp, s.ibu_nama, s.ibu_hp,
           s.foto_path, s.kk_path, s.ktp_path, s.status_biodata,
           to_char(s.created_at, 'DD Mon HH24:MI') as created_fmt
-        FROM tb_santri s
-        JOIN tb_akun_santri a ON s.email = a.email
+        FROM tb_biodata_santri s
+        JOIN tb_registrasi_akun a ON s.email = a.email
         WHERE a.status = 'VERIFIED' 
           AND s.nama IS NOT NULL
           AND (s.status_biodata = 'PENDING' OR s.status_biodata IS NULL)
@@ -473,13 +492,35 @@ router.post('/pengurus/verifikasi', requireAuth, async (req, res) => {
   if (!['admin', 'panitia'].includes(req.session.user.role)) {
     return res.status(403).send('Akses ditolak');
   }
-  const { id, aksi } = req.body;
+  const { id, aksi, alasan } = req.body;
   try {
+    // Ambil nama santri dulu untuk logging
+    const santriData = await pool.query("SELECT nama FROM tb_registrasi_akun WHERE id=$1", [id]);
+    const namaSantri = santriData.rows[0]?.nama || 'Unknown';
+    
     if (aksi === 'verify') {
-      await pool.query("UPDATE tb_akun_santri SET status='VERIFIED' WHERE id=$1", [id]);
+      await pool.query("UPDATE tb_registrasi_akun SET status='VERIFIED' WHERE id=$1", [id]);
+      
+      // Insert/Update ke tb_hasil_verifikasi_daftar
+      const existCheck = await pool.query("SELECT id FROM tb_hasil_verifikasi_daftar WHERE nama=$1", [namaSantri]);
+      if (existCheck.rows.length > 0) {
+        await pool.query("UPDATE tb_hasil_verifikasi_daftar SET akun='VERIFIED', updated_at=NOW() WHERE nama=$1", [namaSantri]);
+      } else {
+        await pool.query("INSERT INTO tb_hasil_verifikasi_daftar (nama, akun, biodata) VALUES ($1, 'VERIFIED', 'PENDING')", [namaSantri]);
+      }
+      console.log(`[Verifikasi Akun] ${namaSantri} VERIFIED`);
+      
     } else if (aksi === 'reject') {
-      const { alasan } = req.body;
-      await pool.query("UPDATE tb_akun_santri SET status='REJECTED', alasan_tolak=$2 WHERE id=$1", [id, alasan]);
+      await pool.query("UPDATE tb_registrasi_akun SET status='REJECTED', alasan_tolak=$2 WHERE id=$1", [id, alasan]);
+      
+      // Insert/Update ke tb_hasil_verifikasi_daftar
+      const existCheck = await pool.query("SELECT id FROM tb_hasil_verifikasi_daftar WHERE nama=$1", [namaSantri]);
+      if (existCheck.rows.length > 0) {
+        await pool.query("UPDATE tb_hasil_verifikasi_daftar SET akun='REJECTED', alasan_tolak_akun=$2, updated_at=NOW() WHERE nama=$1", [namaSantri, alasan]);
+      } else {
+        await pool.query("INSERT INTO tb_hasil_verifikasi_daftar (nama, akun, biodata, alasan_tolak_akun) VALUES ($1, 'REJECTED', 'PENDING', $2)", [namaSantri, alasan]);
+      }
+      console.log(`[Verifikasi Akun] ${namaSantri} REJECTED - ${alasan}`);
     }
   } catch (e) {
     console.error('[POST /verifikasi] Error:', e.message);
@@ -499,7 +540,7 @@ router.post('/pengurus/verifikasi-biodata', requireAuth, async (req, res) => {
   // So I will ignore this one or update it just in case.
   try {
     if (aksi === 'verify') {
-      await pool.query("UPDATE tb_santri SET status_biodata='VERIFIED' WHERE id=$1", [id]);
+      await pool.query("UPDATE tb_biodata_santri SET status_biodata='VERIFIED' WHERE id=$1", [id]);
     }
   } catch (e) {
     console.error('[POST /verifikasi-biodata] Error:', e.message);
@@ -515,7 +556,7 @@ router.get('/pengurus/santri/:id', requireAuth, async (req, res) => {
     const { id } = req.params;
     const { rows } = await pool.query(`
       SELECT *, to_char(created_at,'DD Mon YYYY HH24:MI') AS created_fmt 
-      FROM tb_santri WHERE id = $1 LIMIT 1
+      FROM tb_biodata_santri WHERE id = $1 LIMIT 1
     `, [id]);
 
     const s = rows[0];
@@ -548,7 +589,7 @@ router.get('/pengurus/export.csv', requireAuth, async (req, res) => {
         COALESCE(wa, '') AS phone,
         kelompok, desa, daerah,
         to_char(created_at,'YYYY-MM-DD HH24:MI') AS created_fmt
-      FROM tb_santri
+      FROM tb_biodata_santri
       ORDER BY created_at DESC
     `);
 
@@ -589,8 +630,8 @@ router.get('/pengurus/verifikasi-pembayaran', requireAuth, async (req, res) => {
         to_char(p.tanggal_transfer, 'DD Mon YYYY') AS tanggal_transfer,
         to_char(p.created_at, 'DD Mon YYYY HH24:MI') AS tanggal_upload
       FROM tb_pembayaran p
-      LEFT JOIN tb_santri s ON p.santri_id = s.id
-      LEFT JOIN tb_akun_santri a ON s.email = a.email
+      LEFT JOIN tb_biodata_santri s ON p.santri_id = s.id
+      LEFT JOIN tb_registrasi_akun a ON s.email = a.email
       WHERE p.status = 'PENDING'
       ORDER BY p.created_at ASC
     `);
@@ -629,7 +670,7 @@ router.get('/pengurus/laporan-pembayaran/export', requireAuth, async (req, res) 
         to_char(p.created_at, 'DD-MM-YYYY HH24:MI') AS tanggal_upload,
         p.status
       FROM tb_pembayaran p
-      LEFT JOIN tb_santri s ON p.santri_id = s.id
+      LEFT JOIN tb_biodata_santri s ON p.santri_id = s.id
       WHERE 1=1
     `;
 
@@ -656,8 +697,8 @@ router.get('/pengurus/laporan-pembayaran/export', requireAuth, async (req, res) 
       SELECT 
         s.nama,
         a.wa
-      FROM tb_santri s
-      JOIN tb_akun_santri a ON s.email = a.email
+      FROM tb_biodata_santri s
+      JOIN tb_registrasi_akun a ON s.email = a.email
       WHERE a.status = 'VERIFIED'
         AND NOT EXISTS (
           SELECT 1 FROM tb_pembayaran p WHERE p.santri_id = s.id AND p.status = 'VERIFIED'
@@ -798,7 +839,7 @@ router.post('/pengurus/verifikasi-pembayaran', requireAuth, async (req, res) => 
     const santriResult = await pool.query(`
       SELECT s.nama, s.email 
       FROM tb_pembayaran p
-      JOIN tb_santri s ON p.santri_id = s.id
+      JOIN tb_biodata_santri s ON p.santri_id = s.id
       WHERE p.id = $1
     `, [id]);
     
@@ -807,6 +848,17 @@ router.post('/pengurus/verifikasi-pembayaran', requireAuth, async (req, res) => 
     if (aksi === 'verify') {
       // Update status menjadi VERIFIED
       await pool.query(`UPDATE tb_pembayaran SET status = 'VERIFIED' WHERE id = $1`, [id]);
+      
+      // Insert/Update ke tb_hasil_verifikasi_bayar
+      if (santri) {
+        const existCheck = await pool.query("SELECT id FROM tb_hasil_verifikasi_bayar WHERE nama=$1", [santri.nama]);
+        if (existCheck.rows.length > 0) {
+          await pool.query("UPDATE tb_hasil_verifikasi_bayar SET status='VERIFIED', updated_at=NOW() WHERE nama=$1", [santri.nama]);
+        } else {
+          await pool.query("INSERT INTO tb_hasil_verifikasi_bayar (nama, status) VALUES ($1, 'VERIFIED')", [santri.nama]);
+        }
+        console.log(`[Verifikasi Pembayaran] ${santri.nama} VERIFIED`);
+      }
       
       // Kirim Email Diterima
       if (santri && santri.email) {
@@ -828,6 +880,17 @@ router.post('/pengurus/verifikasi-pembayaran', requireAuth, async (req, res) => 
       // Update status menjadi REJECTED dan simpan alasan
       const { alasan } = req.body;
       await pool.query(`UPDATE tb_pembayaran SET status = 'REJECTED', alasan_tolak = $2 WHERE id = $1`, [id, alasan]);
+      
+      // Insert/Update ke tb_hasil_verifikasi_bayar
+      if (santri) {
+        const existCheck = await pool.query("SELECT id FROM tb_hasil_verifikasi_bayar WHERE nama=$1", [santri.nama]);
+        if (existCheck.rows.length > 0) {
+          await pool.query("UPDATE tb_hasil_verifikasi_bayar SET status='REJECTED', alasan_tolak=$2, updated_at=NOW() WHERE nama=$1", [santri.nama, alasan]);
+        } else {
+          await pool.query("INSERT INTO tb_hasil_verifikasi_bayar (nama, status, alasan_tolak) VALUES ($1, 'REJECTED', $2)", [santri.nama, alasan]);
+        }
+        console.log(`[Verifikasi Pembayaran] ${santri.nama} REJECTED - ${alasan}`);
+      }
       
       // Kirim Email Ditolak
       if (santri && santri.email) {
@@ -927,8 +990,8 @@ router.get('/pengurus/laporan-pembayaran', requireAuth, async (req, res) => {
         to_char(p.tanggal_transfer, 'DD Mon YYYY') AS tanggal_transfer,
         to_char(p.created_at, 'DD Mon YYYY') AS tanggal_upload
       FROM tb_pembayaran p
-      LEFT JOIN tb_santri s ON p.santri_id = s.id
-      LEFT JOIN tb_akun_santri a ON s.email = a.email
+      LEFT JOIN tb_biodata_santri s ON p.santri_id = s.id
+      LEFT JOIN tb_registrasi_akun a ON s.email = a.email
       WHERE p.status = 'VERIFIED'
     `;
 
@@ -961,8 +1024,8 @@ router.get('/pengurus/laporan-pembayaran', requireAuth, async (req, res) => {
         s.id,
         s.nama,
         a.wa
-      FROM tb_santri s
-      JOIN tb_akun_santri a ON s.email = a.email
+      FROM tb_biodata_santri s
+      JOIN tb_registrasi_akun a ON s.email = a.email
       WHERE a.status = 'VERIFIED'
         AND NOT EXISTS (
           SELECT 1 FROM tb_pembayaran p WHERE p.santri_id = s.id AND p.status = 'VERIFIED'
@@ -1157,7 +1220,7 @@ router.get('/pengurus/laporan-masuk', requireAuth, async (req, res) => {
         s.nama AS nama_santri,
         to_char(p.created_at, 'DD Mon YYYY HH24:MI') AS tanggal_upload
       FROM tb_pembayaran p
-      JOIN tb_santri s ON p.santri_id = s.id
+      JOIN tb_biodata_santri s ON p.santri_id = s.id
       WHERE p.status = 'VERIFIED'
     `;
 
@@ -1222,7 +1285,7 @@ router.get('/pengurus/laporan-masuk/export-excel', requireAuth, async (req, res)
         p.status,
         p.jumlah
       FROM tb_pembayaran p
-      JOIN tb_santri s ON p.santri_id = s.id
+      JOIN tb_biodata_santri s ON p.santri_id = s.id
       WHERE p.status = 'VERIFIED'
     `;
 
@@ -1256,8 +1319,8 @@ router.get('/pengurus/laporan-masuk/export-excel', requireAuth, async (req, res)
         s.kelompok,
         s.desa,
         to_char(s.created_at, 'DD-MM-YYYY') AS tgl_daftar
-      FROM tb_santri s
-      JOIN tb_akun_santri a ON s.email = a.email
+      FROM tb_biodata_santri s
+      JOIN tb_registrasi_akun a ON s.email = a.email
       WHERE a.status = 'VERIFIED' -- Hanya akun yg aktif/approved
         AND NOT EXISTS (
           SELECT 1 FROM tb_pembayaran p 
@@ -1385,7 +1448,7 @@ router.get('/pengurus/laporan-masuk/:id/detail', requireAuth, async (req, res) =
         p.bukti_path,
         to_char(p.created_at, 'DD Mon YYYY') AS tanggal
       FROM tb_pembayaran p
-      LEFT JOIN tb_santri s ON p.santri_id = s.id
+      LEFT JOIN tb_biodata_santri s ON p.santri_id = s.id
       WHERE p.status = 'VERIFIED'
       ORDER BY p.created_at DESC
     `);
@@ -1513,7 +1576,7 @@ router.get('/pengurus/kelola-pengumuman', requireAuth, async (req, res) => {
   let info = {};
   
   try {
-    const { rows } = await pool.query(`SELECT * FROM tb_info_ppm ORDER BY id LIMIT 1`);
+    const { rows } = await pool.query(`SELECT * FROM tb_informasi ORDER BY id LIMIT 1`);
     info = rows[0] || {};
     
     // Parse JSON fields
@@ -1574,11 +1637,11 @@ router.post('/pengurus/kelola-pengumuman', requireAuth, async (req, res) => {
   const kontakPanitiaJSON = JSON.stringify(kontakPanitia);
   
   try {
-    const check = await pool.query(`SELECT id FROM tb_info_ppm LIMIT 1`);
+    const check = await pool.query(`SELECT id FROM tb_informasi LIMIT 1`);
     
     if (check.rows.length > 0) {
       await pool.query(`
-        UPDATE tb_info_ppm SET 
+        UPDATE tb_informasi SET 
           pengumuman = $1,
           tanggal_kedatangan = $2,
           peraturan = $3,
@@ -1588,7 +1651,7 @@ router.post('/pengurus/kelola-pengumuman', requireAuth, async (req, res) => {
       `, [pengumuman, tanggal_kedatangan || null, peraturanJSON, kontakPanitiaJSON, check.rows[0].id]);
     } else {
       await pool.query(`
-        INSERT INTO tb_info_ppm (pengumuman, tanggal_kedatangan, peraturan, kontak_panitia)
+        INSERT INTO tb_informasi (pengumuman, tanggal_kedatangan, peraturan, kontak_panitia)
         VALUES ($1, $2, $3, $4)
       `, [pengumuman, tanggal_kedatangan || null, peraturanJSON, kontakPanitiaJSON]);
     }
@@ -1615,7 +1678,7 @@ router.get('/pengurus/laporan-santri', requireAuth, async (req, res) => {
         s.*,
         (s.kelurahan || ', ' || s.kecamatan || ', ' || s.kota_kab) as alamat_display,
         to_char(s.created_at, 'DD Mon YYYY HH24:MI') AS created_fmt
-      FROM tb_santri s
+      FROM tb_biodata_santri s
       ORDER BY s.nama ASC
     `);
 

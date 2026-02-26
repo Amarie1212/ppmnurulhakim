@@ -19,12 +19,12 @@ router.get('/pengurus/home', requireAuth, async (req, res) => {
         // Ambil data statistik untuk kartu dashboard
         const stats = await pool.query(`
             SELECT 
-                (SELECT COUNT(*) FROM tb_akun_santri WHERE status='PENDING') AS pending,
-                (SELECT COUNT(*) FROM tb_santri WHERE status_biodata='PENDING') AS biodata_pending,
+                (SELECT COUNT(*) FROM tb_registrasi_akun WHERE status='PENDING') AS pending,
+                (SELECT COUNT(*) FROM tb_biodata_santri WHERE status_biodata='PENDING') AS biodata_pending,
                 (SELECT COUNT(*) FROM tb_pembayaran WHERE status='PENDING') AS payment_pending,
-                (SELECT COUNT(*) FROM tb_santri) AS total_santri,
-                (SELECT COUNT(*) FROM tb_santri WHERE jk='L') AS putra,
-                (SELECT COUNT(*) FROM tb_santri WHERE jk='P') AS putri
+                (SELECT COUNT(*) FROM tb_biodata_santri) AS total_santri,
+                (SELECT COUNT(*) FROM tb_biodata_santri WHERE jk='L') AS putra,
+                (SELECT COUNT(*) FROM tb_biodata_santri WHERE jk='P') AS putri
         `);
 
         res.render('pengurus_home', {
@@ -58,7 +58,7 @@ router.get('/pengurus', requireAuth, async (req, res) => {
                 END AS jk_label,
                 wa AS phone, 
                 to_char(created_at, 'DD Mon YYYY HH24:MI') AS created_fmt
-            FROM tb_santri 
+            FROM tb_biodata_santri 
             ORDER BY created_at DESC 
             LIMIT 200
         `);
@@ -87,7 +87,7 @@ router.get('/pengurus/santri/:id', requireAuth, async (req, res) => {
         const { id } = req.params;
         const { rows } = await pool.query(`
             SELECT *, to_char(created_at,'DD Mon YYYY HH24:MI') AS created_fmt 
-            FROM tb_santri WHERE id = $1 LIMIT 1
+            FROM tb_biodata_santri WHERE id = $1 LIMIT 1
         `, [id]);
 
         const s = rows[0];
@@ -125,7 +125,7 @@ router.get('/pengurus/export.csv', requireAuth, async (req, res) => {
                 COALESCE(wa, '') AS phone,
                 kelompok, desa, daerah,
                 to_char(created_at,'YYYY-MM-DD HH24:MI') AS created_fmt
-            FROM tb_santri
+            FROM tb_biodata_santri
             ORDER BY created_at DESC
         `);
 

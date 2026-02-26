@@ -55,9 +55,9 @@ async function refreshSantriSession(req, res, next) {
     const email = req.session.user.email;
     if (!email) return next();
     
-    // [FIX] Get fresh ACCOUNT status from tb_akun_santri
+    // [FIX] Get fresh ACCOUNT status from tb_registrasi_akun
     const akunCheck = await pool.query(
-      `SELECT status, alasan_tolak FROM tb_akun_santri WHERE email = $1 LIMIT 1`,
+      `SELECT status, alasan_tolak FROM tb_registrasi_akun WHERE email = $1 LIMIT 1`,
       [email]
     );
     
@@ -68,7 +68,7 @@ async function refreshSantriSession(req, res, next) {
     
     // Get fresh biodata status
     const santriCheck = await pool.query(
-      `SELECT id, status_biodata, alasan_tolak FROM tb_santri WHERE email = $1 LIMIT 1`,
+      `SELECT id, status_biodata, alasan_tolak FROM tb_biodata_santri WHERE email = $1 LIMIT 1`,
       [email]
     );
     
@@ -130,7 +130,7 @@ router.post('/login', async (req, res) => {
 
   try {
     // HANYA CEK TABEL SANTRI
-    const resSantri = await pool.query("SELECT * FROM tb_akun_santri WHERE email=$1", [email]);
+    const resSantri = await pool.query("SELECT * FROM tb_registrasi_akun WHERE email=$1", [email]);
     
     // Email tidak ditemukan
     if (resSantri.rows.length === 0) {
@@ -154,7 +154,7 @@ router.post('/login', async (req, res) => {
     // }
 
     // Cek Biodata dan statusnya
-    const bioCheck = await pool.query("SELECT id, status_biodata, alasan_tolak FROM tb_santri WHERE email=$1", [s.email]);
+    const bioCheck = await pool.query("SELECT id, status_biodata, alasan_tolak FROM tb_biodata_santri WHERE email=$1", [s.email]);
     const isBiodataEmpty = bioCheck.rows.length === 0;
     const santriId = bioCheck.rows.length > 0 ? bioCheck.rows[0].id : null;
     const biodataVerified = bioCheck.rows.length > 0 && bioCheck.rows[0].status_biodata === 'VERIFIED';
@@ -226,14 +226,14 @@ router.post('/register', async (req, res) => {
     const { nama, email, password, wa, kelompok, desa, daerah, kampus, prodi } = req.body;
     
     // 1. Cek Email
-    const check = await pool.query('SELECT id FROM tb_akun_santri WHERE email=$1', [email]);
+    const check = await pool.query('SELECT id FROM tb_registrasi_akun WHERE email=$1', [email]);
     if (check.rows.length > 0) {
         return res.render('register', { title: 'PPM Nurul Hakim / Buat Akun', error: 'Email sudah terdaftar.' });
     }
 
     // 2. Cek Nama (tidak boleh duplikat, kecuali dari akun yang sudah REJECTED)
     const nameCheck = await pool.query(
-      `SELECT id FROM tb_akun_santri WHERE LOWER(nama) = LOWER($1) AND status != 'REJECTED'`, 
+      `SELECT id FROM tb_registrasi_akun WHERE LOWER(nama) = LOWER($1) AND status != 'REJECTED'`, 
       [nama.trim()]
     );
     if (nameCheck.rows.length > 0) {
@@ -245,7 +245,7 @@ router.post('/register', async (req, res) => {
     // 3. Store Password Plain Text (No Hash)
     const passhash = password; // Sesuai permintaan user, simpan mentah
     const result = await pool.query(
-      `INSERT INTO tb_akun_santri (nama, email, passhash, wa, kelompok, desa, daerah, kampus, prodi, status) 
+      `INSERT INTO tb_registrasi_akun (nama, email, passhash, wa, kelompok, desa, daerah, kampus, prodi, status) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'PENDING') 
        RETURNING *`,
       [toTitleCase(nama), email.toLowerCase(), passhash, normPhone(wa), kelompok, desa, daerah, kampus, prodi]
@@ -305,10 +305,10 @@ router.get('/form', requireSantriAuth, refreshSantriSession, async (req, res) =>
 
   try {
     // Ambil data biodata
-    const { rows } = await pool.query("SELECT * FROM tb_santri WHERE email = $1", [req.session.user.email]);
+    const { rows } = await pool.query("SELECT * FROM tb_biodata_santri WHERE email = $1", [req.session.user.email]);
     
     // Ambil password asli dari akun untuk ditampilkan
-    const akunRes = await pool.query("SELECT passhash FROM tb_akun_santri WHERE email = $1", [req.session.user.email]);
+    const akunRes = await pool.query("SELECT passhash FROM tb_registrasi_akun WHERE email = $1", [req.session.user.email]);
     const passwordRaw = akunRes.rows.length > 0 ? akunRes.rows[0].passhash : '';
 
     res.render('form', {
@@ -362,19 +362,19 @@ router.post('/form', requireSantriAuth, refreshSantriSession, upload.fields([
        console.error('[CleanUp] Failed to unlink old files:', err.message);
     }
     
-    const check = await pool.query("SELECT id FROM tb_santri WHERE email=$1", [u.email]);
+    const check = await pool.query("SELECT id FROM tb_biodata_santri WHERE email=$1", [u.email]);
     
     if (check.rows.length > 0) {
       // UPDATE - gunakan nama dari form (b.nama)
       // Reset status_biodata ke PENDING agar admin bisa cek ulang
-      await pool.query(`UPDATE tb_santri SET nama=$1, jk=$2, wa=$3, pernah_mondok=$4, lulus_muballigh=$5, kelurahan=$6, kecamatan=$7, kota_kab=$8, provinsi=$9, no_ki=$10, kampus=$11, prodi=$12, jenjang=$13, angkatan=$14, ayah_nama=$15, ayah_pekerjaan=$16, ayah_penghasilan=$17, ayah_hp=$18, ibu_nama=$19, ibu_pekerjaan=$20, ibu_penghasilan=$21, ibu_hp=$22, kelompok=$23, desa=$24, daerah=$25, foto_path=COALESCE($26, foto_path), kk_path=COALESCE($27, kk_path), ktp_path=COALESCE($28, ktp_path), sertifikat_path=COALESCE($29, sertifikat_path), status_biodata='PENDING' WHERE email=$30`, 
+      await pool.query(`UPDATE tb_biodata_santri SET nama=$1, jk=$2, wa=$3, pernah_mondok=$4, lulus_muballigh=$5, kelurahan=$6, kecamatan=$7, kota_kab=$8, provinsi=$9, no_ki=$10, kampus=$11, prodi=$12, jenjang=$13, angkatan=$14, ayah_nama=$15, ayah_pekerjaan=$16, ayah_penghasilan=$17, ayah_hp=$18, ibu_nama=$19, ibu_pekerjaan=$20, ibu_penghasilan=$21, ibu_hp=$22, kelompok=$23, desa=$24, daerah=$25, foto_path=COALESCE($26, foto_path), kk_path=COALESCE($27, kk_path), ktp_path=COALESCE($28, ktp_path), sertifikat_path=COALESCE($29, sertifikat_path), status_biodata='PENDING' WHERE email=$30`, 
       [toTitleCase(b.nama), b.jk, normPhone(b.wa), b.pernah_mondok === 'true', b.lulus_muballigh === 'true', b.kelurahan, b.kecamatan, b.kota_kab, b.provinsi, b.no_ki, b.kampus, b.prodi, b.jenjang, b.angkatan, b.ayah_nama, '', '', normPhone(b.ayah_hp), b.ibu_nama, '', '', normPhone(b.ibu_hp), b.kelompok, b.desa, b.daerah, req.files?.foto ? fotoPath : null, req.files?.kk ? kkPath : null, req.files?.ktp ? ktpPath : null, req.files?.sertifikat ? sertifikatPath : null, u.email]);
       
-      // Update nama di tb_akun_santri juga (dan password jika ada)
+      // Update nama di tb_registrasi_akun juga (dan password jika ada)
       if (b.password) {
-        await pool.query(`UPDATE tb_akun_santri SET nama=$1, passhash=$2 WHERE email=$3`, [toTitleCase(b.nama), b.password, u.email]);
+        await pool.query(`UPDATE tb_registrasi_akun SET nama=$1, passhash=$2 WHERE email=$3`, [toTitleCase(b.nama), b.password, u.email]);
       } else {
-        await pool.query(`UPDATE tb_akun_santri SET nama=$1 WHERE email=$2`, [toTitleCase(b.nama), u.email]);
+        await pool.query(`UPDATE tb_registrasi_akun SET nama=$1 WHERE email=$2`, [toTitleCase(b.nama), u.email]);
       }
       
       // Update session
@@ -382,14 +382,14 @@ router.post('/form', requireSantriAuth, refreshSantriSession, upload.fields([
       req.session.user.name = toTitleCase(b.nama);
     } else {
       // INSERT - gunakan nama dari form (b.nama)
-      const insertResult = await pool.query(`INSERT INTO tb_santri (nama, jk, email, wa, pernah_mondok, lulus_muballigh, kelurahan, kecamatan, kota_kab, provinsi, kelompok, desa, daerah, no_ki, kampus, prodi, jenjang, angkatan, ayah_nama, ayah_pekerjaan, ayah_penghasilan, ayah_hp, ibu_nama, ibu_pekerjaan, ibu_penghasilan, ibu_hp, foto_path, kk_path, ktp_path, sertifikat_path, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, NOW()) RETURNING id`,
+      const insertResult = await pool.query(`INSERT INTO tb_biodata_santri (nama, jk, email, wa, pernah_mondok, lulus_muballigh, kelurahan, kecamatan, kota_kab, provinsi, kelompok, desa, daerah, no_ki, kampus, prodi, jenjang, angkatan, ayah_nama, ayah_pekerjaan, ayah_penghasilan, ayah_hp, ibu_nama, ibu_pekerjaan, ibu_penghasilan, ibu_hp, foto_path, kk_path, ktp_path, sertifikat_path, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, NOW()) RETURNING id`,
       [toTitleCase(b.nama), b.jk, u.email, normPhone(b.wa), b.pernah_mondok === 'true', b.lulus_muballigh === 'true', b.kelurahan, b.kecamatan, b.kota_kab, b.provinsi, b.kelompok, b.desa, b.daerah, b.no_ki, b.kampus, b.prodi, b.jenjang, b.angkatan, b.ayah_nama, '', '', normPhone(b.ayah_hp), b.ibu_nama, '', '', normPhone(b.ibu_hp), fotoPath, kkPath, ktpPath, sertifikatPath]);
       
-      // Update nama di tb_akun_santri juga (dan password jika ada)
+      // Update nama di tb_registrasi_akun juga (dan password jika ada)
       if (b.password) {
-        await pool.query(`UPDATE tb_akun_santri SET nama=$1, passhash=$2 WHERE email=$3`, [toTitleCase(b.nama), b.password, u.email]);
+        await pool.query(`UPDATE tb_registrasi_akun SET nama=$1, passhash=$2 WHERE email=$3`, [toTitleCase(b.nama), b.password, u.email]);
       } else {
-        await pool.query(`UPDATE tb_akun_santri SET nama=$1 WHERE email=$2`, [toTitleCase(b.nama), u.email]);
+        await pool.query(`UPDATE tb_registrasi_akun SET nama=$1 WHERE email=$2`, [toTitleCase(b.nama), u.email]);
       }
       
       // Set santri_id from newly inserted record dan update session name
@@ -564,7 +564,7 @@ router.get('/info-santri', requireSantriAuth, refreshSantriSession, async (req, 
   
   let cms = {};
   try {
-    const { rows } = await pool.query(`SELECT * FROM tb_info_ppm ORDER BY id LIMIT 1`);
+    const { rows } = await pool.query(`SELECT * FROM tb_informasi ORDER BY id LIMIT 1`);
     if (rows[0]) {
       cms = rows[0];
       // Parse peraturan if it's a JSON string
@@ -615,9 +615,9 @@ router.get('/api/santri-status', async (req, res) => {
       accountRejectedReason: null
     };
     
-    // [FIX] Get fresh ACCOUNT status from tb_akun_santri
+    // [FIX] Get fresh ACCOUNT status from tb_registrasi_akun
     const akunCheck = await pool.query(
-      `SELECT status, alasan_tolak FROM tb_akun_santri WHERE email = $1 LIMIT 1`,
+      `SELECT status, alasan_tolak FROM tb_registrasi_akun WHERE email = $1 LIMIT 1`,
       [email]
     );
     
@@ -630,7 +630,7 @@ router.get('/api/santri-status', async (req, res) => {
     
     // Get fresh biodata status
     const santriCheck = await pool.query(
-      `SELECT id, status_biodata, alasan_tolak FROM tb_santri WHERE email = $1 LIMIT 1`,
+      `SELECT id, status_biodata, alasan_tolak FROM tb_biodata_santri WHERE email = $1 LIMIT 1`,
       [email]
     );
     
@@ -695,7 +695,7 @@ router.get('/edit-akun', requireSantriAuth, async (req, res) => {
   const email = req.session.user.email;
   
   try {
-    const { rows } = await pool.query('SELECT * FROM tb_akun_santri WHERE email = $1', [email]);
+    const { rows } = await pool.query('SELECT * FROM tb_registrasi_akun WHERE email = $1', [email]);
     if (rows.length === 0) {
       return res.redirect('/');
     }
@@ -723,7 +723,7 @@ router.post('/edit-akun', requireSantriAuth, async (req, res) => {
   try {
     // Update data akun dan reset status ke PENDING
     await pool.query(`
-      UPDATE tb_akun_santri 
+      UPDATE tb_registrasi_akun 
       SET nama = $1, wa = $2, kelompok = $3, desa = $4, daerah = $5, 
           kampus = $6, prodi = $7,
           status = 'PENDING', alasan_tolak = NULL
@@ -753,6 +753,76 @@ router.post('/edit-akun', requireSantriAuth, async (req, res) => {
       error: 'Gagal menyimpan perubahan. Silakan coba lagi.',
       success: false
     });
+  }
+});
+
+/* ============================================================
+   API: VIEW STATS - Tracking view count per section (5 tabel terpisah)
+   ============================================================ */
+// Mapping section ke tabel dan kolom
+const tableMapping = {
+  'profil_target': { table: 'tb_profil_target', columns: ['visi', 'misi', 'target_pencapaian'] },
+  'kesantrian_agenda': { table: 'tb_kesantrian_agenda', columns: ['ketentuan', 'tata_tertib', 'mingguan', 'harian', 'bulanan', 'tahunan'] },
+  'alur_administrasi': { table: 'tb_alur_administrasi', columns: ['langkah', 'rincian_biaya'] },
+  'fasilitas_galeri': { table: 'tb_fasilitas_galeri', columns: ['gambar_fasilitas', 'gambar_kegiatan'] },
+  'lokasi_kontak': { table: 'tb_lokasi_kontak', columns: ['peta_ppm', 'kontak_kami'] }
+};
+
+// POST - Increment view count for a section/attribute
+router.post('/api/view-stats', async (req, res) => {
+  const { section, atribut } = req.body;
+  
+  // Validate required fields
+  if (!section || !atribut) {
+    return res.status(400).json({ error: 'section and atribut are required' });
+  }
+  
+  // Validate section and attribute
+  const mapping = tableMapping[section];
+  if (!mapping || !mapping.columns.includes(atribut)) {
+    return res.status(400).json({ error: 'invalid section or atribut' });
+  }
+  
+  try {
+    // Increment view count di tabel yang sesuai
+    const result = await pool.query(`
+      UPDATE ${mapping.table} 
+      SET ${atribut} = ${atribut} + 1, updated_at = NOW() 
+      WHERE id = 1
+      RETURNING ${atribut} as view_count
+    `);
+    
+    res.json({ 
+      success: true, 
+      section, 
+      atribut, 
+      view_count: result.rows[0]?.view_count || 0 
+    });
+  } catch (e) {
+    console.error('[API view-stats] Error:', e.message);
+    res.status(500).json({ error: 'database error' });
+  }
+});
+
+// GET - Get all view stats from all tables
+router.get('/api/view-stats', async (req, res) => {
+  try {
+    const data = {};
+    
+    for (const [section, mapping] of Object.entries(tableMapping)) {
+      const { rows } = await pool.query(`SELECT * FROM ${mapping.table} WHERE id = 1`);
+      if (rows[0]) {
+        data[section] = {};
+        mapping.columns.forEach(col => {
+          data[section][col] = rows[0][col] || 0;
+        });
+      }
+    }
+    
+    res.json({ success: true, data });
+  } catch (e) {
+    console.error('[API view-stats GET] Error:', e.message);
+    res.status(500).json({ error: 'database error' });
   }
 });
 

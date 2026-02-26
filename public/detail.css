@@ -30,6 +30,7 @@ body {
     linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
   background-size: 40px 40px;
   background-attachment: fixed;
+  @media (max-width: 768px) { background-attachment: scroll; }
   color: var(--text);
 }
 
@@ -46,6 +47,7 @@ body {
     linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
   background-size: 40px 40px;
   background-attachment: fixed;
+  @media (max-width: 768px) { background-attachment: scroll; }
   color: var(--text);
 }
 :root[data-theme="light"] .detail-page{

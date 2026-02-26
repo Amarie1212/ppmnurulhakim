@@ -7,7 +7,7 @@ router.get('/', async (req, res) => {
   let cms = {};
   
   try {
-    const { rows } = await pool.query(`SELECT * FROM tb_info_ppm ORDER BY id LIMIT 1`);
+    const { rows } = await pool.query(`SELECT * FROM tb_informasi ORDER BY id LIMIT 1`);
     cms = rows[0] || {};
   } catch (e) {
     console.log('[Home] CMS data error:', e.message);
@@ -24,10 +24,10 @@ router.get('/', async (req, res) => {
       // Get santri_id from session or from database
       let santriId = req.session.user.santri_id;
       
-      // [FIX] Always get FRESH account status from tb_akun_santri
+      // [FIX] Always get FRESH account status from tb_registrasi_akun
       if (req.session.user.email) {
         const akunCheck = await pool.query(
-          `SELECT status, alasan_tolak FROM tb_akun_santri WHERE email = $1 LIMIT 1`,
+          `SELECT status, alasan_tolak FROM tb_registrasi_akun WHERE email = $1 LIMIT 1`,
           [req.session.user.email]
         );
         
@@ -38,10 +38,10 @@ router.get('/', async (req, res) => {
         }
       }
       
-      // Always get FRESH data from tb_santri to check status_biodata
+      // Always get FRESH data from tb_biodata_santri to check status_biodata
       if (req.session.user.email) {
         const santriCheck = await pool.query(
-          `SELECT id, status_biodata, alasan_tolak FROM tb_santri WHERE email = $1 LIMIT 1`,
+          `SELECT id, status_biodata, alasan_tolak FROM tb_biodata_santri WHERE email = $1 LIMIT 1`,
           [req.session.user.email]
         );
         
@@ -104,8 +104,8 @@ router.get('/', async (req, res) => {
   let stat = null;
   if (req.session?.user && ['admin', 'keuangan', 'ketua', 'panitia'].includes(req.session.user.role)) {
     try {
-      const pendingAccount = await pool.query(`SELECT COUNT(*) FROM tb_akun_santri WHERE status = 'PENDING'`);
-      const pendingBiodata = await pool.query(`SELECT COUNT(*) FROM tb_santri WHERE status_biodata = 'PENDING'`);
+      const pendingAccount = await pool.query(`SELECT COUNT(*) FROM tb_registrasi_akun WHERE status = 'PENDING'`);
+      const pendingBiodata = await pool.query(`SELECT COUNT(*) FROM tb_biodata_santri WHERE status_biodata = 'PENDING'`);
       const pendingPayment = await pool.query(`SELECT COUNT(*) FROM tb_pembayaran WHERE status = 'PENDING'`);
       
       stat = {

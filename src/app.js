@@ -46,7 +46,7 @@ const pool = require('./db');
 app.get('/', async (req, res) => {
     let cms = {};
     try {
-        const { rows } = await pool.query(`SELECT * FROM tb_info_ppm ORDER BY id LIMIT 1`);
+        const { rows } = await pool.query(`SELECT * FROM tb_informasi ORDER BY id LIMIT 1`);
         cms = rows[0] || {};
     } catch (e) {
         console.log('[Home] CMS error:', e.message);
@@ -56,7 +56,7 @@ app.get('/', async (req, res) => {
     if (req.session?.user?.role === 'santri' && req.session?.user?.email) {
         try {
             const akunCheck = await pool.query(
-                `SELECT status, alasan_tolak FROM tb_akun_santri WHERE email = $1 LIMIT 1`,
+                `SELECT status, alasan_tolak FROM tb_registrasi_akun WHERE email = $1 LIMIT 1`,
                 [req.session.user.email]
             );
             if (akunCheck.rows.length > 0) {
@@ -66,7 +66,7 @@ app.get('/', async (req, res) => {
             
             // Also refresh biodata status
             const santriCheck = await pool.query(
-                `SELECT id, status_biodata, alasan_tolak FROM tb_santri WHERE email = $1 LIMIT 1`,
+                `SELECT id, status_biodata, alasan_tolak FROM tb_biodata_santri WHERE email = $1 LIMIT 1`,
                 [req.session.user.email]
             );
             if (santriCheck.rows.length > 0) {
@@ -104,8 +104,8 @@ app.get('/', async (req, res) => {
     let stat = null;
     if (req.session?.user && ['admin', 'keuangan', 'ketua', 'panitia'].includes(req.session.user.role)) {
         try {
-            const pendingAccount = await pool.query(`SELECT COUNT(*) FROM tb_akun_santri WHERE status = 'PENDING'`);
-            const pendingBiodata = await pool.query(`SELECT COUNT(*) FROM tb_santri WHERE status_biodata = 'PENDING'`);
+            const pendingAccount = await pool.query(`SELECT COUNT(*) FROM tb_registrasi_akun WHERE status = 'PENDING'`);
+            const pendingBiodata = await pool.query(`SELECT COUNT(*) FROM tb_biodata_santri WHERE status_biodata = 'PENDING'`);
             const pendingPayment = await pool.query(`SELECT COUNT(*) FROM tb_pembayaran WHERE status = 'PENDING'`);
             
             stat = {
